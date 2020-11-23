@@ -1,4 +1,4 @@
-from grafanalib.core import Dashboard, Graph, Row, YAxes, YAxis, DURATION_FORMAT, SHORT_FORMAT, single_y_axis
+from grafanalib.core import Dashboard, Graph, Row, YAxes, YAxis, MILLISECONDS_FORMAT, SHORT_FORMAT, single_y_axis
 from grafanalib.influxdb import InfluxDBTarget
 
 MEASUREMENT = "cloudwatch_aws_lambda"
@@ -39,40 +39,40 @@ def lambda_cron_graph_generate(name: str, dataSource: str, alert: bool, *args, *
       )
   ]
 
-  # yAxes=YAxes(
-  #     YAxis(format=DURATION_FORMAT, decimals=2),
-  #     YAxis(format=SHORT_FORMAT, decimals=2)
-  # )
+  yAxes=YAxes(
+      YAxis(format=MILLISECONDS_FORMAT, decimals=2),
+      YAxis(format=SHORT_FORMAT, decimals=2)
+  )
 
-  # seriesOverrides = [
-  #     {
-  #       "alias": "/Duration.+/",
-  #       "stack": False
-  #     },
-  #     {
-  #       "alias": DURATION_MINIMUM_ALIAS,
-  #       "color": "#C8F2C2",
-  #       "lines": False
-  #     },
-  #     {
-  #       "alias": DURATION_AVERGAE_ALIAS,
-  #       "color": "#FADE2A",
-  #       "fill": 0
-  #     },
-  #     {
-  #       "alias": DURATION_MAXIMUM_ALIAS,
-  #       "color": "rgb(77, 159, 179)",
-  #       "fillBelowTo": DURATION_MINIMUM_ALIAS,
-  #       "lines": False
-  #     }
-  # ]
+  seriesOverrides = [
+      {
+        "alias": "/Duration.+/",
+        "stack": False
+      },
+      {
+        "alias": DURATION_MINIMUM_ALIAS,
+        "color": "#C8F2C2",
+        "lines": False
+      },
+      {
+        "alias": DURATION_AVERGAE_ALIAS,
+        "color": "#FADE2A",
+        "fill": 0
+      },
+      {
+        "alias": DURATION_MAXIMUM_ALIAS,
+        "color": "rgb(77, 159, 179)",
+        "fillBelowTo": DURATION_MINIMUM_ALIAS,
+        "lines": False
+      }
+  ]
 
   return Graph(
     title = name,
     dataSource = dataSource,
     targets=targets,
-    # seriesOverrides=seriesOverrides,
-    # yAxes=yAxes,
+    seriesOverrides=seriesOverrides,
+    yAxes=yAxes,
     transparent=True,
     editable=False
   ).auto_ref_ids()
@@ -82,4 +82,9 @@ def lambda_cron_dashboard(name: str, dataSource: str, alert: bool, *args, **kwar
   '''
   Generate lambda dashboard for cron
   '''
-  return Dashboard(title=name, rows=[Row(panels=[lambda_cron_graph_generate(name, dataSource, alert)])]).auto_panel_ids()
+  return Dashboard(
+    title=name,
+    editable=False,
+    rows=[
+      Row(panels=[lambda_cron_graph_generate(name, dataSource, alert)])
+    ]).auto_panel_ids()
