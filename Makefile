@@ -10,4 +10,4 @@ init:
 	@pip install -r requirements.txt
 
 fmt:
-	@black *.py
+	@black **/*.py

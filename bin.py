@@ -17,9 +17,7 @@ def parse_options():
     parser.add_argument(
         "--environment", type=str, required=True, help="Environment name"
     )
-    parser.add_argument(
-        "--dataSource", type=str, required=True, help="Datasource name"
-    )
+    parser.add_argument("--dataSource", type=str, required=True, help="Datasource name")
     parser.add_argument("--alert", type=bool, default=True, help="Create alert")
 
     subparsers = parser.add_subparsers(dest="service")
@@ -56,6 +54,7 @@ def main():
     # print(dir(args))
     dashboard = lambda_cron_dashboard(**args.__dict__)
     print(json.dumps(dashboard.to_json_data(), cls=DashboardEncoder))
+
 
 if __name__ == "__main__":
     main()
