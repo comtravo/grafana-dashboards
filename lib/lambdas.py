@@ -1,18 +1,26 @@
 from grafanalib.core import (
+    Alert,
+    AlertCondition,
     Dashboard,
     Graph,
+    GreaterThan,
+    MILLISECONDS_FORMAT,
+    OP_AND,
+    RTYPE_MAX,
+    SHORT_FORMAT,
+    TimeRange,
     Row,
+    Target,
     YAxes,
     YAxis,
-    MILLISECONDS_FORMAT,
-    SHORT_FORMAT,
-    single_y_axis,
 )
 from grafanalib.influxdb import InfluxDBTarget
 
 MEASUREMENT = "cloudwatch_aws_lambda"
 RETENTION_POLICY = "autogen"
 RAW_QUERY = True
+
+ALERT_REF_ID = "A"
 
 DURATION_MINIMUM_ALIAS = "Duration - Minimum"
 DURATION_AVERGAE_ALIAS = "Duration - Average"
@@ -28,8 +36,8 @@ def dispatcher(service, trigger, *args, **kwargs):
     pass
 
 
-def lambda_cron_graph_generate(
-    name: str, dataSource: str, alert: bool, *args, **kwargs
+def lambda_generate_graph(
+    name: str, dataSource: str, create_alert: bool, *args, **kwargs
 ):
     """
     Generate lambda cron graph
@@ -70,7 +78,7 @@ def lambda_cron_graph_generate(
                 RETENTION_POLICY, MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
-            refId="A",
+            refId=ALERT_REF_ID,
         ),
     ]
 
@@ -106,6 +114,25 @@ def lambda_cron_graph_generate(
         },
     ]
 
+    alert = None
+
+    if create_alert:
+        alert = Alert(
+            name="{} Invocation Errors".format(name),
+            message="{} is having invocation errors".format(name),
+            noDataState="alerting",
+            executionErrorState="alerting",
+            alertConditions=[
+                AlertCondition(
+                    Target(refId=ALERT_REF_ID),
+                    timeRange=TimeRange("5m", "now"),
+                    evaluator=GreaterThan(0),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_AND,
+                )
+            ],
+        )
+
     return Graph(
         title=name,
         dataSource=dataSource,
@@ -114,6 +141,7 @@ def lambda_cron_graph_generate(
         yAxes=yAxes,
         transparent=True,
         editable=False,
+        alert=alert,
     ).auto_ref_ids()
 
 
@@ -127,5 +155,7 @@ def lambda_cron_dashboard(
         title=name,
         editable=False,
         tags=["lambda", "cron", environment],
-        rows=[Row(panels=[lambda_cron_graph_generate(name, dataSource, alert)])],
+        rows=[
+            Row(panels=[lambda_generate_graph(name, dataSource, create_alert=alert)])
+        ],
     ).auto_panel_ids()
