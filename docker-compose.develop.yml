@@ -1,0 +1,20 @@
+# vim: set ts=2 sw=2 sts=2 et :
+
+version: '2.2'
+
+services:
+  # grafana:
+  #   environment:
+  #     GF_SERVER_ROOT_URL: 'http://localhost:3000'
+  #     GF_SECURITY_ADMIN_PASSWORD: 'admin'
+  #     GF_AUTH_DISABLE_LOGIN_FORM: 'false'
+  #     GF_AUTH_BASIC_ENABLED: 'true'
+  #     GF_LOG_LEVEL: 'info'
+  #   volumes:
+  #     - .:/opt/ct
+  #   ports:
+  #     - 3000:3000
+  grafana_dashboard_generator:
+    volumes:
+      - .:/opt/ct
+    working_dir: /opt/ct
