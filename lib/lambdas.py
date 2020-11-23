@@ -65,7 +65,7 @@ def lambda_cron_graph_generate(
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
-            alias=INVOCATIONS_ALIAS,
+            alias=ERRORS_ALIAS,
             query='SELECT max("errors_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') GROUP BY time(1m) fill(null)'.format(
                 RETENTION_POLICY, MEASUREMENT, name
             ),
