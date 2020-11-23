@@ -78,7 +78,7 @@ def lambda_generate_graph(
                 RETENTION_POLICY, MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
-            refId=ALERT_REF_ID,
+            refId=ALERT_REF_ID if create_alert else None,
         ),
     ]
 
