@@ -53,7 +53,8 @@ def main():
     """
     args = parse_options()
     # print(args)
-    dashboard = lambda_cron_dashboard(name=args.name, dataSource=args.dataSource, alert=args.alert)
+    # print(dir(args))
+    dashboard = lambda_cron_dashboard(**args.__dict__)
     print(json.dumps(dashboard.to_json_data(), cls=DashboardEncoder))
 
 if __name__ == "__main__":

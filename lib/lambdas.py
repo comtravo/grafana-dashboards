@@ -78,13 +78,14 @@ def lambda_cron_graph_generate(name: str, dataSource: str, alert: bool, *args, *
   ).auto_ref_ids()
 
 
-def lambda_cron_dashboard(name: str, dataSource: str, alert: bool, *args, **kwargs):
+def lambda_cron_dashboard(name: str, dataSource: str, alert: bool, environment: str, *args, **kwargs):
   '''
   Generate lambda dashboard for cron
   '''
   return Dashboard(
     title=name,
     editable=False,
+    tags = ["lambda", "cron", environment],
     rows=[
       Row(panels=[lambda_cron_graph_generate(name, dataSource, alert)])
     ]).auto_panel_ids()
