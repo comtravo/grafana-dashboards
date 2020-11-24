@@ -64,7 +64,8 @@ def main():
     # print(args)
     # exit(0)
     dashboard = dispatch[args.service](**args.__dict__)
-    print(json.dumps(dashboard.to_json_data(), cls=DashboardEncoder))
+    dashboard_json = json.dumps(dashboard.to_json_data(), cls=DashboardEncoder)
+    print(dashboard_json)
 
 
 if __name__ == "__main__":
