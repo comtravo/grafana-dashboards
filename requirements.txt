@@ -1,2 +1,2 @@
-grafanalib
 black
+grafanalib==0.5.8

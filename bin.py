@@ -38,9 +38,8 @@ def parse_options():
     lambda_sns_triggers = lambda_function_sub_parser.add_parser(
         "sns", help="Lambda is triggered by SNS"
     )
-    lambda_sns_triggers.add_argument(
-        "--topics", type=list, help="List of SNS topics", required=True
-    )
+    lambda_sns_triggers.add_argument("--topics", type=list, help="List of SNS topics", required=True
+                     )
 
     return parser.parse_args()
 
@@ -50,8 +49,6 @@ def main():
     main
     """
     args = parse_options()
-    # print(args)
-    # print(dir(args))
     dashboard = lambda_cron_dashboard(**args.__dict__)
     print(json.dumps(dashboard.to_json_data(), cls=DashboardEncoder))
 
