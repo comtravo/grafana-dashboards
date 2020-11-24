@@ -1,0 +1,3 @@
+TIMEZONE = ""
+SHARED_CROSSHAIR = True
+EDITABLE = False

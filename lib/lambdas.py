@@ -17,8 +17,11 @@ from grafanalib.core import (
 from grafanalib.influxdb import InfluxDBTarget
 
 from lib.annotations import get_release_annotations
+from lib.commons import EDITABLE, SHARED_CROSSHAIR, TIMEZONE
 from lib.templating import get_release_template
 from lib import colors
+
+from typing import List
 
 MEASUREMENT = "cloudwatch_aws_lambda"
 RETENTION_POLICY = "autogen"
@@ -42,9 +45,9 @@ def dispatcher(service, trigger, *args, **kwargs):
         raise Exception("Lambda dispatcher recieved a non lambda call")
 
     dispatch = {
-        "cognito": lambda_cron_dashboard,
+        "cognito": lambda_cognito_dashboard,
         "cron": lambda_cron_dashboard,
-        "events": lambda_cron_dashboard,
+        "events": lambda_events_dashboard,
         "logs": lambda_cron_dashboard,
     }
 
@@ -155,25 +158,66 @@ def lambda_generate_graph(
         seriesOverrides=seriesOverrides,
         yAxes=yAxes,
         transparent=True,
-        editable=False,
+        editable=EDITABLE,
         alert=alert,
     ).auto_ref_ids()
 
 
-def lambda_cron_dashboard(
-    name: str, data_source: str, alert: bool, environment: str, *args, **kwargs
-):
+def lambda_cron_dashboard(*args, **kwargs):
     """
     Generate lambda dashboard for cron
     """
+    tags = ["cron"]
+    return create_lambda_only_dashboard(tags, *args, **kwargs)
+
+
+def lambda_cognito_dashboard(*args, **kwargs):
+    """
+    Generate lambda dashboard for Cognito
+    """
+    tags = ["cognito"]
+    return create_lambda_only_dashboard(tags, *args, **kwargs)
+
+
+def lambda_events_dashboard(*args, **kwargs):
+    """
+    Generate lambda dashboard for Cloudwatch Events
+    """
+    tags = ["cloudwatch events"]
+    return create_lambda_only_dashboard(tags, *args, **kwargs)
+
+
+def lambda_logs_dashboard(*args, **kwargs):
+    """
+    Generate lambda dashboard for Cloudwatch Logs
+    """
+    tags = ["cloudwatch logs"]
+    return create_lambda_only_dashboard(tags, *args, **kwargs)
+
+
+def create_lambda_only_dashboard(
+    tags: List[str],
+    name: str,
+    data_source: str,
+    alert: bool,
+    environment: str,
+    *args,
+    **kwargs
+):
+    """Create a dashboard with just the lambda
+
+    Args:
+        tags (list): List of tags to apply to the dasboard
+    """
+
     return Dashboard(
         title=name,
-        editable=False,
+        editable=EDITABLE,
         annotations=get_release_annotations(data_source),
         templating=get_release_template(data_source),
-        tags=["lambda", "cron", environment],
-        timezone="",
-        sharedCrosshair=True,
+        tags=tags + ["lambda", environment],
+        timezone=TIMEZONE,
+        sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
             Row(panels=[lambda_generate_graph(name, data_source, create_alert=alert)])
         ],
