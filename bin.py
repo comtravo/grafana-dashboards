@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from lib import DashboardEncoder
-from lib.lambdas import lambda_cron_dashboard
+from lib.lambdas import dispatcher as lambda_dispatcher
 import argparse
 import json
 
@@ -17,7 +17,9 @@ def parse_options():
     parser.add_argument(
         "--environment", type=str, required=True, help="Environment name"
     )
-    parser.add_argument("--data_source", type=str, required=True, help="Datasource name")
+    parser.add_argument(
+        "--data_source", type=str, required=True, help="Datasource name"
+    )
     parser.add_argument("--alert", type=bool, default=True, help="Create alert")
 
     subparsers = parser.add_subparsers(dest="service")
@@ -38,8 +40,9 @@ def parse_options():
     lambda_sns_triggers = lambda_function_sub_parser.add_parser(
         "sns", help="Lambda is triggered by SNS"
     )
-    lambda_sns_triggers.add_argument("--topics", type=list, help="List of SNS topics", required=True
-                     )
+    lambda_sns_triggers.add_argument(
+        "--topics", type=list, help="List of SNS topics", required=True
+    )
 
     return parser.parse_args()
 
@@ -49,7 +52,9 @@ def main():
     main
     """
     args = parse_options()
-    dashboard = lambda_cron_dashboard(**args.__dict__)
+
+    dispatch = {"lambda": lambda_dispatcher}
+    dashboard = dispatch[args.service](**args.__dict__)
     print(json.dumps(dashboard.to_json_data(), cls=DashboardEncoder))
 
 

@@ -37,7 +37,13 @@ def dispatcher(service, trigger, *args, **kwargs):
     """
     lambda dashboard generator
     """
-    pass
+
+    if service != "lambda":
+        raise Exception("Lambda dispatcher recieved a non lambda call")
+
+    dispatch = {"cron": lambda_cron_dashboard}
+
+    return dispatch[trigger](**kwargs)
 
 
 def lambda_generate_graph(
