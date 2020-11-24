@@ -17,7 +17,7 @@ def parse_options():
     parser.add_argument(
         "--environment", type=str, required=True, help="Environment name"
     )
-    parser.add_argument("--dataSource", type=str, required=True, help="Datasource name")
+    parser.add_argument("--data_source", type=str, required=True, help="Datasource name")
     parser.add_argument("--alert", type=bool, default=True, help="Create alert")
 
     subparsers = parser.add_subparsers(dest="service")

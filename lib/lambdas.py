@@ -16,6 +16,8 @@ from grafanalib.core import (
 )
 from grafanalib.influxdb import InfluxDBTarget
 
+from lib.annotations import get_release_annotations
+
 MEASUREMENT = "cloudwatch_aws_lambda"
 RETENTION_POLICY = "autogen"
 RAW_QUERY = True
@@ -37,7 +39,7 @@ def dispatcher(service, trigger, *args, **kwargs):
 
 
 def lambda_generate_graph(
-    name: str, dataSource: str, create_alert: bool, *args, **kwargs
+    name: str, data_source: str, create_alert: bool, *args, **kwargs
 ):
     """
     Generate lambda cron graph
@@ -135,7 +137,7 @@ def lambda_generate_graph(
 
     return Graph(
         title=name,
-        dataSource=dataSource,
+        dataSource=data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
         yAxes=yAxes,
@@ -146,7 +148,7 @@ def lambda_generate_graph(
 
 
 def lambda_cron_dashboard(
-    name: str, dataSource: str, alert: bool, environment: str, *args, **kwargs
+    name: str, data_source: str, alert: bool, environment: str, *args, **kwargs
 ):
     """
     Generate lambda dashboard for cron
@@ -154,8 +156,9 @@ def lambda_cron_dashboard(
     return Dashboard(
         title=name,
         editable=False,
+        annotations=get_release_annotations(data_source),
         tags=["lambda", "cron", environment],
         rows=[
-            Row(panels=[lambda_generate_graph(name, dataSource, create_alert=alert)])
+            Row(panels=[lambda_generate_graph(name, data_source, create_alert=alert)])
         ],
     ).auto_panel_ids()
