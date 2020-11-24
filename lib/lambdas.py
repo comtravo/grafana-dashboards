@@ -19,8 +19,11 @@ from grafanalib.influxdb import InfluxDBTarget
 
 from lib.annotations import get_release_annotations
 from lib.commons import (
+    ALERT_REF_ID,
     ALERT_THRESHOLD,
     EDITABLE,
+    RAW_QUERY,
+    RETENTION_POLICY,
     SHARED_CROSSHAIR,
     TIMEZONE,
     TRANSPARENT,
@@ -30,17 +33,14 @@ from lib import colors
 
 from typing import List
 
-MEASUREMENT = "cloudwatch_aws_lambda"
-RETENTION_POLICY = "autogen"
-RAW_QUERY = True
+LAMBDA_MEASUREMENT = "cloudwatch_aws_lambda"
 
-ALERT_REF_ID = "A"
 
 DURATION_MINIMUM_ALIAS = "Duration - Minimum"
 DURATION_AVERGAE_ALIAS = "Duration - Average"
 DURATION_MAXIMUM_ALIAS = "Duration - Maximum"
-INVOCATIONS_ALIAS = "Invocations - Sum"
-ERRORS_ALIAS = "Errors - Sum"
+LAMBDA_INVOCATIONS_ALIAS = "Invocations - Sum"
+LAMBDA_ERRORS_ALIAS = "Errors - Sum"
 
 
 def dispatcher(service, trigger, *args, **kwargs):
@@ -73,35 +73,35 @@ def lambda_generate_graph(
         InfluxDBTarget(
             alias=DURATION_MINIMUM_ALIAS,
             query='SELECT min("duration_minimum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') GROUP BY time(5m) fill(null)'.format(
-                RETENTION_POLICY, MEASUREMENT, name
+                RETENTION_POLICY, LAMBDA_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=DURATION_AVERGAE_ALIAS,
             query='SELECT mean("duration_average") FROM "{}"."{}" WHERE ("function_name" = \'{}\') GROUP BY time(5m) fill(null)'.format(
-                RETENTION_POLICY, MEASUREMENT, name
+                RETENTION_POLICY, LAMBDA_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=DURATION_MAXIMUM_ALIAS,
             query='SELECT max("duration_maximum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') GROUP BY time(5m) fill(null)'.format(
-                RETENTION_POLICY, MEASUREMENT, name
+                RETENTION_POLICY, LAMBDA_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
-            alias=INVOCATIONS_ALIAS,
+            alias=LAMBDA_INVOCATIONS_ALIAS,
             query='SELECT max("invocations_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') GROUP BY time(1m) fill(null)'.format(
-                RETENTION_POLICY, MEASUREMENT, name
+                RETENTION_POLICY, LAMBDA_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
-            alias=ERRORS_ALIAS,
+            alias=LAMBDA_ERRORS_ALIAS,
             query='SELECT max("errors_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') GROUP BY time(1m) fill(null)'.format(
-                RETENTION_POLICY, MEASUREMENT, name
+                RETENTION_POLICY, LAMBDA_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
             refId=ALERT_REF_ID if create_alert else None,
@@ -115,7 +115,7 @@ def lambda_generate_graph(
 
     seriesOverrides = [
         {
-            "alias": INVOCATIONS_ALIAS,
+            "alias": LAMBDA_INVOCATIONS_ALIAS,
             "yaxis": 2,
             "lines": False,
             "points": False,
@@ -123,7 +123,7 @@ def lambda_generate_graph(
             "color": colors.GREEN,
         },
         {
-            "alias": ERRORS_ALIAS,
+            "alias": LAMBDA_ERRORS_ALIAS,
             "yaxis": 2,
             "lines": False,
             "points": False,
@@ -283,6 +283,35 @@ def lambda_sqs_dashboard(
     name: str, data_source: str, alert: bool, environment: str, *args, **kwargs
 ):
     """Create a dashboard with Lambda and its SQS dead letter queue"""
+    tags = ["lambda", "sqs", environment]
+
+    lambda_graph = lambda_generate_graph(name, data_source, create_alert=alert)
+    dead_letter_sqs_graph = create_lambda_sqs_graph(
+        name=name + "-dlq", data_source=data_source, create_alert=alert
+    )
+
+    return Dashboard(
+        title=name,
+        editable=EDITABLE,
+        annotations=get_release_annotations(data_source),
+        templating=get_release_template(data_source),
+        tags=tags,
+        timezone=TIMEZONE,
+        sharedCrosshair=SHARED_CROSSHAIR,
+        rows=[Row(panels=[lambda_graph]), Row(panels=[dead_letter_sqs_graph])],
+    ).auto_panel_ids()
+
+
+def lambda_sns_sqs_dashboard(
+    name: str,
+    data_source: str,
+    alert: bool,
+    environment: str,
+    topics: List[str],
+    *args,
+    **kwargs
+):
+    """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment]
 
     lambda_graph = lambda_generate_graph(name, data_source, create_alert=alert)
