@@ -36,6 +36,12 @@ def parse_options():
         "logs", help="Lambda is triggered by Cloudwatch logs"
     )
     lambda_function_sub_parser.add_parser("sqs", help="Lambda is triggered by SQS")
+    lambda_function_sub_parser.add_parser(
+        "events", help="Lambda is triggered by Cloudwatch Events"
+    )
+    lambda_function_sub_parser.add_parser(
+        "cognito", help="Lambda is triggered by Cognito"
+    )
 
     lambda_sns_triggers = lambda_function_sub_parser.add_parser(
         "sns", help="Lambda is triggered by SNS"
