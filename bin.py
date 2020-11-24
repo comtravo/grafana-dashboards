@@ -31,16 +31,16 @@ def parse_options():
 
     lambda_function_sub_parser = lambda_function.add_subparsers(dest="trigger")
     lambda_function_sub_parser.required = True
-    lambda_function_sub_parser.add_parser("cron", help="Lambda is triggered by Cron")
+
     lambda_function_sub_parser.add_parser(
-        "logs", help="Lambda is triggered by Cloudwatch logs"
+        "cognito", help="Lambda is triggered by Cognito"
     )
-    lambda_function_sub_parser.add_parser("sqs", help="Lambda is triggered by SQS")
+    lambda_function_sub_parser.add_parser("cron", help="Lambda is triggered by Cron")
     lambda_function_sub_parser.add_parser(
         "events", help="Lambda is triggered by Cloudwatch Events"
     )
     lambda_function_sub_parser.add_parser(
-        "cognito", help="Lambda is triggered by Cognito"
+        "logs", help="Lambda is triggered by Cloudwatch logs"
     )
 
     lambda_sns_triggers = lambda_function_sub_parser.add_parser(
@@ -49,6 +49,7 @@ def parse_options():
     lambda_sns_triggers.add_argument(
         "--topics", type=list, help="List of SNS topics", required=True
     )
+    lambda_function_sub_parser.add_parser("sqs", help="Lambda is triggered by SQS")
 
     return parser.parse_args()
 

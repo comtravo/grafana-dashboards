@@ -41,7 +41,12 @@ def dispatcher(service, trigger, *args, **kwargs):
     if service != "lambda":
         raise Exception("Lambda dispatcher recieved a non lambda call")
 
-    dispatch = {"cron": lambda_cron_dashboard}
+    dispatch = {
+        "cognito": lambda_cron_dashboard,
+        "cron": lambda_cron_dashboard,
+        "events": lambda_cron_dashboard,
+        "logs": lambda_cron_dashboard,
+    }
 
     return dispatch[trigger](**kwargs)
 
