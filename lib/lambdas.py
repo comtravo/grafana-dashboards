@@ -7,6 +7,7 @@ from grafanalib.core import (
     MILLISECONDS_FORMAT,
     OP_AND,
     RTYPE_MAX,
+    single_y_axis,
     SHORT_FORMAT,
     TimeRange,
     Row,
@@ -17,7 +18,13 @@ from grafanalib.core import (
 from grafanalib.influxdb import InfluxDBTarget
 
 from lib.annotations import get_release_annotations
-from lib.commons import EDITABLE, SHARED_CROSSHAIR, TIMEZONE
+from lib.commons import (
+    ALERT_THRESHOLD,
+    EDITABLE,
+    SHARED_CROSSHAIR,
+    TIMEZONE,
+    TRANSPARENT,
+)
 from lib.templating import get_release_template
 from lib import colors
 
@@ -49,6 +56,7 @@ def dispatcher(service, trigger, *args, **kwargs):
         "cron": lambda_cron_dashboard,
         "events": lambda_events_dashboard,
         "logs": lambda_cron_dashboard,
+        "sqs": lambda_sqs_dashboard,
     }
 
     return dispatch[trigger](**kwargs)
@@ -157,9 +165,10 @@ def lambda_generate_graph(
         targets=targets,
         seriesOverrides=seriesOverrides,
         yAxes=yAxes,
-        transparent=True,
+        transparent=TRANSPARENT,
         editable=EDITABLE,
         alert=alert,
+        alertThreshold=ALERT_THRESHOLD,
     ).auto_ref_ids()
 
 
@@ -221,4 +230,73 @@ def create_lambda_only_dashboard(
         rows=[
             Row(panels=[lambda_generate_graph(name, data_source, create_alert=alert)])
         ],
+    ).auto_panel_ids()
+
+
+def create_lambda_sqs_graph(name: str, data_source: str, create_alert: bool):
+    """Create SQS graph"""
+
+    targets = [
+        InfluxDBTarget(
+            alias="Approximate number of messages available",
+            query='SELECT max("approximate_number_of_messages_visible_maximum") FROM "{}"."cloudwatch_aws_sqs" WHERE ("queue_name" = \'{}\') GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, name
+            ),
+            rawQuery=RAW_QUERY,
+            refId=ALERT_REF_ID if create_alert else None,
+        )
+    ]
+
+    yAxes = single_y_axis(format=SHORT_FORMAT)
+    alert = None
+
+    if create_alert:
+        alert = Alert(
+            name="{} messages".format(name),
+            message="{} is having messages".format(name),
+            noDataState="alerting",
+            executionErrorState="alerting",
+            alertConditions=[
+                AlertCondition(
+                    Target(refId=ALERT_REF_ID),
+                    timeRange=TimeRange("5m", "now"),
+                    evaluator=GreaterThan(0),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_AND,
+                )
+            ],
+        )
+
+    return Graph(
+        title=name,
+        dataSource=data_source,
+        targets=targets,
+        yAxes=yAxes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        alert=alert,
+        alertThreshold=ALERT_THRESHOLD,
+    ).auto_ref_ids()
+
+
+def lambda_sqs_dashboard(
+    name: str, data_source: str, alert: bool, environment: str, *args, **kwargs
+):
+    """Create a dashboard with Lambda and its SQS dead letter queue"""
+    tags = ["lambda", "sqs", environment]
+
+    lambda_graph = lambda_generate_graph(name, data_source, create_alert=alert)
+    dead_letter_sqs_graph = create_lambda_sqs_graph(
+        name=name + "-dlq", data_source=data_source, create_alert=alert
+    )
+
+    return Dashboard(
+        title=name,
+        editable=EDITABLE,
+        annotations=get_release_annotations(data_source),
+        templating=get_release_template(data_source),
+        tags=tags,
+        timezone=TIMEZONE,
+        sharedCrosshair=SHARED_CROSSHAIR,
+        rows=[Row(panels=[lambda_graph]), Row(panels=[dead_letter_sqs_graph])],
     ).auto_panel_ids()
