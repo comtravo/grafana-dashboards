@@ -215,11 +215,7 @@ def create_lambda_only_dashboard(
     *args,
     **kwargs
 ):
-    """Create a dashboard with just the lambda
-
-    Args:
-        tags (list): List of tags to apply to the dasboard
-    """
+    """Create a dashboard with just the lambda"""
 
     return Dashboard(
         title=name,

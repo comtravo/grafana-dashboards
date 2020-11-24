@@ -2,11 +2,7 @@ from grafanalib.core import Templating
 
 
 def get_release_template(data_source: str):
-    """Get templating for release
-
-    Args:
-        data_source (str): Data source to populate the release variable
-    """
+    """Get templating for release"""
 
     return Templating(
         [

@@ -4,11 +4,7 @@ from lib import colors
 
 
 def get_release_annotations(data_source: str):
-    """Generate release annotations
-
-    Args:
-        data_source (str): data source to find annotations in
-    """
+    """Generate release annotations"""
 
     return Annotations(
         [
