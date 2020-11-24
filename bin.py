@@ -20,7 +20,7 @@ def parse_options():
     parser.add_argument(
         "--data_source", type=str, required=True, help="Datasource name"
     )
-    parser.add_argument("--alert", type=bool, default=True, help="Create alert")
+    parser.add_argument("--alert", action="store_true", help="Create alert")
 
     subparsers = parser.add_subparsers(dest="service")
     subparsers.required = True
