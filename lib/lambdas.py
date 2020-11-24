@@ -28,6 +28,7 @@ from lib.commons import (
     TIMEZONE,
     TRANSPARENT,
 )
+from lib.sns import create_lambda_sns_graph
 from lib.templating import get_release_template
 from lib import colors
 
@@ -57,6 +58,7 @@ def dispatcher(service, trigger, *args, **kwargs):
         "events": lambda_events_dashboard,
         "logs": lambda_cron_dashboard,
         "sqs": lambda_sqs_dashboard,
+        "sns": lambda_sns_sqs_dashboard,
     }
 
     return dispatch[trigger](**kwargs)
@@ -319,6 +321,11 @@ def lambda_sns_sqs_dashboard(
         name=name + "-dlq", data_source=data_source, create_alert=alert
     )
 
+    sns_topic_panels = [
+        create_lambda_sns_graph(name=topic, data_source=data_source, create_alert=True)
+        for topic in topics
+    ]
+
     return Dashboard(
         title=name,
         editable=EDITABLE,
@@ -327,5 +334,9 @@ def lambda_sns_sqs_dashboard(
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
-        rows=[Row(panels=[lambda_graph]), Row(panels=[dead_letter_sqs_graph])],
+        rows=[
+            Row(panels=sns_topic_panels),
+            Row(panels=[lambda_graph]),
+            Row(panels=[dead_letter_sqs_graph]),
+        ],
     ).auto_panel_ids()

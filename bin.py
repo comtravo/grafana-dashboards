@@ -47,7 +47,7 @@ def parse_options():
         "sns", help="Lambda is triggered by SNS"
     )
     lambda_sns_triggers.add_argument(
-        "--topics", type=list, help="List of SNS topics", required=True
+        "--topics", nargs="+", help="List of SNS topics", required=True
     )
     lambda_function_sub_parser.add_parser("sqs", help="Lambda is triggered by SQS")
 
@@ -61,6 +61,8 @@ def main():
     args = parse_options()
 
     dispatch = {"lambda": lambda_dispatcher}
+    # print(args)
+    # exit(0)
     dashboard = dispatch[args.service](**args.__dict__)
     print(json.dumps(dashboard.to_json_data(), cls=DashboardEncoder))
 
