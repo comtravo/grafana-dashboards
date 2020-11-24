@@ -17,6 +17,8 @@ from grafanalib.core import (
 from grafanalib.influxdb import InfluxDBTarget
 
 from lib.annotations import get_release_annotations
+from lib.templating import get_release_template
+from lib import colors
 
 MEASUREMENT = "cloudwatch_aws_lambda"
 RETENTION_POLICY = "autogen"
@@ -96,7 +98,7 @@ def lambda_generate_graph(
             "lines": False,
             "points": False,
             "bars": True,
-            "color": "#37872D",
+            "color": colors.GREEN,
         },
         {
             "alias": ERRORS_ALIAS,
@@ -104,7 +106,7 @@ def lambda_generate_graph(
             "lines": False,
             "points": False,
             "bars": True,
-            "color": "#C4162A",
+            "color": colors.RED,
         },
         {"alias": DURATION_MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
         {"alias": DURATION_AVERGAE_ALIAS, "color": "#FADE2A", "fill": 0},
@@ -157,7 +159,10 @@ def lambda_cron_dashboard(
         title=name,
         editable=False,
         annotations=get_release_annotations(data_source),
+        templating=get_release_template(data_source),
         tags=["lambda", "cron", environment],
+        timezone="",
+        sharedCrosshair=True,
         rows=[
             Row(panels=[lambda_generate_graph(name, data_source, create_alert=alert)])
         ],
