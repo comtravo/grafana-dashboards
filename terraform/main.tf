@@ -5,10 +5,10 @@ provider "grafana" {
 
 locals {
   sfn = {
-    name = "sfn-gateway-prod"
+    name        = "sfn-gateway-prod"
     environment = "prod"
     data_source = "prod"
-    topics = ["lambda-elasticsearch-booking-prod", "lambda-pretty-mail-payment-prod", "lambda-offer-created-prod"]
+    topics      = ["lambda-elasticsearch-booking-prod", "lambda-pretty-mail-payment-prod", "lambda-offer-created-prod"]
   }
 }
 
@@ -29,7 +29,7 @@ resource "null_resource" "sfn" {
 
   provisioner "local-exec" {
     working_dir = ".."
-    command = "python bin.py --name ${local.sfn.name} --environment ${local.sfn.environment}  --data_source ${local.sfn.data_source} --alert lambda sns --topics ${join(" ", local.sfn.topics)} > terraform/dashboard.json"
+    command     = "python bin.py --name ${local.sfn.name} --environment ${local.sfn.environment}  --data_source ${local.sfn.data_source} --alert lambda sns --topics ${join(" ", local.sfn.topics)} > terraform/dashboard.json"
   }
 
   triggers = {
@@ -38,7 +38,7 @@ resource "null_resource" "sfn" {
 }
 
 data "local_file" "dashboard" {
-  filename = "dashboard.json"
+  filename   = "dashboard.json"
   depends_on = [null_resource.sfn]
 }
 

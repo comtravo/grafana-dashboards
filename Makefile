@@ -11,6 +11,7 @@ init:
 
 fmt:
 	@black .
+	@terraform fmt -recursive
 
 lint:
 	@black --check .

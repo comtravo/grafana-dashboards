@@ -74,35 +74,35 @@ def lambda_generate_graph(
     targets = [
         InfluxDBTarget(
             alias=DURATION_MINIMUM_ALIAS,
-            query='SELECT min("duration_minimum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') GROUP BY time(5m) fill(null)'.format(
+            query='SELECT min("duration_minimum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(null)'.format(
                 RETENTION_POLICY, LAMBDA_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=DURATION_AVERGAE_ALIAS,
-            query='SELECT mean("duration_average") FROM "{}"."{}" WHERE ("function_name" = \'{}\') GROUP BY time(5m) fill(null)'.format(
+            query='SELECT mean("duration_average") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(null)'.format(
                 RETENTION_POLICY, LAMBDA_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=DURATION_MAXIMUM_ALIAS,
-            query='SELECT max("duration_maximum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') GROUP BY time(5m) fill(null)'.format(
+            query='SELECT max("duration_maximum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(null)'.format(
                 RETENTION_POLICY, LAMBDA_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=LAMBDA_INVOCATIONS_ALIAS,
-            query='SELECT max("invocations_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') GROUP BY time(1m) fill(null)'.format(
+            query='SELECT max("invocations_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
                 RETENTION_POLICY, LAMBDA_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=LAMBDA_ERRORS_ALIAS,
-            query='SELECT max("errors_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') GROUP BY time(1m) fill(null)'.format(
+            query='SELECT max("errors_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
                 RETENTION_POLICY, LAMBDA_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
@@ -148,7 +148,6 @@ def lambda_generate_graph(
         alert = Alert(
             name="{} Invocation Errors".format(name),
             message="{} is having invocation errors".format(name),
-            noDataState="alerting",
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -237,7 +236,7 @@ def create_lambda_sqs_graph(name: str, data_source: str, create_alert: bool):
     targets = [
         InfluxDBTarget(
             alias="Approximate number of messages available",
-            query='SELECT max("approximate_number_of_messages_visible_maximum") FROM "{}"."cloudwatch_aws_sqs" WHERE ("queue_name" = \'{}\') GROUP BY time(1m) fill(previous)'.format(
+            query='SELECT max("approximate_number_of_messages_visible_maximum") FROM "{}"."cloudwatch_aws_sqs" WHERE ("queue_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
                 RETENTION_POLICY, name
             ),
             rawQuery=RAW_QUERY,
@@ -252,7 +251,6 @@ def create_lambda_sqs_graph(name: str, data_source: str, create_alert: bool):
         alert = Alert(
             name="{} messages".format(name),
             message="{} is having messages".format(name),
-            noDataState="alerting",
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -284,6 +282,9 @@ def lambda_sqs_dashboard(
     tags = ["lambda", "sqs", environment]
 
     lambda_graph = lambda_generate_graph(name, data_source, create_alert=alert)
+    sqs_graph = create_lambda_sqs_graph(
+        name=name, data_source=data_source, create_alert=False
+    )
     dead_letter_sqs_graph = create_lambda_sqs_graph(
         name=name + "-dlq", data_source=data_source, create_alert=alert
     )
@@ -296,7 +297,11 @@ def lambda_sqs_dashboard(
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
-        rows=[Row(panels=[lambda_graph]), Row(panels=[dead_letter_sqs_graph])],
+        rows=[
+            Row(panels=[lambda_graph]),
+            Row(panels=[sqs_graph]),
+            Row(panels=[dead_letter_sqs_graph]),
+        ],
     ).auto_panel_ids()
 
 
@@ -313,6 +318,9 @@ def lambda_sns_sqs_dashboard(
     tags = ["lambda", "sqs", environment]
 
     lambda_graph = lambda_generate_graph(name, data_source, create_alert=alert)
+    sqs_graph = create_lambda_sqs_graph(
+        name=name, data_source=data_source, create_alert=False
+    )
     dead_letter_sqs_graph = create_lambda_sqs_graph(
         name=name + "-dlq", data_source=data_source, create_alert=alert
     )
@@ -333,6 +341,7 @@ def lambda_sns_sqs_dashboard(
         rows=[
             Row(panels=sns_topic_panels),
             Row(panels=[lambda_graph]),
+            Row(panels=[sqs_graph]),
             Row(panels=[dead_letter_sqs_graph]),
         ],
     ).auto_panel_ids()
