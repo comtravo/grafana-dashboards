@@ -3,27 +3,29 @@ provider "grafana" {
   auth = "admin:admin"
 }
 
+
+
+
 locals {
+  # sfn = {
+  #   name        = "sfn-gateway-prod"
+  #   environment = "prod"
+  #   data_source = "prod"
+  #   topics      = ["lambda-elasticsearch-booking-prod", "lambda-pretty-mail-payment-prod", "lambda-offer-created-prod"]
+  # }
   sfn = {
-    name        = "sfn-gateway-prod"
+    name        = "metabase-prod"
     environment = "prod"
     data_source = "prod"
-    topics      = ["lambda-elasticsearch-booking-prod", "lambda-pretty-mail-payment-prod", "lambda-offer-created-prod"]
+    topics = [
+      "lambda-elasticsearch-traveler-prod",
+      "lambda-elasticsearch-company-prod",
+      "lambda-elasticsearch-booking-prod",
+      "lambda-offer-prod",
+      "invoice-correction-prod"
+    ]
   }
 }
-
-# data "external" "sfn" {
-#   working_dir = ".."
-#   program = [
-#     "python", "bin.py",
-#     "--name", "${local.sfn.name}",
-#     "--environment", "${local.sfn.environment}",
-#     "--data_source", "${local.sfn.data_source}",
-#     "--alert",
-#     # "lambda", "sns", "--topics", "${join(" ", local.sfn.topics)}"
-#     "lambda", "sns", "--topics", "lorem"
-#   ]
-# }
 
 resource "null_resource" "sfn" {
 
@@ -45,9 +47,3 @@ data "local_file" "dashboard" {
 resource "grafana_dashboard" "sfn" {
   config_json = data.local_file.dashboard.content
 }
-
-
-
-# resource "grafana_dashboard" "sfn_external" {
-#   config_json = data.external.sfn.result
-# }

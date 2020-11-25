@@ -43,6 +43,8 @@ DURATION_MAXIMUM_ALIAS = "Duration - Maximum"
 LAMBDA_INVOCATIONS_ALIAS = "Invocations - Sum"
 LAMBDA_ERRORS_ALIAS = "Errors - Sum"
 
+LAMBDA_INVOCATION_METRIC_GROUP_BY="1m"
+
 
 def dispatcher(service, trigger, *args, **kwargs):
     """
@@ -68,7 +70,7 @@ def lambda_generate_graph(
     name: str, data_source: str, create_alert: bool, *args, **kwargs
 ):
     """
-    Generate lambda cron graph
+    Generate lambda graph
     """
 
     targets = [
@@ -144,11 +146,13 @@ def lambda_generate_graph(
 
     alert = None
 
+    # https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics.html
     if create_alert:
         alert = Alert(
             name="{} Invocation Errors".format(name),
             message="{} is having invocation errors".format(name),
             executionErrorState="alerting",
+            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
@@ -158,10 +162,11 @@ def lambda_generate_graph(
                     operator=OP_AND,
                 )
             ],
+            gracePeriod="1m"
         )
 
     return Graph(
-        title=name,
+        title="Lambda: {}".format(name),
         dataSource=data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
@@ -247,11 +252,14 @@ def create_lambda_sqs_graph(name: str, data_source: str, create_alert: bool):
     yAxes = single_y_axis(format=SHORT_FORMAT)
     alert = None
 
+    # https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-monitoring-using-cloudwatch.html
+    # https://aws.amazon.com/about-aws/whats-new/2019/12/amazon-sqs-now-supports-1-minute-cloudwatch-metrics/
     if create_alert:
         alert = Alert(
             name="{} messages".format(name),
             message="{} is having messages".format(name),
             executionErrorState="alerting",
+            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
@@ -259,12 +267,13 @@ def create_lambda_sqs_graph(name: str, data_source: str, create_alert: bool):
                     evaluator=GreaterThan(0),
                     reducerType=RTYPE_MAX,
                     operator=OP_AND,
-                )
+                ),
             ],
+            gracePeriod="5m"
         )
 
     return Graph(
-        title=name,
+        title="SQS: {}".format(name),
         dataSource=data_source,
         targets=targets,
         yAxes=yAxes,

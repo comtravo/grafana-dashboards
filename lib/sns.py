@@ -39,7 +39,6 @@ SNS_MEASUREMENT = "cloudwatch_aws_sns"
 SNS_PUBLISHED_NOTIFICATIONS = "Published notifications"
 SNS_DELIVERED_NOTIFICATIONS = "Delivered notifications"
 SNS_FAILED_NOTIFICATIONS = "Failed notifications"
-SNS_ACTIVE_SUBSCRIPTIONS = "Active subscriptions"
 
 
 def create_lambda_sns_graph(name: str, data_source: str, create_alert: bool):
@@ -80,11 +79,6 @@ def create_lambda_sns_graph(name: str, data_source: str, create_alert: bool):
             "alias": SNS_PUBLISHED_NOTIFICATIONS,
             "zindex": 1,
         },
-        {
-            "alias": SNS_ACTIVE_SUBSCRIPTIONS,
-            "hiddenSeries": True,
-            "legend": False,
-        },
     ]
 
     yAxes = single_y_axis(format=SHORT_FORMAT)
@@ -95,6 +89,7 @@ def create_lambda_sns_graph(name: str, data_source: str, create_alert: bool):
 
     alert = None
 
+    # https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html
     if create_alert:
         alert = Alert(
             name="{} alerts".format(name),
@@ -102,6 +97,7 @@ def create_lambda_sns_graph(name: str, data_source: str, create_alert: bool):
                 name
             ),
             executionErrorState="alerting",
+            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
@@ -111,10 +107,11 @@ def create_lambda_sns_graph(name: str, data_source: str, create_alert: bool):
                     operator=OP_OR,
                 ),
             ],
+            gracePeriod="10m",
         )
 
     return Graph(
-        title=name,
+        title="SNS: {}".format(name),
         dataSource=data_source,
         targets=targets,
         yAxes=yAxes,
