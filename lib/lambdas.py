@@ -235,8 +235,8 @@ def create_lambda_only_dashboard(
     ).auto_panel_ids()
 
 
-def create_lambda_sqs_graph(name: str, data_source: str, create_alert: bool):
-    """Create SQS graph"""
+def create_lambda_sqs_dlq_graph(name: str, data_source: str, create_alert: bool):
+    """Create SQS Deadletter graph"""
 
     targets = [
         InfluxDBTarget(
@@ -273,7 +273,7 @@ def create_lambda_sqs_graph(name: str, data_source: str, create_alert: bool):
         )
 
     return Graph(
-        title="SQS: {}".format(name),
+        title="SQS Dead Letter Queue: {}".format(name),
         dataSource=data_source,
         targets=targets,
         yAxes=yAxes,
@@ -281,6 +281,30 @@ def create_lambda_sqs_graph(name: str, data_source: str, create_alert: bool):
         editable=EDITABLE,
         alert=alert,
         alertThreshold=ALERT_THRESHOLD,
+    ).auto_ref_ids()
+
+def create_lambda_sqs_graph(name: str, data_source: str):
+    """Create SQS graph"""
+
+    targets = [
+        InfluxDBTarget(
+            alias="Number of messages sent to the queue",
+            query='SELECT max("number_of_messages_sent_sum") FROM "{}"."cloudwatch_aws_sqs" WHERE ("queue_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
+                RETENTION_POLICY, name
+            ),
+            rawQuery=RAW_QUERY,
+        )
+    ]
+
+    yAxes = single_y_axis(format=SHORT_FORMAT)
+
+    return Graph(
+        title="SQS: {}".format(name),
+        dataSource=data_source,
+        targets=targets,
+        yAxes=yAxes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
     ).auto_ref_ids()
 
 
@@ -292,9 +316,9 @@ def lambda_sqs_dashboard(
 
     lambda_graph = lambda_generate_graph(name, data_source, create_alert=alert)
     sqs_graph = create_lambda_sqs_graph(
-        name=name, data_source=data_source, create_alert=False
+        name=name, data_source=data_source
     )
-    dead_letter_sqs_graph = create_lambda_sqs_graph(
+    dead_letter_sqs_graph = create_lambda_sqs_dlq_graph(
         name=name + "-dlq", data_source=data_source, create_alert=alert
     )
 
@@ -328,9 +352,9 @@ def lambda_sns_sqs_dashboard(
 
     lambda_graph = lambda_generate_graph(name, data_source, create_alert=alert)
     sqs_graph = create_lambda_sqs_graph(
-        name=name, data_source=data_source, create_alert=False
+        name=name, data_source=data_source
     )
-    dead_letter_sqs_graph = create_lambda_sqs_graph(
+    dead_letter_sqs_graph = create_lambda_sqs_dlq_graph(
         name=name + "-dlq", data_source=data_source, create_alert=alert
     )
 

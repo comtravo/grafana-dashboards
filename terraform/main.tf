@@ -7,24 +7,24 @@ provider "grafana" {
 
 
 locals {
-  # sfn = {
-  #   name        = "sfn-gateway-prod"
-  #   environment = "prod"
-  #   data_source = "prod"
-  #   topics      = ["lambda-elasticsearch-booking-prod", "lambda-pretty-mail-payment-prod", "lambda-offer-created-prod"]
-  # }
   sfn = {
-    name        = "metabase-prod"
+    name        = "sfn-gateway-prod"
     environment = "prod"
     data_source = "prod"
-    topics = [
-      "lambda-elasticsearch-traveler-prod",
-      "lambda-elasticsearch-company-prod",
-      "lambda-elasticsearch-booking-prod",
-      "lambda-offer-prod",
-      "invoice-correction-prod"
-    ]
+    topics      = ["lambda-elasticsearch-booking-prod", "lambda-pretty-mail-payment-prod", "lambda-offer-created-prod"]
   }
+  # sfn = {
+  #   name        = "metabase-prod"
+  #   environment = "prod"
+  #   data_source = "prod"
+  #   topics = [
+  #     "lambda-elasticsearch-traveler-prod",
+  #     "lambda-elasticsearch-company-prod",
+  #     "lambda-elasticsearch-booking-prod",
+  #     "lambda-offer-prod",
+  #     "invoice-correction-prod"
+  #   ]
+  # }
 }
 
 resource "null_resource" "sfn" {
