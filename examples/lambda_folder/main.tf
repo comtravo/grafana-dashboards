@@ -28,3 +28,7 @@ module "dashboard" {
     trigger = "cron"
   }
 }
+
+output "op" {
+  value = module.dashboard
+}
