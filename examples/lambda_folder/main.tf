@@ -30,5 +30,5 @@ module "dashboard" {
 }
 
 output "op" {
-  value = module.dashboard
+  value = module.dashboard.output
 }

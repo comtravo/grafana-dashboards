@@ -47,3 +47,10 @@ resource "grafana_dashboard" "this" {
   folder      = var.grafana_configuration.folder
   config_json = data.local_file.dashboard[0].content
 }
+
+output "output" {
+  value = {
+    slug         = try(grafana_dashboard.this[0].slug, "")
+    dashboard_id = try(grafana_dashboard.this[0].dashboard_id, "")
+  }
+}

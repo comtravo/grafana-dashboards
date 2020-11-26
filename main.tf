@@ -39,3 +39,8 @@ module "generate_lambda_dashboard" {
     topics      = try(var.lambda_configuration.topics, [])
   }
 }
+
+output "output" {
+  description = "Dashboard output"
+  value       = module.generate_lambda_dashboard.output
+}
