@@ -31,6 +31,7 @@ lint-go:
 
 clean-state:
 	@find . -type f -name 'terraform.tfstate*' | xargs rm -rf
+	@find . -type f -name 'dashboard.json' | xargs rm -rf
 	@find . -type d -name '.terraform' | xargs rm -rf
 
 generate-docs: fmt-go lint-go

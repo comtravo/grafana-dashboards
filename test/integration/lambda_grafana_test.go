@@ -38,6 +38,19 @@ func TestLambda_noDashboard(t *testing.T) {
 	require.Equal(t, expectedMap, output, "Map %q should match %q", expectedMap, output)
 }
 
+func TestLambda_lambda(t *testing.T) {
+	t.Parallel()
+
+	dashboardName := fmt.Sprintf("lambda-%s", random.UniqueId())
+	exampleDir := "../../examples/lambda_dashboards/lambda/"
+
+	terraformOptions := SetupExample(t, dashboardName, exampleDir)
+	t.Logf("Terraform module inputs: %+v", *terraformOptions)
+	defer terraform.Destroy(t, terraformOptions)
+
+	TerraformApplyAndValidateOutputs(t, terraformOptions)
+}
+
 func SetupExample(t *testing.T, dashboardName string, exampleDir string) *terraform.Options {
 
 	terraformOptions := &terraform.Options{
@@ -47,4 +60,24 @@ func SetupExample(t *testing.T, dashboardName string, exampleDir string) *terraf
 		},
 	}
 	return terraformOptions
+}
+
+func TerraformApplyAndValidateOutputs(t *testing.T, terraformOptions *terraform.Options) {
+	terraformApplyOutput := terraform.InitAndApply(t, terraformOptions)
+	resourceCount := terraform.GetResourceCount(t, terraformApplyOutput)
+
+	require.Greater(t, resourceCount.Add, 0)
+	require.Equal(t, resourceCount.Change, 0)
+	require.Equal(t, resourceCount.Destroy, 0)
+
+	output := terraform.OutputMap(t, terraformOptions, "op")
+
+	expectedLen := 2
+	notExpectedMap := map[string]string{
+		"dashboard_id": "",
+		"slug":         "",
+	}
+
+	require.Len(t, output, expectedLen, "Output should contain %d items", expectedLen)
+	require.NotEqual(t, output, notExpectedMap)
 }
