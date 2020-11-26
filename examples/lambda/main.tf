@@ -11,7 +11,7 @@ module "dashboard" {
 
   source = "../../"
 
-  enable = false
+  enable = true
   dashboard_configuration = {
     name        = var.name
     environment = "prod"

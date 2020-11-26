@@ -1,36 +1,41 @@
 variable "enable" {
   description = "Enable creating dashboards"
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
-variable "grafana_configuration" {
+
+variable "dashboard_configuration" {
   description = "Configuration for creating Grafana dashboards and alerts"
-  type        = any
   default     = null
+  type = object({
+    name        = string
+    environment = string
+    data_source = string
+    service     = string
+    alert       = bool
+    folder      = string
+  })
+}
+variable "lambda_configuration" {
+  description = "Configuration for creating lambda dashboards and alerts"
+  type        = any
+  default = {
+    trigger = ""
+    topics  = []
+  }
 }
 
 module "generate_lambda_dashboard" {
   source = "./terraform_modules/lambda/"
 
-  enable = var.grafana_configuration.service == "lambda" && var.enable ? true : false
+  enable = var.dashboard_configuration.service == "lambda" && var.enable ? true : false
   grafana_configuration = {
-    name        = tostring(var.grafana_configuration.name)
-    environment = tostring(var.grafana_configuration.environment)
-    data_source = tostring(var.grafana_configuration.data_source)
-    alert       = tobool(var.grafana_configuration.alert)
-    trigger     = try(tostring(var.grafana_configuration.trigger), "")
-    topics      = try(var.grafana_configuration.topics, [])
+    name        = var.dashboard_configuration.name
+    environment = var.dashboard_configuration.environment
+    data_source = var.dashboard_configuration.data_source
+    alert       = var.dashboard_configuration.alert
+    folder      = var.dashboard_configuration.folder
+    trigger     = var.lambda_configuration.trigger
+    topics      = try(var.lambda_configuration.topics, [])
   }
-}
-
-
-data "local_file" "dashboard" {
-  count = var.enable ? 1 : 0
-  filename   = "dashboard.json"
-}
-
-resource "grafana_dashboard" "this" {
-  count = var.enable ? 1 : 0
-  folder      = var.grafana_configuration.folder
-  config_json = data.local_file.dashboard[0].content
 }
