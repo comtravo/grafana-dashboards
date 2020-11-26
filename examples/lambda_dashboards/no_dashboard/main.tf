@@ -9,7 +9,7 @@ variable "name" {
 
 module "dashboard" {
 
-  source = "../../"
+  source = "../../../"
 
   enable = false
   dashboard_configuration = {

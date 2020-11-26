@@ -13,7 +13,7 @@ resource "grafana_folder" "this" {
 
 module "dashboard" {
 
-  source = "../../"
+  source = "../../../"
 
   enable = true
   dashboard_configuration = {
