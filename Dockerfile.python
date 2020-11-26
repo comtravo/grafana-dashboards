@@ -1,6 +1,7 @@
 FROM python:3
 
 COPY --from=hashicorp/terraform:0.12.29 /bin/terraform /bin/
+COPY --from=cytopia/terraform-docs /usr/local/bin/terraform-docs /bin/
 
 WORKDIR /opt/ct
 

@@ -21,3 +21,10 @@ services:
     working_dir: /opt/ct
     depends_on:
       - grafana
+
+  grafana_terraform_module:
+    volumes:
+      - .:/go/src/github.com/comtravo/grafana-dashboards
+    working_dir: /go/src/github.com/comtravo/grafana-dashboards
+    depends_on:
+      - grafana

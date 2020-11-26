@@ -10,4 +10,10 @@ services:
     image: grafana-dashboard-generator
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.python
+
+  grafana_terraform_module:
+    image: grafana-terraform-module
+    build:
+      context: .
+      dockerfile: Dockerfile.terraform
