@@ -43,7 +43,7 @@ DURATION_MAXIMUM_ALIAS = "Duration - Maximum"
 LAMBDA_INVOCATIONS_ALIAS = "Invocations - Sum"
 LAMBDA_ERRORS_ALIAS = "Errors - Sum"
 
-LAMBDA_INVOCATION_METRIC_GROUP_BY="1m"
+LAMBDA_INVOCATION_METRIC_GROUP_BY = "1m"
 
 
 def dispatcher(service, trigger, *args, **kwargs):
@@ -162,7 +162,7 @@ def lambda_generate_graph(
                     operator=OP_AND,
                 )
             ],
-            gracePeriod="1m"
+            gracePeriod="1m",
         )
 
     return Graph(
@@ -269,7 +269,7 @@ def create_lambda_sqs_dlq_graph(name: str, data_source: str, create_alert: bool)
                     operator=OP_AND,
                 ),
             ],
-            gracePeriod="5m"
+            gracePeriod="5m",
         )
 
     return Graph(
@@ -282,6 +282,7 @@ def create_lambda_sqs_dlq_graph(name: str, data_source: str, create_alert: bool)
         alert=alert,
         alertThreshold=ALERT_THRESHOLD,
     ).auto_ref_ids()
+
 
 def create_lambda_sqs_graph(name: str, data_source: str):
     """Create SQS graph"""
@@ -315,9 +316,7 @@ def lambda_sqs_dashboard(
     tags = ["lambda", "sqs", environment]
 
     lambda_graph = lambda_generate_graph(name, data_source, create_alert=alert)
-    sqs_graph = create_lambda_sqs_graph(
-        name=name, data_source=data_source
-    )
+    sqs_graph = create_lambda_sqs_graph(name=name, data_source=data_source)
     dead_letter_sqs_graph = create_lambda_sqs_dlq_graph(
         name=name + "-dlq", data_source=data_source, create_alert=alert
     )
@@ -351,9 +350,7 @@ def lambda_sns_sqs_dashboard(
     tags = ["lambda", "sqs", environment]
 
     lambda_graph = lambda_generate_graph(name, data_source, create_alert=alert)
-    sqs_graph = create_lambda_sqs_graph(
-        name=name, data_source=data_source
-    )
+    sqs_graph = create_lambda_sqs_graph(name=name, data_source=data_source)
     dead_letter_sqs_graph = create_lambda_sqs_dlq_graph(
         name=name + "-dlq", data_source=data_source, create_alert=alert
     )
