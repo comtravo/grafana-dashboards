@@ -27,7 +27,7 @@ resource "null_resource" "generate_dashboard" {
   count = var.enable ? 1 : 0
 
   provisioner "local-exec" {
-    command = "python ../../bin.py --name ${var.grafana_configuration.name} --environment ${var.grafana_configuration.environment}  --data_source ${var.grafana_configuration.data_source} ${local.alert_flag} lambda ${var.grafana_configuration.trigger} ${local.topics_args} > ${local.dahboard_path}"
+    command = "python ${path.module}/../../bin.py --name ${var.grafana_configuration.name} --environment ${var.grafana_configuration.environment}  --data_source ${var.grafana_configuration.data_source} ${local.alert_flag} lambda ${var.grafana_configuration.trigger} ${local.topics_args} > ${local.dahboard_path}"
   }
 
   triggers = {
