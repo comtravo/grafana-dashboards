@@ -41,7 +41,7 @@ SNS_DELIVERED_NOTIFICATIONS = "Delivered notifications"
 SNS_FAILED_NOTIFICATIONS = "Failed notifications"
 
 
-def create_lambda_sns_graph(name: str, data_source: str, notifications: List[str]):
+def create_sns_graph(name: str, data_source: str, notifications: List[str]):
     """Create SNS graph"""
 
     targets = [

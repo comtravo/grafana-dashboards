@@ -28,7 +28,7 @@ from lib.commons import (
     TIMEZONE,
     TRANSPARENT,
 )
-from lib.sns import create_lambda_sns_graph
+from lib.sns import create_sns_graph
 from lib.templating import get_release_template
 from lib import colors
 
@@ -370,7 +370,7 @@ def lambda_sns_sqs_dashboard(
     )
 
     sns_topic_panels = [
-        create_lambda_sns_graph(
+        create_sns_graph(
             name=topic, data_source=data_source, notifications=notifications
         )
         for topic in topics
