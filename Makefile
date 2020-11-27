@@ -6,7 +6,7 @@ build:
 	@docker-compose build
 
 develop:
-	@docker-compose -f ./docker-compose.yml -f ./docker-compose.develop.yml run --rm workhorse bash
+	@docker-compose -f ./docker-compose.yml -f ./docker-compose.develop.yml run --rm workhorse bash && docker-compose down -v || docker-compose down -v
 
 init:
 	@pip3 install -r requirements.txt

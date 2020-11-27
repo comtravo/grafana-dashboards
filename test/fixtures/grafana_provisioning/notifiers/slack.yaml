@@ -1,0 +1,16 @@
+apiVersion: 1
+
+notifiers:
+  - name: 'slack'
+    type: slack
+    org_name: Main Org.
+    is_default: true
+    uid: slack
+    settings:
+      recipient: '#lorem'
+      username: 'ct-infra'
+      mentionChannel: channel
+      token: vdssvbdshjvbdskbvkdbv
+      iconEmoji: ':ghost:'
+      url: http://slack
+      uploadImage: false

@@ -1,0 +1,25 @@
+# # config file version
+apiVersion: 1
+
+# # list of datasources to insert/update depending
+# # on what's available in the database
+datasources:
+#   # <string, required> name of the datasource. Required
+- name: prod
+#   # <string, required> datasource type. Required
+  type: influxdb
+#   # <string, required> access mode. direct or proxy. Required
+  access: proxy
+#   # <string> url
+  url: http://influxdb.infra.comtravo.com:8086
+#   # <string> database name, if used
+  database: prod
+#   # <bool> mark as default datasource. Max one per org
+  isDefault: true
+#   # <map> fields that will be converted to json and stored in json_data
+  jsonData:
+    timeInterval: 60s
+    httpMode: GET
+#   # <bool> allow users to edit datasources from the UI.
+  editable: false
+

@@ -5,9 +5,14 @@ version: '3.8'
 services:
   grafana:
     image: grafana/grafana
+    volumes:
+      - ./test/fixtures/grafana_provisioning/:/etc/grafana/provisioning/
 
   workhorse:
     image: workhorse
     build:
       context: .
       dockerfile: Dockerfile
+
+  slack:
+    image: ealen/echo-server:latest
