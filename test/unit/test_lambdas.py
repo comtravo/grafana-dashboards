@@ -146,3 +146,70 @@ class TestDispatcher:
         generated_lambd_graph.should.have.property("alert").be.a(Alert)
         generated_lambd_graph.alert.executionErrorState.should.eql("alerting")
         generated_lambd_graph.alert.noDataState.should.eql("keep_state")
+
+    def test_should_create_lambda_sqs_graph(self):
+        lambda_name = "lambda-1"
+        data_source = "influxdb"
+
+        expected_query = InfluxDBTarget(
+            alias="Number of messages sent to the queue",
+            query='SELECT max("number_of_messages_sent_sum") FROM "autogen"."cloudwatch_aws_sqs" WHERE ("queue_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
+                lambda_name
+            ),
+            rawQuery=True,
+            refId="A",
+        )
+        generated_lambd_graph = create_lambda_sqs_graph(
+            name=lambda_name, data_source=data_source
+        )
+        generated_lambd_graph.should.be.a(Graph)
+        generated_lambd_graph.should.have.property("title").with_value.equal(
+            "SQS: {}".format(lambda_name)
+        )
+        generated_lambd_graph.should.have.property("dataSource").with_value.equal(
+            data_source
+        )
+        generated_lambd_graph.should.have.property("targets")
+        generated_lambd_graph.targets.should.have.length_of(1)
+        generated_lambd_graph.targets[0].should.eql(expected_query)
+
+    def test_should_generate_lambda_sqs_dashboard(self):
+        lambda_name = "lambda-1"
+        data_source = "influxdb"
+        environment = "alpha"
+        call_args = {
+            "name": lambda_name,
+            "environment": environment,
+            "data_source": data_source,
+            "notifications": [],
+        }
+
+        generated_dashboard = lambda_sqs_dashboard(**call_args)
+        generated_dashboard.should.be.a(Dashboard)
+        generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
+        generated_dashboard.tags.sort().should.eql(
+            ["lambda", environment, "sqs"].sort()
+        )
+        generated_dashboard.rows.should.be.length_of(3)
+
+    def test_should_generate_lambda_sns_sqs_dashboard(self):
+        lambda_name = "lambda-1"
+        data_source = "influxdb"
+        environment = "alpha"
+        topics = ["topic-1", "topic-2"]
+        call_args = {
+            "name": lambda_name,
+            "environment": environment,
+            "data_source": data_source,
+            "notifications": [],
+            "topics": topics,
+        }
+
+        generated_dashboard = lambda_sns_sqs_dashboard(**call_args)
+        generated_dashboard.should.be.a(Dashboard)
+        generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
+        generated_dashboard.tags.sort().should.eql(
+            ["lambda", environment, "sqs", "sns"].sort()
+        )
+        generated_dashboard.rows.should.be.length_of(4)
+        generated_dashboard.rows[0].panels.should.be.length_of(len(topics))

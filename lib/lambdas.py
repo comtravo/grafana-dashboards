@@ -336,7 +336,7 @@ def lambda_sqs_dashboard(
     )
 
     return Dashboard(
-        title="{} {}".format(LAMBDA_DASHBOARD_PREFIX, name),
+        title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
         annotations=get_release_annotations(data_source),
         templating=get_release_template(data_source),
@@ -361,7 +361,7 @@ def lambda_sns_sqs_dashboard(
     **kwargs
 ):
     """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
-    tags = ["lambda", "sqs", environment]
+    tags = ["lambda", "sqs", environment, "sns"]
 
     lambda_graph = lambda_generate_graph(name, data_source, notifications=notifications)
     sqs_graph = create_lambda_sqs_graph(name=name, data_source=data_source)
@@ -377,7 +377,7 @@ def lambda_sns_sqs_dashboard(
     ]
 
     return Dashboard(
-        title="{} {}".format(LAMBDA_DASHBOARD_PREFIX, name),
+        title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
         annotations=get_release_annotations(data_source),
         templating=get_release_template(data_source),
