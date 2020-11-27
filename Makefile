@@ -1,6 +1,6 @@
 #!make
 
-GENERATE_DOCS_COMMAND:=terraform-docs --sort-inputs-by-required markdown --no-escape . > README.md
+GENERATE_DOCS_COMMAND:=terraform-docs markdown . > README.md
 
 build:
 	@docker-compose build
@@ -38,7 +38,6 @@ clean-state:
 	@find . -type d -name '.terraform' | xargs rm -rf
 
 generate-docs: fmt-go lint-go
-	@$(shell $(GENERATE_DOCS_COMMAND))
 	@find terraform_modules -maxdepth 1 -type d -not -path 'terraform_modules' -exec sh -c 'cd {} && $(GENERATE_DOCS_COMMAND)' ';'
 
 test-integration:
