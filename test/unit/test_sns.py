@@ -49,3 +49,16 @@ class TestCreateSNSGraph:
         for target in actual_sns_graph.targets:
             target.should.be.a(InfluxDBTarget)
             target.query.should.be.within(expected_queries)
+
+    def test_should_generate_correct_object_with_no_alert_notifications(self):
+
+        expected_data_source = "prod"
+        expected_topic_name = "sns-1"
+        expected_notifications = []
+
+        actual_sns_graph = create_sns_graph(
+            name=expected_topic_name,
+            data_source=expected_data_source,
+            notifications=expected_notifications,
+        )
+        actual_sns_graph.should.have.property("alert").with_value.equal(None)
