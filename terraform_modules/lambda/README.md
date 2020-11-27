@@ -24,5 +24,5 @@
 
 | Name | Description |
 |------|-------------|
-| output | n/a |
+| output | Grafana slug and dashboard\_id |
 

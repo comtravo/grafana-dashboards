@@ -49,6 +49,7 @@ resource "grafana_dashboard" "this" {
 }
 
 output "output" {
+  description = "Grafana slug and dashboard_id"
   value = {
     slug         = try(grafana_dashboard.this[0].slug, "")
     dashboard_id = try(grafana_dashboard.this[0].dashboard_id, "")
