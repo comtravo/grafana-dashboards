@@ -7,6 +7,10 @@ from lib.lambdas import (
     lambda_events_dashboard,
     lambda_cognito_dashboard,
     lambda_logs_dashboard,
+    create_lambda_sqs_dlq_graph,
+    create_lambda_sqs_graph,
+    lambda_sqs_dashboard,
+    lambda_sns_sqs_dashboard,
 )
 
 import re
@@ -87,7 +91,7 @@ class TestDispatcher:
         )
         generated_lambd_graph.targets.should.contain(expected_alert_query)
 
-    def test_should_generate_lambda_basic_dashboard(self):
+    def test_should_generate_lambda_basic_dashboards(self):
         lambda_name = "lambda-1"
         data_source = "influxdb"
         environment = "alpha"
@@ -112,3 +116,33 @@ class TestDispatcher:
             generated_dashboard.tags.sort().should.eql(
                 ["lambda", environment, expected_dashboard_tag].sort()
             )
+
+    def test_should_create_lambda_sqs_dlq_graph(self):
+        lambda_name = "lambda-1"
+        data_source = "influxdb"
+        notifications = ["lorem"]
+
+        expected_alert_query = InfluxDBTarget(
+            alias="Approximate number of messages available",
+            query='SELECT max("approximate_number_of_messages_visible_maximum") FROM "autogen"."cloudwatch_aws_sqs" WHERE ("queue_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                lambda_name
+            ),
+            rawQuery=True,
+            refId="A",
+        )
+        generated_lambd_graph = create_lambda_sqs_dlq_graph(
+            name=lambda_name, data_source=data_source, notifications=notifications
+        )
+        generated_lambd_graph.should.be.a(Graph)
+        generated_lambd_graph.should.have.property("title").with_value.equal(
+            "SQS Dead Letter Queue: {}".format(lambda_name)
+        )
+        generated_lambd_graph.should.have.property("dataSource").with_value.equal(
+            data_source
+        )
+        generated_lambd_graph.should.have.property("targets")
+        generated_lambd_graph.targets.should.have.length_of(1)
+        generated_lambd_graph.targets[0].should.eql(expected_alert_query)
+        generated_lambd_graph.should.have.property("alert").be.a(Alert)
+        generated_lambd_graph.alert.executionErrorState.should.eql("alerting")
+        generated_lambd_graph.alert.noDataState.should.eql("keep_state")
