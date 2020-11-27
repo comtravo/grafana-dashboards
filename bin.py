@@ -6,7 +6,7 @@ import argparse
 import json
 
 
-def parse_options():
+def parse_options():  # pragma: no cover
     """
     parse cli
     """
@@ -64,7 +64,7 @@ def apply_options(args):
     return args
 
 
-def main():
+def main():  # pragma: no cover
     """
     main
     """
@@ -77,5 +77,5 @@ def main():
     print(dashboard_json)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
