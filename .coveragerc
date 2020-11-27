@@ -2,3 +2,4 @@
 omit =
       test/unit/*
       /usr/*
+      **/__init__.py
