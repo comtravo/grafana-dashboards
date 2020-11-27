@@ -1,4 +1,4 @@
-from grafanalib.core import Alert, Graph
+from grafanalib.core import Alert, AlertCondition, Graph, Target
 from grafanalib.influxdb import InfluxDBTarget
 from lib.sns import create_sns_graph
 
@@ -22,13 +22,21 @@ class TestCreateSNSGraph:
             ),
         ]
 
+        expected_alert_query = InfluxDBTarget(
+            alias="Failed notifications",
+            query='SELECT sum("number_of_notifications_failed_sum") FROM "autogen"."cloudwatch_aws_sns" WHERE ("topic_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+                expected_topic_name
+            ),
+            rawQuery=True,
+            refId="A",
+        )
+
         actual_sns_graph = create_sns_graph(
             name=expected_topic_name,
             data_source=expected_data_source,
             notifications=expected_notifications,
         )
         actual_sns_graph.should.be.a(Graph)
-        print(dir(actual_sns_graph))
         actual_sns_graph.should.have.property("title").with_value.equal(expected_title)
         actual_sns_graph.should.have.property("bars").with_value.equal(True)
         actual_sns_graph.should.have.property("lines").with_value.equal(False)
@@ -43,12 +51,22 @@ class TestCreateSNSGraph:
         actual_sns_graph.alert.should.have.property(
             "notifications"
         ).which.should.be.equal(expected_notifications)
+        actual_sns_graph.alert.should.have.property(
+            "alertConditions"
+        ).which.should.have.length_of(1)
+        actual_sns_graph.alert.alertConditions[0].should.be.a(AlertCondition)
+        actual_sns_graph.alert.alertConditions[0].should.have.property("target")
+        actual_sns_graph.alert.alertConditions[0].target.should.be.equal(
+            Target(refId="A")
+        )
 
         actual_sns_graph.should.have.property("targets").length_of(3)
 
         for target in actual_sns_graph.targets:
             target.should.be.a(InfluxDBTarget)
             target.query.should.be.within(expected_queries)
+
+        actual_sns_graph.targets.should.contain(expected_alert_query)
 
     def test_should_generate_correct_object_with_no_alert_notifications(self):
 
