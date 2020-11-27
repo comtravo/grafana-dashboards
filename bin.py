@@ -54,15 +54,24 @@ def parse_options():
     return parser.parse_args()
 
 
+def apply_options(args):
+    """Apply options"""
+    if args.notifications:
+        args.notifications = [
+            {"uid": notification} for notification in args.notifications
+        ]
+
+    return args
+
+
 def main():
     """
     main
     """
     args = parse_options()
+    args = apply_options(args)
 
     dispatch = {"lambda": lambda_dispatcher}
-    # print(args)
-    # exit(0)
     dashboard = dispatch[args.service](**args.__dict__)
     dashboard_json = json.dumps(dashboard.to_json_data(), cls=DashboardEncoder)
     print(dashboard_json)
