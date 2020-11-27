@@ -35,6 +35,7 @@ from lib import colors
 from typing import List
 
 LAMBDA_MEASUREMENT = "cloudwatch_aws_lambda"
+LAMBDA_DASHBOARD_PREFIX = "Lambda: "
 
 
 DURATION_MINIMUM_ALIAS = "Duration - Minimum"
@@ -223,7 +224,7 @@ def create_lambda_only_dashboard(
     """Create a dashboard with just the lambda"""
 
     return Dashboard(
-        title=name,
+        title="{} {}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
         annotations=get_release_annotations(data_source),
         templating=get_release_template(data_source),
@@ -335,7 +336,7 @@ def lambda_sqs_dashboard(
     )
 
     return Dashboard(
-        title=name,
+        title="{} {}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
         annotations=get_release_annotations(data_source),
         templating=get_release_template(data_source),
@@ -376,7 +377,7 @@ def lambda_sns_sqs_dashboard(
     ]
 
     return Dashboard(
-        title=name,
+        title="{} {}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
         annotations=get_release_annotations(data_source),
         templating=get_release_template(data_source),
