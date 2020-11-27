@@ -18,7 +18,7 @@ variable "enable" {
 
 locals {
   alert_flag    = var.grafana_configuration.alert ? "--alert" : ""
-  topics_args   = length(var.grafana_configuration.topics) > 0 ? "--topics ${var.grafana_configuration.topics}" : ""
+  topics_args   = length(var.grafana_configuration.topics) > 0 ? "--topics ${join(" ", var.grafana_configuration.topics)}" : ""
   dahboard_path = "${path.cwd}/dashboard.json"
 }
 
