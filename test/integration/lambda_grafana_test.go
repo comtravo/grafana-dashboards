@@ -51,6 +51,19 @@ func TestLambda_lambda(t *testing.T) {
 	TerraformApplyAndValidateOutputs(t, terraformOptions)
 }
 
+func TestLambda_lambdaFolder(t *testing.T) {
+	t.Parallel()
+
+	dashboardName := fmt.Sprintf("lambda-%s", random.UniqueId())
+	exampleDir := "../../examples/lambda_dashboards/lambda_folder/"
+
+	terraformOptions := SetupExample(t, dashboardName, exampleDir)
+	t.Logf("Terraform module inputs: %+v", *terraformOptions)
+	defer terraform.Destroy(t, terraformOptions)
+
+	TerraformApplyAndValidateOutputs(t, terraformOptions)
+}
+
 func SetupExample(t *testing.T, dashboardName string, exampleDir string) *terraform.Options {
 
 	terraformOptions := &terraform.Options{

@@ -15,16 +15,9 @@ services:
     ports:
       - 3000:3000
 
-  grafana_dashboard_generator:
+  workhorse:
     volumes:
       - .:/opt/ct
     working_dir: /opt/ct
-    depends_on:
-      - grafana
-
-  grafana_terraform_module:
-    volumes:
-      - .:/go/src/github.com/comtravo/grafana-dashboards
-    working_dir: /go/src/github.com/comtravo/grafana-dashboards
     depends_on:
       - grafana

@@ -5,29 +5,29 @@ GENERATE_DOCS_COMMAND:=terraform-docs --sort-inputs-by-required markdown --no-es
 build:
 	@docker-compose build
 
-develop-scripts:
-	@docker-compose -f ./docker-compose.yml -f ./docker-compose.develop.yml run --rm grafana_dashboard_generator bash
-
-develop-module:
-	@docker-compose -f ./docker-compose.yml -f ./docker-compose.develop.yml run --rm grafana_terraform_module bash
+develop:
+	@docker-compose -f ./docker-compose.yml -f ./docker-compose.develop.yml run --rm workhorse bash
 
 init:
-	@pip install -r requirements.txt
+	@pip3 install -r requirements.txt
 
 fmt-py:
 	@black .
-
-lint-py:
-	@black --check .
 
 fmt-go:
 	@terraform fmt -recursive
 	@find . -name '*.go' | xargs gofmt -w -s
 
+fmt: fmt-go fmt-py
+
+lint-py:
+	@black --check .
+
 lint-go:
 	@terraform fmt -check -recursive -diff=true
 	@test -z $(shell find . -type f -name '*.go' | xargs gofmt -l)
-	@tflint
+
+lint: lint-py lint-go
 
 clean-state:
 	@find . -type f -name 'terraform.tfstate*' | xargs rm -rf
