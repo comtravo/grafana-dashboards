@@ -13,19 +13,17 @@ resource "grafana_folder" "this" {
 
 module "dashboard" {
 
-  source = "../../../"
+  source = "../../../terraform_modules/lambda/"
 
   enable = true
-  dashboard_configuration = {
+  grafana_configuration = {
     name        = var.name
     environment = "prod"
     data_source = "prod"
+    trigger     = "cron"
     alert       = false
-    service     = "lambda"
     folder      = grafana_folder.this.id
-  }
-  lambda_configuration = {
-    trigger = "cron"
+    topics      = []
   }
 }
 

@@ -9,19 +9,17 @@ variable "name" {
 
 module "dashboard" {
 
-  source = "../../../"
+  source = "../../../terraform_modules/lambda/"
 
   enable = false
-  dashboard_configuration = {
+  grafana_configuration = {
     name        = var.name
     environment = "prod"
     data_source = "prod"
+    trigger     = "cron"
     alert       = false
-    service     = "lambda"
     folder      = null
-  }
-  lambda_configuration = {
-    trigger = "cron"
+    topics      = []
   }
 }
 
