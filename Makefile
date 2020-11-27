@@ -37,6 +37,12 @@ clean-state:
 	@find . -type f -name 'dashboard.json' | xargs rm -rf
 	@find . -type d -name '.terraform' | xargs rm -rf
 
+clean-py:
+	@find . -type f -name '*.pyc' | xargs rm -rf
+
+clean: clean-py clean-state
+
+
 generate-docs: fmt-go lint-go
 	@find terraform_modules -maxdepth 1 -type d -not -path 'terraform_modules' -exec sh -c 'cd {} && $(GENERATE_DOCS_COMMAND)' ';'
 
