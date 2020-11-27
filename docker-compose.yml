@@ -7,12 +7,16 @@ services:
     image: grafana/grafana
     volumes:
       - ./test/fixtures/grafana_provisioning/:/etc/grafana/provisioning/
+    depends_on:
+      - slack
 
   workhorse:
     image: workhorse
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - grafana
 
   slack:
     image: ealen/echo-server:latest
