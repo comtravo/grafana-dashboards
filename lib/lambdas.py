@@ -224,7 +224,7 @@ def create_lambda_only_dashboard(
     """Create a dashboard with just the lambda"""
 
     return Dashboard(
-        title="{} {}".format(LAMBDA_DASHBOARD_PREFIX, name),
+        title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
         annotations=get_release_annotations(data_source),
         templating=get_release_template(data_source),

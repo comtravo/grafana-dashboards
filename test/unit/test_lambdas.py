@@ -1,6 +1,13 @@
 from grafanalib.core import Alert, AlertCondition, Dashboard, Graph, Target
 from grafanalib.influxdb import InfluxDBTarget
-from lib.lambdas import dispatcher, lambda_generate_graph
+from lib.lambdas import (
+    dispatcher,
+    lambda_generate_graph,
+    lambda_cron_dashboard,
+    lambda_events_dashboard,
+    lambda_cognito_dashboard,
+    lambda_logs_dashboard,
+)
 
 import re
 
@@ -79,3 +86,29 @@ class TestDispatcher:
             Target(refId="A")
         )
         generated_lambd_graph.targets.should.contain(expected_alert_query)
+
+    def test_should_generate_lambda_basic_dashboard(self):
+        lambda_name = "lambda-1"
+        data_source = "influxdb"
+        environment = "alpha"
+        call_args = {
+            "name": lambda_name,
+            "environment": environment,
+            "data_source": data_source,
+            "notifications": [],
+        }
+
+        test_matrix = {
+            lambda_cron_dashboard: "cron",
+            lambda_cognito_dashboard: "cognito",
+            lambda_events_dashboard: "cloudwatch events",
+            lambda_logs_dashboard: "cloudwatch logs",
+        }
+
+        for dahboard_generator, expected_dashboard_tag in test_matrix.items():
+            generated_dashboard = dahboard_generator(**call_args)
+            generated_dashboard.should.be.a(Dashboard)
+            generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
+            generated_dashboard.tags.sort().should.eql(
+                ["lambda", environment, expected_dashboard_tag].sort()
+            )
