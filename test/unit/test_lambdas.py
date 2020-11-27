@@ -13,4 +13,6 @@ class TestDispatcher:
         expected_triggers = ["cognito", "cron", "events", "logs", "sns", "sqs"]
 
         for trigger in expected_triggers:
-            dispatcher.when.called_with(service="lambda", trigger=trigger).should.be.ok
+            dispatcher.when.called_with(
+                service="lambda", trigger=trigger
+            ).should.be.ok
