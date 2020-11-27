@@ -67,7 +67,7 @@ def dispatcher(service, trigger, *args, **kwargs):
 
 
 def lambda_generate_graph(
-    name: str, data_source: str, create_alert: bool, *args, **kwargs
+    name: str, data_source: str, notifications: List[str], *args, **kwargs
 ):
     """
     Generate lambda graph
@@ -108,7 +108,7 @@ def lambda_generate_graph(
                 RETENTION_POLICY, LAMBDA_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
-            refId=ALERT_REF_ID if create_alert else None,
+            refId=ALERT_REF_ID if notifications else None,
         ),
     ]
 
@@ -147,7 +147,7 @@ def lambda_generate_graph(
     alert = None
 
     # https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics.html
-    if create_alert:
+    if notifications:
         alert = Alert(
             name="{} Invocation Errors".format(name),
             message="{} is having invocation errors".format(name),
@@ -163,6 +163,7 @@ def lambda_generate_graph(
                 )
             ],
             gracePeriod="1m",
+            notifications=notifications,
         )
 
     return Graph(
@@ -214,7 +215,7 @@ def create_lambda_only_dashboard(
     tags: List[str],
     name: str,
     data_source: str,
-    alert: bool,
+    notifications: List[str],
     environment: str,
     *args,
     **kwargs
@@ -230,12 +231,18 @@ def create_lambda_only_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
-            Row(panels=[lambda_generate_graph(name, data_source, create_alert=alert)])
+            Row(
+                panels=[
+                    lambda_generate_graph(
+                        name, data_source, notifications=notifications
+                    )
+                ]
+            )
         ],
     ).auto_panel_ids()
 
 
-def create_lambda_sqs_dlq_graph(name: str, data_source: str, create_alert: bool):
+def create_lambda_sqs_dlq_graph(name: str, data_source: str, notifications: List[str]):
     """Create SQS Deadletter graph"""
 
     targets = [
@@ -245,7 +252,7 @@ def create_lambda_sqs_dlq_graph(name: str, data_source: str, create_alert: bool)
                 RETENTION_POLICY, name
             ),
             rawQuery=RAW_QUERY,
-            refId=ALERT_REF_ID if create_alert else None,
+            refId=ALERT_REF_ID if notifications else None,
         )
     ]
 
@@ -254,7 +261,7 @@ def create_lambda_sqs_dlq_graph(name: str, data_source: str, create_alert: bool)
 
     # https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-monitoring-using-cloudwatch.html
     # https://aws.amazon.com/about-aws/whats-new/2019/12/amazon-sqs-now-supports-1-minute-cloudwatch-metrics/
-    if create_alert:
+    if notifications:
         alert = Alert(
             name="{} messages".format(name),
             message="{} is having messages".format(name),
@@ -270,6 +277,7 @@ def create_lambda_sqs_dlq_graph(name: str, data_source: str, create_alert: bool)
                 ),
             ],
             gracePeriod="5m",
+            notifications=notifications,
         )
 
     return Graph(
@@ -310,15 +318,20 @@ def create_lambda_sqs_graph(name: str, data_source: str):
 
 
 def lambda_sqs_dashboard(
-    name: str, data_source: str, alert: bool, environment: str, *args, **kwargs
+    name: str,
+    data_source: str,
+    notifications: List[str],
+    environment: str,
+    *args,
+    **kwargs
 ):
     """Create a dashboard with Lambda and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment]
 
-    lambda_graph = lambda_generate_graph(name, data_source, create_alert=alert)
+    lambda_graph = lambda_generate_graph(name, data_source, notifications=notifications)
     sqs_graph = create_lambda_sqs_graph(name=name, data_source=data_source)
     dead_letter_sqs_graph = create_lambda_sqs_dlq_graph(
-        name=name + "-dlq", data_source=data_source, create_alert=alert
+        name=name + "-dlq", data_source=data_source, notifications=notifications
     )
 
     return Dashboard(
@@ -340,7 +353,7 @@ def lambda_sqs_dashboard(
 def lambda_sns_sqs_dashboard(
     name: str,
     data_source: str,
-    alert: bool,
+    notifications: List[str],
     environment: str,
     topics: List[str],
     *args,
@@ -349,14 +362,16 @@ def lambda_sns_sqs_dashboard(
     """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment]
 
-    lambda_graph = lambda_generate_graph(name, data_source, create_alert=alert)
+    lambda_graph = lambda_generate_graph(name, data_source, notifications=notifications)
     sqs_graph = create_lambda_sqs_graph(name=name, data_source=data_source)
     dead_letter_sqs_graph = create_lambda_sqs_dlq_graph(
-        name=name + "-dlq", data_source=data_source, create_alert=alert
+        name=name + "-dlq", data_source=data_source, notifications=notifications
     )
 
     sns_topic_panels = [
-        create_lambda_sns_graph(name=topic, data_source=data_source, create_alert=True)
+        create_lambda_sns_graph(
+            name=topic, data_source=data_source, notifications=notifications
+        )
         for topic in topics
     ]
 

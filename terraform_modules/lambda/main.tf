@@ -1,13 +1,13 @@
 variable "grafana_configuration" {
   description = "Configuration for creating Grafana dashboards and alerts"
   type = object({
-    name        = string
-    environment = string
-    data_source = string
-    trigger     = string
-    alert       = bool
-    topics      = list(string)
-    folder      = string
+    name          = string
+    environment   = string
+    data_source   = string
+    trigger       = string
+    notifications = list(string)
+    topics        = list(string)
+    folder        = string
   })
 }
 
@@ -17,9 +17,9 @@ variable "enable" {
 }
 
 locals {
-  alert_flag    = var.grafana_configuration.alert ? "--alert" : ""
-  topics_args   = length(var.grafana_configuration.topics) > 0 ? "--topics ${join(" ", var.grafana_configuration.topics)}" : ""
-  dahboard_path = "${path.cwd}/dashboard.json"
+  notification_args = length(var.grafana_configuration.notifications) > 0 ? "--notifications ${join(" ", var.grafana_configuration.notifications)}" : ""
+  topics_args       = length(var.grafana_configuration.topics) > 0 ? "--topics ${join(" ", var.grafana_configuration.topics)}" : ""
+  dahboard_path     = "${path.cwd}/dashboard.json"
 }
 
 resource "null_resource" "generate_dashboard" {
@@ -27,7 +27,7 @@ resource "null_resource" "generate_dashboard" {
   count = var.enable ? 1 : 0
 
   provisioner "local-exec" {
-    command = "python3 ${path.module}/../../bin.py --name ${var.grafana_configuration.name} --environment ${var.grafana_configuration.environment}  --data_source ${var.grafana_configuration.data_source} ${local.alert_flag} lambda ${var.grafana_configuration.trigger} ${local.topics_args} > ${local.dahboard_path}"
+    command = "python3 ${path.module}/../../bin.py --name ${var.grafana_configuration.name} --environment ${var.grafana_configuration.environment} ${local.notification_args} --data_source ${var.grafana_configuration.data_source} lambda ${var.grafana_configuration.trigger} ${local.topics_args} > ${local.dahboard_path}"
   }
 
   triggers = {

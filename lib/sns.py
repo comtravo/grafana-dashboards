@@ -41,7 +41,7 @@ SNS_DELIVERED_NOTIFICATIONS = "Delivered notifications"
 SNS_FAILED_NOTIFICATIONS = "Failed notifications"
 
 
-def create_lambda_sns_graph(name: str, data_source: str, create_alert: bool):
+def create_lambda_sns_graph(name: str, data_source: str, notifications: List[str]):
     """Create SNS graph"""
 
     targets = [
@@ -65,7 +65,7 @@ def create_lambda_sns_graph(name: str, data_source: str, create_alert: bool):
                 RETENTION_POLICY, SNS_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
-            refId=ALERT_REF_ID if create_alert else None,
+            refId=ALERT_REF_ID if notifications else None,
         ),
     ]
 
@@ -90,7 +90,7 @@ def create_lambda_sns_graph(name: str, data_source: str, create_alert: bool):
     alert = None
 
     # https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html
-    if create_alert:
+    if notifications:
         alert = Alert(
             name="{} alerts".format(name),
             message="{} seems to have no subscriptions or failed deliveries".format(
@@ -108,6 +108,7 @@ def create_lambda_sns_graph(name: str, data_source: str, create_alert: bool):
                 ),
             ],
             gracePeriod="10m",
+            notifications=notifications,
         )
 
     return Graph(

@@ -13,13 +13,13 @@ module "dashboard" {
 
   enable = true
   grafana_configuration = {
-    name        = var.name
-    environment = "prod"
-    data_source = "prod"
-    trigger     = "sns"
-    alert       = false
-    folder      = null
-    topics      = ["topic-1", "topic-2", "topic-3"]
+    name          = var.name
+    environment   = "prod"
+    data_source   = "prod"
+    trigger       = "sns"
+    notifications = ["slack"]
+    folder        = null
+    topics        = ["topic-1", "topic-2", "topic-3"]
   }
 }
 
