@@ -24,9 +24,22 @@ class TestDispatcher:
 
     def test_should_call_trigger_handlers(self):
         expected_triggers = ["cognito", "cron", "events", "logs", "sns", "sqs"]
+        lambda_name = "lambda-1"
+        data_source = "influxdb"
+        environment = "alpha"
+        topics = ["topic-1", "topic-2"]
+        call_args = {
+            "name": lambda_name,
+            "environment": environment,
+            "data_source": data_source,
+            "notifications": [],
+            "topics": topics,
+        }
 
         for trigger in expected_triggers:
-            dispatcher.when.called_with(service="lambda", trigger=trigger).should.be.ok
+            dash = dispatcher(service="lambda", trigger=trigger, **call_args)
+
+            dash.should.be.a(Dashboard)
 
     def test_should_generate_lambda_graph(self):
         lambda_name = "lambda-1"
