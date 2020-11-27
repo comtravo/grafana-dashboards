@@ -1,2 +1,5 @@
 black
+coverage
 git+https://github.com/weaveworks/grafanalib.git@8f4b0fa48a2ff19e1af95d6298d36cabe28ca13d
+pytest
+sure
