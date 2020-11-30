@@ -43,6 +43,7 @@ Useful make targets:
 - `make lint` checks currently the code formatting
 - `make fmt` formats your terraform, go and python code
 - `make test` runs unit and integration tests
+- `make generate-docs` generates the terraform docs
 
 ## Examples
 
