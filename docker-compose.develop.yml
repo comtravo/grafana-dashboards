@@ -1,6 +1,6 @@
 # vim: set ts=2 sw=2 sts=2 et :
 
-version: '2.2'
+version: '3.8'
 
 services:
   grafana:
