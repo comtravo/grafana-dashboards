@@ -9,7 +9,7 @@ develop:
 	@docker-compose -f ./docker-compose.yml -f ./docker-compose.develop.yml run --rm workhorse bash ; docker-compose down -v
 
 test-docker:
-	@docker-compose -f ./docker-compose.yml -f ./docker-compose.develop.yml run --rm workhorse make test; docker-compose down -v
+	@docker-compose -f ./docker-compose.yml run --rm workhorse make test; docker-compose down -v
 
 init:
 	@pip3 install -r requirements.txt
