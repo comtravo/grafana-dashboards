@@ -21,7 +21,7 @@ With Grafana, one can not only define dashboards but also alerts. When one visit
 - Cannot apply CI CD practices
 - Code re-usability is non-existent
 - Cannot apply changes across all dashboards and alerts
-- Dashboard and alert provisioning and de-provisioning.
+- Automated dashboard and alert provisioning and de-provisioning using IaC.
   - Given the serverless trend today, your cloud infrastructure can have various functions that are triggered by ways. In such cacses, it is difficult to create individual dashboards and maintain them. They get renamed, move deleted
 
 ## Introduction
