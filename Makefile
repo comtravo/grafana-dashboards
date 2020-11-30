@@ -52,6 +52,6 @@ test-unit:
 test-integration:
 	@cd test/integration && go test
 
-test: test-integration
+test: test-unit test-integration
 
 .PHONY: test
