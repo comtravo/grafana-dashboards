@@ -17,7 +17,7 @@ With Grafana, one can not only define dashboards but also alerts. When one visit
 
 ### Problems
 
-- No human could possibliy create them by hand and maintain them. Scalability is an issue. [Grafana JSON model](https://grafana.com/docs/grafana/latest/dashboards/json-model/)
+- No human could possibliy create them by hand and maintain them. Scalability is an issue. [Read more about Grafana JSON model](https://grafana.com/docs/grafana/latest/dashboards/json-model/)
 - Cannot apply CI CD practices
 - Code re-usability is non-existent
 - Cannot apply changes across all dashboards and alerts
