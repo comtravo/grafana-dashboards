@@ -56,12 +56,13 @@ def dispatcher(service, trigger, *args, **kwargs):
         raise Exception("Lambda dispatcher recieved a non lambda call")
 
     dispatch = {
-        "cognito": lambda_cognito_dashboard,
-        "cron": lambda_cron_dashboard,
-        "events": lambda_events_dashboard,
-        "logs": lambda_cron_dashboard,
+        "cognito-idp": lambda_cognito_dashboard,
+        "cloudwatch-event-schedule": lambda_cron_dashboard,
+        "cloudwatch-event-trigger": lambda_events_dashboard,
+        "cloudwatch-logs": lambda_cron_dashboard,
         "sqs": lambda_sqs_dashboard,
         "sns": lambda_sns_sqs_dashboard,
+        "null": lambda_basic_dashboard,
     }
 
     return dispatch[trigger](**kwargs)
@@ -185,6 +186,14 @@ def lambda_cron_dashboard(*args, **kwargs):
     Generate lambda dashboard for cron
     """
     tags = ["cron"]
+    return create_lambda_only_dashboard(tags, *args, **kwargs)
+
+
+def lambda_basic_dashboard(*args, **kwargs):
+    """
+    Generate lambda dashboard for cron
+    """
+    tags = []
     return create_lambda_only_dashboard(tags, *args, **kwargs)
 
 

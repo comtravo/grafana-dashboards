@@ -33,14 +33,19 @@ def parse_options():  # pragma: no cover
     lambda_function_sub_parser.required = True
 
     lambda_function_sub_parser.add_parser(
-        "cognito", help="Lambda is triggered by Cognito"
-    )
-    lambda_function_sub_parser.add_parser("cron", help="Lambda is triggered by Cron")
-    lambda_function_sub_parser.add_parser(
-        "events", help="Lambda is triggered by Cloudwatch Events"
+        "cognito-idp", help="Lambda is triggered by Cognito"
     )
     lambda_function_sub_parser.add_parser(
-        "logs", help="Lambda is triggered by Cloudwatch logs"
+        "cloudwatch-event-schedule", help="Lambda is triggered by Cron"
+    )
+    lambda_function_sub_parser.add_parser(
+        "cloudwatch-event-trigger", help="Lambda is triggered by Cloudwatch Events"
+    )
+    lambda_function_sub_parser.add_parser(
+        "cloudwatch-logs", help="Lambda is triggered by Cloudwatch logs"
+    )
+    lambda_function_sub_parser.add_parser(
+        "null", help="Lambda is triggered by external forces"
     )
 
     lambda_sns_triggers = lambda_function_sub_parser.add_parser(

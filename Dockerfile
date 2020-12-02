@@ -12,5 +12,3 @@ COPY ./requirements.txt ./Makefile ./
 RUN make init
 COPY . .
 
-RUN make lint
-

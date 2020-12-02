@@ -20,7 +20,7 @@ module "dashboard" {
     name          = var.name
     environment   = "prod"
     data_source   = "prod"
-    trigger       = "cron"
+    trigger       = "cloudwatch-event-schedule"
     notifications = ["slack"]
     folder        = grafana_folder.this.id
     topics        = []
