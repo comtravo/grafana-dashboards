@@ -31,8 +31,9 @@ from lib.commons import (
 )
 from lib.templating import get_release_template
 from lib import colors
-
 from typing import List
+
+import re
 
 SNS_MEASUREMENT = "cloudwatch_aws_sns"
 
@@ -43,6 +44,9 @@ SNS_FAILED_NOTIFICATIONS = "Failed notifications"
 
 def create_sns_graph(name: str, data_source: str, notifications: List[str]):
     """Create SNS graph"""
+
+    if re.match("^arn:aws:sns", name):
+        name = name.split(":")[-1]
 
     targets = [
         InfluxDBTarget(
