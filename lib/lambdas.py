@@ -62,6 +62,7 @@ def dispatcher(service, trigger, *args, **kwargs):
         "cloudwatch-logs": lambda_cron_dashboard,
         "sqs": lambda_sqs_dashboard,
         "sns": lambda_sns_sqs_dashboard,
+        "null": lambda_basic_dashboard,
     }
 
     return dispatch[trigger](**kwargs)
@@ -185,6 +186,14 @@ def lambda_cron_dashboard(*args, **kwargs):
     Generate lambda dashboard for cron
     """
     tags = ["cron"]
+    return create_lambda_only_dashboard(tags, *args, **kwargs)
+
+
+def lambda_basic_dashboard(*args, **kwargs):
+    """
+    Generate lambda dashboard for cron
+    """
+    tags = []
     return create_lambda_only_dashboard(tags, *args, **kwargs)
 
 

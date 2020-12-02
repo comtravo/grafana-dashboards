@@ -44,6 +44,9 @@ def parse_options():  # pragma: no cover
     lambda_function_sub_parser.add_parser(
         "cloudwatch-logs", help="Lambda is triggered by Cloudwatch logs"
     )
+    lambda_function_sub_parser.add_parser(
+        "null", help="Lambda is triggered by external forces"
+    )
 
     lambda_sns_triggers = lambda_function_sub_parser.add_parser(
         "sns", help="Lambda is triggered by SNS"

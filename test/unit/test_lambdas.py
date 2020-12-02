@@ -30,6 +30,7 @@ class TestDispatcher:
             "cloudwatch-logs",
             "sns",
             "sqs",
+            "null",
         ]
         lambda_name = "lambda-1"
         data_source = "influxdb"
