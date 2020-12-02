@@ -27,6 +27,10 @@ resource "null_resource" "generate_dashboard" {
   count = var.enable ? 1 : 0
 
   provisioner "local-exec" {
+    command = "pip3 install -r ${path.module}/../../requirements.txt"
+  }
+
+  provisioner "local-exec" {
     command = "python3 ${path.module}/../../bin.py --name ${var.grafana_configuration.name} --environment ${var.grafana_configuration.environment} ${local.notification_args} --data_source ${var.grafana_configuration.data_source} lambda ${var.grafana_configuration.trigger} ${local.topics_args} > ${local.dahboard_path}"
   }
 
