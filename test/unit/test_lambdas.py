@@ -23,7 +23,14 @@ class TestDispatcher:
         )
 
     def test_should_call_trigger_handlers(self):
-        expected_triggers = ["cognito", "cron", "events", "logs", "sns", "sqs"]
+        expected_triggers = [
+            "cognito-idp",
+            "cloudwatch-event-schedule",
+            "cloudwatch-event-trigger",
+            "cloudwatch-logs",
+            "sns",
+            "sqs",
+        ]
         lambda_name = "lambda-1"
         data_source = "influxdb"
         environment = "alpha"

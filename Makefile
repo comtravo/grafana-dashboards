@@ -11,6 +11,9 @@ develop:
 test-docker:
 	@docker-compose -f ./docker-compose.yml run --rm workhorse make test; docker-compose down -v
 
+lint-docker:
+	@docker-compose -f ./docker-compose.yml run --rm --no-deps workhorse make lint; docker-compose down -v
+
 init:
 	@pip3 install -r requirements.txt
 
