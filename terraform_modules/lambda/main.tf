@@ -19,7 +19,7 @@ variable "enable" {
 locals {
   notification_args = length(var.grafana_configuration.notifications) > 0 ? "--notifications ${join(" ", var.grafana_configuration.notifications)}" : ""
   topics_args       = length(var.grafana_configuration.topics) > 0 ? "--topics ${join(" ", var.grafana_configuration.topics)}" : ""
-  dahboard_path     = "${path.cwd}/dashboard.json"
+  dahboard_path     = "${path.module}/dashboard.json"
 }
 
 resource "null_resource" "generate_dashboard" {
