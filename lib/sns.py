@@ -86,10 +86,6 @@ def create_sns_graph(name: str, data_source: str, notifications: List[str]):
     ]
 
     yAxes = single_y_axis(format=SHORT_FORMAT)
-    yAxes = YAxes(
-        YAxis(format=SHORT_FORMAT),
-        YAxis(format=SHORT_FORMAT),
-    )
 
     alert = None
 

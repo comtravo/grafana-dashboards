@@ -25,10 +25,14 @@ def parse_options():  # pragma: no cover
     subparsers = parser.add_subparsers(dest="service")
     subparsers.required = True
 
+    apig = subparsers.add_parser(
+        "api-gateway", help="Create dashboard for API gateways"
+    )
+    apig.add_argument("--lambdas", nargs="*", help="List of Lambda names or arns")
+
     lambda_function = subparsers.add_parser(
         "lambda", help="Create dashboard for lambdas"
     )
-
     lambda_function_sub_parser = lambda_function.add_subparsers(dest="trigger")
     lambda_function_sub_parser.required = True
 
@@ -75,6 +79,8 @@ def main():  # pragma: no cover
     """
     args = parse_options()
     args = apply_options(args)
+    print(args)
+    exit(0)
 
     dispatch = {"lambda": lambda_dispatcher}
     dashboard = dispatch[args.service](**args.__dict__)
