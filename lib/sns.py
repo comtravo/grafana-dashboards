@@ -37,9 +37,9 @@ import re
 
 SNS_MEASUREMENT = "cloudwatch_aws_sns"
 
-SNS_PUBLISHED_NOTIFICATIONS = "Published notifications"
-SNS_DELIVERED_NOTIFICATIONS = "Delivered notifications"
-SNS_FAILED_NOTIFICATIONS = "Failed notifications"
+SNS_PUBLISHED_NOTIFICATIONS = "Published"
+SNS_DELIVERED_NOTIFICATIONS = "Delivered"
+SNS_FAILED_NOTIFICATIONS = "Failed"
 
 
 def create_sns_graph(name: str, data_source: str, notifications: List[str]):
@@ -105,13 +105,14 @@ def create_sns_graph(name: str, data_source: str, notifications: List[str]):
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
-                    timeRange=TimeRange("5m", "now"),
+                    timeRange=TimeRange("15m", "now"),
                     evaluator=GreaterThan(0),
                     reducerType=RTYPE_MAX,
                     operator=OP_OR,
                 ),
             ],
-            gracePeriod="10m",
+            frequency="2m",
+            gracePeriod="2m",
             notifications=notifications,
         )
 
