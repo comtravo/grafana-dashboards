@@ -39,10 +39,9 @@ import re
 
 # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-metrics-and-dimensions.html
 API_GATEWAY_INVOCATION_METRIC_GROUP_BY = "1m"
-API_GATEWAY_MEASUREMENT = "cloudwatch_aws_lambda"
+API_GATEWAY_MEASUREMENT = "cloudwatch_aws_api_gateway"
 API_GATEWAY_4XX_ALIAS = "4xx"
 API_GATEWAY_4XX_REF_ID = "B"
-API_GATEWAY_4XX_ALERTS_REF_ID = "D"
 API_GATEWAY_5XX_ALIAS = "5xx"
 API_GATEWAY_REQUESTS_ALIAS = "requests"
 API_GATEWAY_REQUESTS_REF_ID = "C"
@@ -130,7 +129,7 @@ def generate_api_gateway_requests_5xx_graph(
 
 
 def generate_api_gateway_requests_4xx_graph(
-    name: str, data_source: str, notification: List[str], *args, **kwargs
+    name: str, data_source: str, notifications: List[str], *args, **kwargs
 ):
     targets = [
         InfluxDBTarget(
@@ -185,14 +184,14 @@ def generate_api_gateway_requests_4xx_graph(
             noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
-                    Target(refId=API_GATEWAY_REQUESTS_ALIAS),
+                    Target(refId=API_GATEWAY_REQUESTS_REF_ID),
                     timeRange=TimeRange("15m", "now"),
                     evaluator=GreaterThan(9),
                     reducerType=RTYPE_MAX,
                     operator=OP_AND,
                 ),
                 AlertCondition(
-                    Target(refId=API_GATEWAY_4XX_ALIAS),
+                    Target(refId=API_GATEWAY_4XX_REF_ID),
                     timeRange=TimeRange("15m", "now"),
                     evaluator=GreaterThan(0.1),
                     reducerType=RTYPE_MAX,
