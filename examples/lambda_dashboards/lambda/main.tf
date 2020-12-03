@@ -19,7 +19,7 @@ module "dashboard" {
     trigger       = "cloudwatch-event-schedule"
     notifications = ["slack"]
     folder        = null
-    topics        = []
+    topics        = null
   }
 }
 
