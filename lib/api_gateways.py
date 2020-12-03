@@ -249,7 +249,7 @@ def generate_api_gateways_dashboard(
         rows = rows + [Row(panels=lambda_panels)]
 
     return Dashboard(
-        title="{}{}".format("API Gateway:{}", name),
+        title="{}{}".format("API Gateway:", name),
         editable=EDITABLE,
         annotations=get_release_annotations(data_source),
         templating=get_release_template(data_source),
