@@ -161,3 +161,25 @@ class TestAPIGatewayDashboards:
         generated_dashboard.templating.should.be.a(Templating)
         generated_dashboard.tags.should.have.length_of(2)
         generated_dashboard.rows.should.have.length_of(2)
+
+    def test_should_generate_proper_dashboard_with_lambdas(self):
+        apig_name = "apig-1"
+        data_source = "prod"
+        environment = "prod"
+        notifications = ["foo-1", "foo-2"]
+        lambdas = ["lambda-1", "lambda-2"]
+
+        generated_dashboard = generate_api_gateways_dashboard(
+            name=apig_name,
+            data_source=data_source,
+            notifications=notifications,
+            environment=environment,
+            lambdas=lambdas,
+        )
+
+        generated_dashboard.should.be.a(Dashboard)
+        generated_dashboard.title.should.match(r"API Gateway:")
+        generated_dashboard.annotations.should.be.a(Annotations)
+        generated_dashboard.templating.should.be.a(Templating)
+        generated_dashboard.tags.should.have.length_of(3)
+        generated_dashboard.rows.should.have.length_of(3)
