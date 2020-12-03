@@ -130,4 +130,4 @@ class TestAPIGatewayDashboards:
         generated_graph.alert.alertConditions.should.have.length_of(2)
         generated_graph.alert.alertConditions[0].target.should.equal(Target(refId="C"))
         generated_graph.alert.alertConditions[1].target.should.equal(Target(refId="B"))
-        # generated_graph.targets[0].should.eql(expected_alert_query)
+        generated_graph.targets.should.eql(expected_alert_query)
