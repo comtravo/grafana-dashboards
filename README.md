@@ -52,7 +52,6 @@ The [examples](./examples) directory showcases various possibilies on using the 
 ## TODO
 
  - [ ] Create snapshots of dasboards in the [examples](./examples) directory
- - [ ] Add API Gateway
  - [ ] Add Firehose
  - [ ] Add ECS
  - [ ] Add RDS
