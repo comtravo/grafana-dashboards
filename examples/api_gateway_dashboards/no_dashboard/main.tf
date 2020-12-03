@@ -9,17 +9,16 @@ variable "name" {
 
 module "dashboard" {
 
-  source = "../../../terraform_modules/lambda/"
+  source = "../../../terraform_modules/api_gateway/"
 
-  enable = true
+  enable = false
   grafana_configuration = {
     name          = var.name
     environment   = "prod"
     data_source   = "prod"
-    trigger       = "cloudwatch-event-schedule"
     notifications = ["slack"]
     folder        = null
-    topics        = null
+    lambdas       = []
   }
 }
 

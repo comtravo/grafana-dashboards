@@ -7,19 +7,22 @@ variable "name" {
   type = string
 }
 
+resource "grafana_folder" "this" {
+  title = "${var.name}-folder"
+}
+
 module "dashboard" {
 
-  source = "../../../terraform_modules/lambda/"
+  source = "../../../terraform_modules/api_gateway/"
 
   enable = true
   grafana_configuration = {
     name          = var.name
     environment   = "prod"
     data_source   = "prod"
-    trigger       = "cloudwatch-event-schedule"
     notifications = ["slack"]
-    folder        = null
-    topics        = null
+    folder        = grafana_folder.this.id
+    lambdas       = ["lambda-1", "lambda-2"]
   }
 }
 
