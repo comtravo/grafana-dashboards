@@ -16,8 +16,8 @@ variable "enable" {
 }
 
 locals {
-  notification_args = length(var.grafana_configuration.notifications) > 0 ? "--notifications ${join(" ", var.grafana_configuration.notifications)}" : ""
-  lambda_args       = length(var.grafana_configuration.lambdas) > 0 ? "--lambdas ${join(" ", var.grafana_configuration.lambdas)}" : ""
+  notification_args = try(length(var.grafana_configuration.notifications), 0) > 0 ? "--notifications ${join(" ", var.grafana_configuration.notifications)}" : ""
+  lambda_args       = try(length(var.grafana_configuration.lambdas), 0) > 0 ? "--lambdas ${join(" ", var.grafana_configuration.lambdas)}" : ""
   dahboard_path     = "${path.module}/dashboard.json"
 }
 
