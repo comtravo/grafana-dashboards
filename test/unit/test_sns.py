@@ -23,7 +23,7 @@ class TestCreateSNSGraph:
         ]
 
         expected_alert_query = InfluxDBTarget(
-            alias="Failed notifications",
+            alias="Failed",
             query='SELECT sum("number_of_notifications_failed_sum") FROM "autogen"."cloudwatch_aws_sns" WHERE ("topic_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
                 expected_topic_name
             ),
@@ -103,7 +103,7 @@ class TestCreateSNSGraph:
         ]
 
         expected_alert_query = InfluxDBTarget(
-            alias="Failed notifications",
+            alias="Failed",
             query='SELECT sum("number_of_notifications_failed_sum") FROM "autogen"."cloudwatch_aws_sns" WHERE ("topic_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
                 expected_topic_name
             ),
