@@ -27,13 +27,13 @@ class TestAPIGatewayDashboards:
         expected_targets = [
             InfluxDBTarget(
                 alias="5xx",
-                query='SELECT sum("5xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+                query='SELECT sum("5xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                     apig_name
                 ),
             ),
             InfluxDBTarget(
                 alias="requests",
-                query='SELECT sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+                query='SELECT sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                     apig_name
                 ),
             ),
@@ -55,7 +55,7 @@ class TestAPIGatewayDashboards:
 
         expected_alert_query = InfluxDBTarget(
             alias="5xx",
-            query='SELECT sum("5xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+            query='SELECT sum("5xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 apig_name
             ),
             rawQuery=True,
@@ -81,13 +81,19 @@ class TestAPIGatewayDashboards:
         expected_targets = [
             InfluxDBTarget(
                 alias="4xx",
-                query='SELECT sum("4xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+                query='SELECT sum("4xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                     apig_name
                 ),
             ),
             InfluxDBTarget(
                 alias="requests",
-                query='SELECT sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+                query='SELECT sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
+                    apig_name
+                ),
+            ),
+            InfluxDBTarget(
+                alias="requests",
+                query='SELECT sum("4xx_error_sum")/sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                     apig_name
                 ),
             ),
@@ -110,7 +116,7 @@ class TestAPIGatewayDashboards:
         expected_alert_query = targets = [
             InfluxDBTarget(
                 alias="4xx",
-                query='SELECT sum("4xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+                query='SELECT sum("4xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                     apig_name
                 ),
                 rawQuery=True,
@@ -118,11 +124,19 @@ class TestAPIGatewayDashboards:
             ),
             InfluxDBTarget(
                 alias="requests",
-                query='SELECT sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+                query='SELECT sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                     apig_name
                 ),
                 rawQuery=True,
                 refId="C",
+            ),
+            InfluxDBTarget(
+                alias="alert_query",
+                query='SELECT sum("4xx_error_sum")/sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
+                    apig_name
+                ),
+                rawQuery=True,
+                refId="A",
             ),
         ]
 
@@ -137,7 +151,7 @@ class TestAPIGatewayDashboards:
         generated_graph.alert.gracePeriod.should.equal("2m")
         generated_graph.alert.alertConditions.should.have.length_of(2)
         generated_graph.alert.alertConditions[0].target.should.equal(Target(refId="C"))
-        generated_graph.alert.alertConditions[1].target.should.equal(Target(refId="B"))
+        generated_graph.alert.alertConditions[1].target.should.equal(Target(refId="A"))
         generated_graph.targets.should.eql(expected_alert_query)
 
     def test_should_generate_proper_dashboard(self):

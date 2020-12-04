@@ -42,6 +42,7 @@ API_GATEWAY_INVOCATION_METRIC_GROUP_BY = "1m"
 API_GATEWAY_MEASUREMENT = "cloudwatch_aws_api_gateway"
 API_GATEWAY_4XX_ALIAS = "4xx"
 API_GATEWAY_4XX_REF_ID = "B"
+API_GATEWAY_4XX_ALERT_ALIAS = "alert_query"
 API_GATEWAY_5XX_ALIAS = "5xx"
 API_GATEWAY_REQUESTS_ALIAS = "requests"
 API_GATEWAY_REQUESTS_REF_ID = "C"
@@ -53,7 +54,7 @@ def generate_api_gateway_requests_5xx_graph(
     targets = [
         InfluxDBTarget(
             alias=API_GATEWAY_5XX_ALIAS,
-            query='SELECT sum("5xx_error_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+            query='SELECT sum("5xx_error_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, API_GATEWAY_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
@@ -61,7 +62,7 @@ def generate_api_gateway_requests_5xx_graph(
         ),
         InfluxDBTarget(
             alias=API_GATEWAY_REQUESTS_ALIAS,
-            query='SELECT sum("count_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+            query='SELECT sum("count_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, API_GATEWAY_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
@@ -134,7 +135,7 @@ def generate_api_gateway_requests_4xx_graph(
     targets = [
         InfluxDBTarget(
             alias=API_GATEWAY_4XX_ALIAS,
-            query='SELECT sum("4xx_error_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+            query='SELECT sum("4xx_error_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, API_GATEWAY_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
@@ -142,11 +143,19 @@ def generate_api_gateway_requests_4xx_graph(
         ),
         InfluxDBTarget(
             alias=API_GATEWAY_REQUESTS_ALIAS,
-            query='SELECT sum("count_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
+            query='SELECT sum("count_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, API_GATEWAY_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
             refId=API_GATEWAY_REQUESTS_REF_ID if notifications else None,
+        ),
+        InfluxDBTarget(
+            alias=API_GATEWAY_4XX_ALERT_ALIAS,
+            query='SELECT sum("4xx_error_sum")/sum("count_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
+                RETENTION_POLICY, API_GATEWAY_MEASUREMENT, name
+            ),
+            rawQuery=RAW_QUERY,
+            refId=ALERT_REF_ID if notifications else None,
         ),
     ]
 
@@ -171,6 +180,14 @@ def generate_api_gateway_requests_4xx_graph(
             "bars": True,
             "color": colors.RED,
         },
+        {
+            "alias": API_GATEWAY_4XX_ALERT_ALIAS,
+            "yaxis": 2,
+            "lines": False,
+            "points": False,
+            "bars": False,
+            "color": colors.RED,
+        },
     ]
 
     alert = None
@@ -191,7 +208,7 @@ def generate_api_gateway_requests_4xx_graph(
                     operator=OP_AND,
                 ),
                 AlertCondition(
-                    Target(refId=API_GATEWAY_4XX_REF_ID),
+                    Target(refId=ALERT_REF_ID),
                     timeRange=TimeRange("15m", "now"),
                     evaluator=GreaterThan(0.1),
                     reducerType=RTYPE_MAX,
