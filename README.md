@@ -57,4 +57,3 @@ The [examples](./examples) directory showcases various possibilies on using the 
  - [ ] Add RDS
  - [ ] Add SNS
  - [ ] Add MongoDB
- - [ ] Add Step functionss

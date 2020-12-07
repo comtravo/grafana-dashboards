@@ -90,6 +90,7 @@ def generate_api_gateway_requests_5xx_graph(
             "points": False,
             "bars": True,
             "color": colors.RED,
+            "zindex": 1,
         },
     ]
 
@@ -179,6 +180,7 @@ def generate_api_gateway_requests_4xx_graph(
             "points": False,
             "bars": True,
             "color": colors.RED,
+            "zindex": 1,
         },
         {
             "alias": API_GATEWAY_4XX_ALERT_ALIAS,
@@ -248,7 +250,7 @@ def generate_api_gateways_dashboard(
         tags = tags + ["lambda"]
 
     api_gateway_4xx_graph = generate_api_gateway_requests_4xx_graph(
-        name, data_source, notifications
+        name, data_source, []
     )
     api_gateway_5xx_graph = generate_api_gateway_requests_5xx_graph(
         name, data_source, notifications

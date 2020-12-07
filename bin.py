@@ -3,6 +3,7 @@
 from lib import DashboardEncoder
 from lib.lambdas import dispatcher as lambda_dispatcher
 from lib.api_gateways import generate_api_gateways_dashboard as apig_dispatcher
+from lib.step_functions import generate_sfn_dashboard as sfn_dispatcher
 import argparse
 import json
 
@@ -30,6 +31,13 @@ def parse_options():  # pragma: no cover
         "api-gateway", help="Create dashboard for API gateways"
     )
     apig.add_argument(
+        "--lambdas", nargs="+", help="List of Lambda names or arns", default=[]
+    )
+
+    sfn = subparsers.add_parser(
+        "step-function", help="Create dashboard for Step function"
+    )
+    sfn.add_argument(
         "--lambdas", nargs="+", help="List of Lambda names or arns", default=[]
     )
 
@@ -82,7 +90,11 @@ def main():  # pragma: no cover
     """
     args = parse_options()
     args = apply_options(args)
-    dispatch = {"lambda": lambda_dispatcher, "api-gateway": apig_dispatcher}
+    dispatch = {
+        "lambda": lambda_dispatcher,
+        "api-gateway": apig_dispatcher,
+        "step-function": sfn_dispatcher,
+    }
     dashboard = dispatch[args.service](**args.__dict__)
     dashboard_json = json.dumps(dashboard.to_json_data(), cls=DashboardEncoder)
     print(dashboard_json)
