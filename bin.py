@@ -35,7 +35,7 @@ def parse_options():  # pragma: no cover
     )
 
     sfn = subparsers.add_parser(
-        "step-function", help="Create dashboard for API gateways"
+        "step-function", help="Create dashboard for Step function"
     )
     sfn.add_argument(
         "--lambdas", nargs="+", help="List of Lambda names or arns", default=[]

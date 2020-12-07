@@ -66,42 +66,42 @@ def generate_sfn_graph(
     targets = [
         InfluxDBTarget(
             alias=DURATION_MINIMUM_ALIAS,
-            query='SELECT min("execution_time_minimum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
+            query='SELECT min("execution_time_minimum") FROM "{}"."{}" WHERE ("state_machine_arn" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, SFN_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=DURATION_AVERAGE_ALIAS,
-            query='SELECT mean("execution_time_average") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
+            query='SELECT mean("execution_time_average") FROM "{}"."{}" WHERE ("state_machine_arn" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, SFN_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=DURATION_MAXIMUM_ALIAS,
-            query='SELECT max("execution_time_maximum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
+            query='SELECT max("execution_time_maximum") FROM "{}"."{}" WHERE ("state_machine_arn" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, SFN_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=SFN_EXECUTIONS_STARTED_ALIAS,
-            query='SELECT max("executions_started_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
+            query='SELECT max("executions_started_sum") FROM "{}"."{}" WHERE ("state_machine_arn" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, SFN_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=SFN_EXECUTIONS_SUCCEEDED_ALIAS,
-            query='SELECT max("executions_succeeded_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
+            query='SELECT max("executions_succeeded_sum") FROM "{}"."{}" WHERE ("state_machine_arn" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, SFN_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=SFN_EXECUTIONS_ABORTED_ALIAS,
-            query='SELECT max("executions_aborted_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
+            query='SELECT max("executions_aborted_sum") FROM "{}"."{}" WHERE ("state_machine_arn" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, SFN_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
@@ -109,7 +109,7 @@ def generate_sfn_graph(
         ),
         InfluxDBTarget(
             alias=SFN_EXECUTIONS_FAILED_ALIAS,
-            query='SELECT max("executions_failed_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
+            query='SELECT max("executions_failed_sum") FROM "{}"."{}" WHERE ("state_machine_arn" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, SFN_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
@@ -117,7 +117,7 @@ def generate_sfn_graph(
         ),
         InfluxDBTarget(
             alias=SFN_EXECUTIONS_THROTTLED_ALIAS,
-            query='SELECT max("execution_throttled_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
+            query='SELECT max("execution_throttled_sum") FROM "{}"."{}" WHERE ("state_machine_arn" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, SFN_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
@@ -125,7 +125,7 @@ def generate_sfn_graph(
         ),
         InfluxDBTarget(
             alias=SFN_EXECUTIONS_TIMEDOUT_ALIAS,
-            query='SELECT max("execution_timed_out_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
+            query='SELECT max("execution_timed_out_sum") FROM "{}"."{}" WHERE ("state_machine_arn" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
                 RETENTION_POLICY, SFN_MEASUREMENT, name
             ),
             rawQuery=RAW_QUERY,
