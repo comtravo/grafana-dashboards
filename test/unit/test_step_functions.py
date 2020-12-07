@@ -172,7 +172,7 @@ class TestStepFunctionDashboards:
         generated_dashboard.annotations.should.be.a(Annotations)
         generated_dashboard.templating.should.be.a(Templating)
         generated_dashboard.tags.should.have.length_of(3)
-        generated_dashboard.rows.should.have.length_of(2)
+        generated_dashboard.rows.should.have.length_of(3)
 
     def test_should_generate_proper_dashboard_with_arn(self):
         name = "arn:aws:states:eu-west-1:606762362359:stateMachine:sfn-1"

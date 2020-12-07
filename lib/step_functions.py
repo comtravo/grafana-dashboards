@@ -269,28 +269,27 @@ def generate_sfn_dashboard(
 
     tags = ["step-function", environment]
 
-    if lambdas:
-        tags = tags + ["lambda"]
-
     sfn_name = name
     if sfn_name.startswith("arn:aws:states"):
-        sfn_name = sfn_name.split(':')[-1]
+        sfn_name = sfn_name.split(":")[-1]
 
     sfn_graph = generate_sfn_graph(
         name=sfn_name, data_source=data_source, notifications=notifications
     )
 
-    lambda_panels = [
-        lambda_generate_graph(
-            name=l, data_source=data_source, notifications=notifications
-        )
-        for l in lambdas
-    ]
-
     rows = [Row(panels=[sfn_graph])]
 
-    if lambda_panels:
-        rows = rows + [Row(panels=lambda_panels)]
+    if lambdas:
+        tags = tags + ["lambda"]
+
+        lambda_graphs = [
+            lambda_generate_graph(name=l, data_source=data_source, notifications=[])
+            for l in lambdas
+        ]
+
+        lambda_rows = [Row(panels=[g]) for g in lambda_graphs]
+
+        rows = rows + lambda_rows
 
     return Dashboard(
         title="{}{}".format(SFN_DASHBOARD_PREFIX, sfn_name),
