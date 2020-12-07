@@ -168,8 +168,24 @@ class TestStepFunctionDashboards:
         )
 
         generated_dashboard.should.be.a(Dashboard)
-        generated_dashboard.title.should.match(r"Step Function:")
+        generated_dashboard.title.should.match(r"Step Function: sfn-1")
         generated_dashboard.annotations.should.be.a(Annotations)
         generated_dashboard.templating.should.be.a(Templating)
         generated_dashboard.tags.should.have.length_of(3)
         generated_dashboard.rows.should.have.length_of(2)
+
+    def test_should_generate_proper_dashboard_with_arn(self):
+        name = "arn:aws:states:eu-west-1:606762362359:stateMachine:sfn-1"
+        data_source = "prod"
+        environment = "prod"
+        notifications = ["foo-1", "foo-2"]
+        lambdas = ["lambda-1", "lambda-2"]
+
+        generated_dashboard = generate_sfn_dashboard(
+            name=name,
+            data_source=data_source,
+            notifications=notifications,
+            environment=environment,
+            lambdas=lambdas,
+        )
+        generated_dashboard.title.should.match(r"Step Function: sfn-1")
