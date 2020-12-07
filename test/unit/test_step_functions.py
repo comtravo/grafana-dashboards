@@ -37,52 +37,75 @@ class TestStepFunctionDashboards:
 
         expected_targets = [
             InfluxDBTarget(
+                alias="Duration - Minimum",
                 query='SELECT min("execution_time_minimum") FROM "autogen"."cloudwatch_aws_states" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
                     sfn_name
                 ),
+                rawQuery=True,
+                refId="E",
             ),
             InfluxDBTarget(
+                alias="Duration - Average",
                 query='SELECT mean("execution_time_average") FROM "autogen"."cloudwatch_aws_states" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
                     sfn_name
                 ),
+                rawQuery=True,
+                refId="F",
             ),
             InfluxDBTarget(
+                alias="Duration - Maximum",
                 query='SELECT max("execution_time_maximum") FROM "autogen"."cloudwatch_aws_states" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
                     sfn_name
                 ),
+                rawQuery=True,
+                refId="G",
             ),
             InfluxDBTarget(
+                alias="Executions - Started",
                 query='SELECT max("executions_started_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
                     sfn_name
                 ),
+                rawQuery=True,
+                refId="H",
             ),
             InfluxDBTarget(
+                alias="Executions - Succeeded",
                 query='SELECT max("executions_succeeded_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
                     sfn_name
                 ),
+                rawQuery=True,
+                refId="I",
             ),
             InfluxDBTarget(
+                alias="Executions - Aborted",
                 query='SELECT max("executions_aborted_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
                     sfn_name
                 ),
+                rawQuery=True,
                 refId="A",
             ),
             InfluxDBTarget(
+                alias="Executions - Failed",
                 query='SELECT max("executions_failed_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
                     sfn_name
                 ),
+                rawQuery=True,
                 refId="B",
             ),
             InfluxDBTarget(
+                alias="Executions - Throttled",
                 query='SELECT max("execution_throttled_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
                     sfn_name
                 ),
+                rawQuery=True,
                 refId="C",
             ),
             InfluxDBTarget(
+                alias="Executions - Timeout",
                 query='SELECT max("execution_timed_out_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
                     sfn_name
                 ),
+                rawQuery=True,
                 refId="D",
             ),
         ]
@@ -94,6 +117,8 @@ class TestStepFunctionDashboards:
         generated_graph.alert.frequency.should.eql("2m")
         generated_graph.alert.gracePeriod.should.eql("2m")
         generated_graph.alert.notifications.should.eql(notifications)
+
+        generated_graph.targets.should.equal(expected_targets)
 
         generated_graph.alert.alertConditions.should.have.length_of(4)
         generated_graph.alert.alertConditions[0].target.should.equal(Target(refId="A"))
