@@ -25,7 +25,7 @@ pipeline {
         try {
         sh(label: 'Lint docker image', script: "make lint-docker")
         sh(label: 'Tests', script: "make test-docker")
-        } fincally {
+        } finally {
           sh(label: 'Teardown', script: "make test-docker")
         }
       }
