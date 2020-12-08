@@ -1,3 +1,8 @@
+"""
+Generate lambda dashboards and alerts
+"""
+
+from typing import List
 from grafanalib.core import (
     Alert,
     AlertCondition,
@@ -32,7 +37,6 @@ from lib.sns import create_sns_graph
 from lib.templating import get_release_template
 from lib import colors
 
-from typing import List
 
 LAMBDA_MEASUREMENT = "cloudwatch_aws_lambda"
 LAMBDA_DASHBOARD_PREFIX = "Lambda: "
@@ -47,7 +51,7 @@ LAMBDA_ERRORS_ALIAS = "Errors - Sum"
 LAMBDA_INVOCATION_METRIC_GROUP_BY = "1m"
 
 
-def dispatcher(service, trigger, *args, **kwargs):
+def dispatcher(service, trigger, **kwargs):
     """
     lambda dashboard generator
     """
@@ -68,9 +72,7 @@ def dispatcher(service, trigger, *args, **kwargs):
     return dispatch[trigger](**kwargs)
 
 
-def lambda_generate_graph(
-    name: str, data_source: str, notifications: List[str], *args, **kwargs
-):
+def lambda_generate_graph(name: str, data_source: str, notifications: List[str]):
     """
     Generate lambda graph
     """
@@ -114,12 +116,12 @@ def lambda_generate_graph(
         ),
     ]
 
-    yAxes = YAxes(
+    y_axes = YAxes(
         YAxis(format=MILLISECONDS_FORMAT, decimals=2),
         YAxis(format=SHORT_FORMAT, decimals=2),
     )
 
-    seriesOverrides = [
+    series_overrides = [
         {
             "alias": LAMBDA_INVOCATIONS_ALIAS,
             "yaxis": 2,
@@ -172,8 +174,8 @@ def lambda_generate_graph(
         title="Lambda: {}".format(name),
         dataSource=data_source,
         targets=targets,
-        seriesOverrides=seriesOverrides,
-        yAxes=yAxes,
+        seriesOverrides=series_overrides,
+        yAxes=y_axes,
         transparent=TRANSPARENT,
         editable=EDITABLE,
         alert=alert,
@@ -227,8 +229,6 @@ def create_lambda_only_dashboard(
     data_source: str,
     notifications: List[str],
     environment: str,
-    *args,
-    **kwargs
 ):
     """Create a dashboard with just the lambda"""
 
@@ -266,7 +266,7 @@ def create_lambda_sqs_dlq_graph(name: str, data_source: str, notifications: List
         )
     ]
 
-    yAxes = single_y_axis(format=SHORT_FORMAT)
+    y_axes = single_y_axis(format=SHORT_FORMAT)
     alert = None
 
     # https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-monitoring-using-cloudwatch.html
@@ -294,7 +294,7 @@ def create_lambda_sqs_dlq_graph(name: str, data_source: str, notifications: List
         title="SQS Dead Letter Queue: {}".format(name),
         dataSource=data_source,
         targets=targets,
-        yAxes=yAxes,
+        yAxes=y_axes,
         transparent=TRANSPARENT,
         editable=EDITABLE,
         alert=alert,
@@ -315,25 +315,20 @@ def create_lambda_sqs_graph(name: str, data_source: str):
         )
     ]
 
-    yAxes = single_y_axis(format=SHORT_FORMAT)
+    y_axes = single_y_axis(format=SHORT_FORMAT)
 
     return Graph(
         title="SQS: {}".format(name),
         dataSource=data_source,
         targets=targets,
-        yAxes=yAxes,
+        yAxes=y_axes,
         transparent=TRANSPARENT,
         editable=EDITABLE,
     ).auto_ref_ids()
 
 
 def lambda_sqs_dashboard(
-    name: str,
-    data_source: str,
-    notifications: List[str],
-    environment: str,
-    *args,
-    **kwargs
+    name: str, data_source: str, notifications: List[str], environment: str
 ):
     """Create a dashboard with Lambda and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment]
@@ -366,8 +361,6 @@ def lambda_sns_sqs_dashboard(
     notifications: List[str],
     environment: str,
     topics: List[str],
-    *args,
-    **kwargs
 ):
     """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment, "sns"]

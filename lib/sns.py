@@ -1,39 +1,33 @@
+"""
+Generate SNS dashboards and alerts
+"""
+
+import re
+from typing import List
+
 from grafanalib.core import (
     Alert,
     AlertCondition,
-    Dashboard,
     Graph,
     GreaterThan,
-    LowerThan,
-    MILLISECONDS_FORMAT,
     OP_OR,
     RTYPE_MAX,
     single_y_axis,
     SHORT_FORMAT,
     TimeRange,
-    Row,
     Target,
-    YAxes,
-    YAxis,
 )
 from grafanalib.influxdb import InfluxDBTarget
 
-from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
     EDITABLE,
     RAW_QUERY,
     RETENTION_POLICY,
-    SHARED_CROSSHAIR,
-    TIMEZONE,
     TRANSPARENT,
 )
-from lib.templating import get_release_template
 from lib import colors
-from typing import List
-
-import re
 
 SNS_MEASUREMENT = "cloudwatch_aws_sns"
 
@@ -73,7 +67,7 @@ def create_sns_graph(name: str, data_source: str, notifications: List[str]):
         ),
     ]
 
-    seriesOverrides = [
+    series_overrides = [
         {
             "alias": SNS_FAILED_NOTIFICATIONS,
             "yaxis": 2,
@@ -85,7 +79,7 @@ def create_sns_graph(name: str, data_source: str, notifications: List[str]):
         },
     ]
 
-    yAxes = single_y_axis(format=SHORT_FORMAT)
+    y_axes = single_y_axis(format=SHORT_FORMAT)
 
     alert = None
 
@@ -116,8 +110,8 @@ def create_sns_graph(name: str, data_source: str, notifications: List[str]):
         title="SNS: {}".format(name),
         dataSource=data_source,
         targets=targets,
-        yAxes=yAxes,
-        seriesOverrides=seriesOverrides,
+        yAxes=y_axes,
+        seriesOverrides=series_overrides,
         transparent=TRANSPARENT,
         editable=EDITABLE,
         bars=True,

@@ -21,8 +21,15 @@ pipeline {
     stage("Build and Test") {
       steps {
         sh(label: 'Building docker image', script: "make build")
-        sh(label: 'Building docker image', script: "make lint-docker")
-        sh(label: 'Testing docker image', script: "make test-docker")
+
+        script {
+          try {
+            sh(label: 'Lint docker image', script: "make lint-docker")
+            sh(label: 'Tests', script: "make test-docker")
+          } finally {
+            sh(label: 'Teardown', script: "make test-docker")
+          }
+        }
       }
     }
   }

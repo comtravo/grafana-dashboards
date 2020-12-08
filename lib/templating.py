@@ -1,3 +1,7 @@
+"""
+Generate Templating configuration
+"""
+
 from grafanalib.core import Templating
 
 
