@@ -1,6 +1,6 @@
-#   """
-#     https://docs.aws.amazon.com/firehose/latest/dev/monitoring-with-cloudwatch-metrics.html
-#   """
+"""
+    https://docs.aws.amazon.com/firehose/latest/dev/monitoring-with-cloudwatch-metrics.html
+"""
 
 from grafanalib.core import (
     Dashboard,
