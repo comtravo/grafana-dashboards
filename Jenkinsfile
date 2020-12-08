@@ -27,7 +27,7 @@ pipeline {
             sh(label: 'lint', script: "make lint-docker")
             sh(label: 'test', script: "make test-docker")
           } finally {
-            sh(label: 'tear down', script: "down")
+            sh(label: 'tear down', script: "make down")
           }
         }
       }
