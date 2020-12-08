@@ -1,3 +1,7 @@
+"""
+Generate annotations
+"""
+
 from grafanalib.core import Annotations
 
 from lib import colors

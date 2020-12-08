@@ -1,3 +1,7 @@
+"""
+Common configuration
+"""
+
 ALERT_THRESHOLD = False
 ALERT_REF_ID = "A"
 TIMEZONE = ""

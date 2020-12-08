@@ -1,3 +1,8 @@
+"""
+Generate Step function dashboards and alerts
+"""
+
+from typing import List
 from grafanalib.core import (
     Alert,
     AlertCondition,
@@ -7,7 +12,6 @@ from grafanalib.core import (
     MILLISECONDS_FORMAT,
     OP_OR,
     RTYPE_MAX,
-    single_y_axis,
     SHORT_FORMAT,
     TimeRange,
     Row,
@@ -19,7 +23,6 @@ from grafanalib.influxdb import InfluxDBTarget
 
 from lib.annotations import get_release_annotations
 from lib.commons import (
-    ALERT_REF_ID,
     ALERT_THRESHOLD,
     EDITABLE,
     RAW_QUERY,
@@ -33,7 +36,6 @@ from lib.templating import get_release_template
 from lib.lambdas import lambda_generate_graph
 from lib import colors
 
-from typing import List
 
 # https://docs.aws.amazon.com/step-functions/latest/dg/procedure-cw-metrics.html
 
@@ -56,9 +58,7 @@ SFN_EXECUTIONS_TIMEDOUT_ALIAS = "Executions - Timeout"
 SFN_EXECUTIONS_TIMEDOUT_REF_ID = "D"
 
 
-def generate_sfn_graph(
-    name: str, data_source: str, notifications: List[str], *args, **kwargs
-):
+def generate_sfn_graph(name: str, data_source: str, notifications: List[str]):
     """
     Generate step function graph
     """
@@ -133,12 +133,12 @@ def generate_sfn_graph(
         ),
     ]
 
-    yAxes = YAxes(
+    y_axes = YAxes(
         YAxis(format=MILLISECONDS_FORMAT, decimals=2),
         YAxis(format=SHORT_FORMAT, decimals=2),
     )
 
-    seriesOverrides = [
+    series_overrides = [
         {
             "alias": SFN_EXECUTIONS_STARTED_ALIAS,
             "yaxis": 2,
@@ -247,8 +247,8 @@ def generate_sfn_graph(
         title="Step function execution metrics",
         dataSource=data_source,
         targets=targets,
-        seriesOverrides=seriesOverrides,
-        yAxes=yAxes,
+        seriesOverrides=series_overrides,
+        yAxes=y_axes,
         transparent=TRANSPARENT,
         editable=EDITABLE,
         alert=alert,
@@ -262,8 +262,6 @@ def generate_sfn_dashboard(
     notifications: List[str],
     environment: str,
     lambdas: List[str],
-    *args,
-    **kwargs
 ):
     """Create a dashboard for the step function"""
 

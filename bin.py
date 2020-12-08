@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
+"""
+    Entrypoint
+"""
+import argparse
+import json
 
-from lib import DashboardEncoder
+from lib.dashboard import DashboardEncoder
 from lib.lambdas import dispatcher as lambda_dispatcher
 from lib.api_gateways import generate_api_gateways_dashboard as apig_dispatcher
 from lib.step_functions import generate_sfn_dashboard as sfn_dispatcher
-import argparse
-import json
 
 
 def parse_options():  # pragma: no cover

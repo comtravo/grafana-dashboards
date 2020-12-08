@@ -28,6 +28,7 @@ fmt: fmt-go fmt-py
 
 lint-py:
 	@black --check .
+	@pylint *.py **/*.py
 
 lint-go:
 	@terraform fmt -check -recursive -diff=true

@@ -1,3 +1,7 @@
+"""
+Standard colors
+"""
+
 YELLOW = "#EAB839"
 GREEN = "#7EB26D"
 BLUE = "#6ED0E0"

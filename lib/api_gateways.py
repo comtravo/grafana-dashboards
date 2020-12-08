@@ -1,13 +1,16 @@
+"""
+Generate API Gateway graphs and dashboards
+"""
+
+from typing import List
 from grafanalib.core import (
     Alert,
     AlertCondition,
     Dashboard,
     Graph,
     GreaterThan,
-    MILLISECONDS_FORMAT,
     OP_AND,
     RTYPE_MAX,
-    single_y_axis,
     SHORT_FORMAT,
     TimeRange,
     Row,
@@ -33,9 +36,6 @@ from lib.templating import get_release_template
 from lib.lambdas import lambda_generate_graph
 from lib import colors
 
-from typing import List
-
-import re
 
 # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-metrics-and-dimensions.html
 API_GATEWAY_INVOCATION_METRIC_GROUP_BY = "1m"
@@ -49,8 +49,11 @@ API_GATEWAY_REQUESTS_REF_ID = "C"
 
 
 def generate_api_gateway_requests_5xx_graph(
-    name: str, data_source: str, notifications: List[str], *args, **kwargs
+    name: str, data_source: str, notifications: List[str]
 ):
+    """
+    Generate API Gateway graph with 5XX info
+    """
     targets = [
         InfluxDBTarget(
             alias=API_GATEWAY_5XX_ALIAS,
@@ -70,12 +73,12 @@ def generate_api_gateway_requests_5xx_graph(
         ),
     ]
 
-    yAxes = YAxes(
+    y_axes = YAxes(
         YAxis(format=SHORT_FORMAT),
         YAxis(format=SHORT_FORMAT),
     )
 
-    seriesOverrides = [
+    series_overrides = [
         {
             "alias": API_GATEWAY_REQUESTS_ALIAS,
             "lines": False,
@@ -121,8 +124,8 @@ def generate_api_gateway_requests_5xx_graph(
         title="API Gateway Requests and 5XX errors: {}".format(name),
         dataSource=data_source,
         targets=targets,
-        seriesOverrides=seriesOverrides,
-        yAxes=yAxes,
+        seriesOverrides=series_overrides,
+        yAxes=y_axes,
         transparent=TRANSPARENT,
         editable=EDITABLE,
         alert=alert,
@@ -131,8 +134,11 @@ def generate_api_gateway_requests_5xx_graph(
 
 
 def generate_api_gateway_requests_4xx_graph(
-    name: str, data_source: str, notifications: List[str], *args, **kwargs
+    name: str, data_source: str, notifications: List[str]
 ):
+    """
+    Generate API Gateway graph with 4XX info
+    """
     targets = [
         InfluxDBTarget(
             alias=API_GATEWAY_4XX_ALIAS,
@@ -160,12 +166,12 @@ def generate_api_gateway_requests_4xx_graph(
         ),
     ]
 
-    yAxes = YAxes(
+    y_axes = YAxes(
         YAxis(format=SHORT_FORMAT),
         YAxis(format=SHORT_FORMAT),
     )
 
-    seriesOverrides = [
+    series_overrides = [
         {
             "alias": API_GATEWAY_REQUESTS_ALIAS,
             "lines": False,
@@ -226,8 +232,8 @@ def generate_api_gateway_requests_4xx_graph(
         title="API Gateway Requests and 4XX errors: {}".format(name),
         dataSource=data_source,
         targets=targets,
-        seriesOverrides=seriesOverrides,
-        yAxes=yAxes,
+        seriesOverrides=series_overrides,
+        yAxes=y_axes,
         transparent=TRANSPARENT,
         editable=EDITABLE,
         alert=alert,
@@ -241,9 +247,10 @@ def generate_api_gateways_dashboard(
     notifications: List[str],
     environment: str,
     lambdas: List[str],
-    *args,
-    **kwargs
 ):
+    """
+    Generate API Gateway dashboard
+    """
     tags = ["api-gateway", environment]
 
     if lambdas:
