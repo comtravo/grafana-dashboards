@@ -28,7 +28,6 @@ class TestDispatcher:
             "cloudwatch-event-schedule",
             "cloudwatch-event-trigger",
             "cloudwatch-logs",
-            # "sns",
             "sqs",
             "null",
         ]
