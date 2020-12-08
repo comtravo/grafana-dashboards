@@ -62,6 +62,7 @@ confidence=
 # --disable=W".
 disable=print-statement,
         line-too-long,
+        duplicate-code,
         parameter-unpacking,
         unpacking-in-except,
         old-raise-syntax,
