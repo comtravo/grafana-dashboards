@@ -22,11 +22,13 @@ pipeline {
       steps {
         sh(label: 'Building docker image', script: "make build")
 
-        try {
-        sh(label: 'Lint docker image', script: "make lint-docker")
-        sh(label: 'Tests', script: "make test-docker")
-        } finally {
-          sh(label: 'Teardown', script: "make test-docker")
+        script {
+          try {
+            sh(label: 'Lint docker image', script: "make lint-docker")
+            sh(label: 'Tests', script: "make test-docker")
+          } finally {
+            sh(label: 'Teardown', script: "make test-docker")
+          }
         }
       }
     }
