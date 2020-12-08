@@ -10,7 +10,6 @@ import (
 )
 
 func TestLambda_noDashboard(t *testing.T) {
-	t.Parallel()
 
 	dashboardName := fmt.Sprintf("lambda-%s", random.UniqueId())
 	exampleDir := "../../examples/lambda_dashboards/no_dashboard/"
@@ -39,7 +38,6 @@ func TestLambda_noDashboard(t *testing.T) {
 }
 
 func TestLambda_lambda(t *testing.T) {
-	t.Parallel()
 
 	dashboardName := fmt.Sprintf("lambda-%s", random.UniqueId())
 	exampleDir := "../../examples/lambda_dashboards/lambda/"
@@ -52,7 +50,6 @@ func TestLambda_lambda(t *testing.T) {
 }
 
 func TestLambda_lambdaFolder(t *testing.T) {
-	t.Parallel()
 
 	dashboardName := fmt.Sprintf("lambda-%s", random.UniqueId())
 	exampleDir := "../../examples/lambda_dashboards/lambda_folder/"
@@ -65,7 +62,6 @@ func TestLambda_lambdaFolder(t *testing.T) {
 }
 
 func TestLambda_lambdaAlert(t *testing.T) {
-	t.Parallel()
 
 	dashboardName := fmt.Sprintf("lambda-%s", random.UniqueId())
 	exampleDir := "../../examples/lambda_dashboards/lambda_alert/"
@@ -78,7 +74,6 @@ func TestLambda_lambdaAlert(t *testing.T) {
 }
 
 func TestLambda_lambdaSnsSqsTrigger(t *testing.T) {
-	t.Parallel()
 
 	dashboardName := fmt.Sprintf("lambda-%s", random.UniqueId())
 	exampleDir := "../../examples/lambda_dashboards/lambda_sns_sqs_trigger/"
