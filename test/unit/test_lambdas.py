@@ -47,7 +47,9 @@ class TestDispatcher:
             dash = dispatcher(service="lambda", trigger=trigger, **call_args)
             dash.should.be.a(Dashboard)
 
-        dash = dispatcher(service="lambda", trigger="sns", **{**call_args, **{"topics": topics}})
+        dash = dispatcher(
+            service="lambda", trigger="sns", **{**call_args, **{"topics": topics}}
+        )
         dash.should.be.a(Dashboard)
 
     def test_should_generate_lambda_graph(self):
