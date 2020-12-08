@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestStepFunction_noDashboard(t *testing.T) {
+func TestFirehose_noDashboard(t *testing.T) {
 
-	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
-	exampleDir := "../../examples/step_function_dashboards/no_dashboard/"
+	dashboardName := fmt.Sprintf("firehose-%s", random.UniqueId())
+	exampleDir := "../../examples/firehose_dashboards/no_dashboard/"
 
 	terraformOptions := SetupExample(t, dashboardName, exampleDir)
 	t.Logf("Terraform module inputs: %+v", *terraformOptions)
@@ -37,22 +37,10 @@ func TestStepFunction_noDashboard(t *testing.T) {
 	require.Equal(t, expectedMap, output, "Map %q should match %q", expectedMap, output)
 }
 
-func TestStepFunction_alert(t *testing.T) {
+func TestFirehose_dashboard(t *testing.T) {
 
-	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
-	exampleDir := "../../examples/step_function_dashboards/step_function_alert/"
-
-	terraformOptions := SetupExample(t, dashboardName, exampleDir)
-	t.Logf("Terraform module inputs: %+v", *terraformOptions)
-	defer terraform.Destroy(t, terraformOptions)
-
-	TerraformApplyAndValidateOutputs(t, terraformOptions)
-}
-
-func TestStepFunction_folder(t *testing.T) {
-
-	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
-	exampleDir := "../../examples/step_function_dashboards/step_function_folder/"
+	dashboardName := fmt.Sprintf("firehose-%s", random.UniqueId())
+	exampleDir := "../../examples/firehose_dashboards/dashboard/"
 
 	terraformOptions := SetupExample(t, dashboardName, exampleDir)
 	t.Logf("Terraform module inputs: %+v", *terraformOptions)
@@ -61,10 +49,10 @@ func TestStepFunction_folder(t *testing.T) {
 	TerraformApplyAndValidateOutputs(t, terraformOptions)
 }
 
-func TestStepFunction_withoutLambda(t *testing.T) {
+func TestFirehose_folder(t *testing.T) {
 
-	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
-	exampleDir := "../../examples/step_function_dashboards/step_function_without_lambda/"
+	dashboardName := fmt.Sprintf("firehose-%s", random.UniqueId())
+	exampleDir := "../../examples/firehose_dashboards/dashboard_with_folder/"
 
 	terraformOptions := SetupExample(t, dashboardName, exampleDir)
 	t.Logf("Terraform module inputs: %+v", *terraformOptions)

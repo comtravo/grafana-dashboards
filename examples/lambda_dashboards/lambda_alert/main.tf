@@ -8,7 +8,7 @@ variable "name" {
 }
 
 resource "grafana_alert_notification" "slack_1" {
-  name          = "slack_1"
+  name          = "${var.name}-slack_1"
   type          = "slack"
   is_default    = false
   send_reminder = true
@@ -26,7 +26,7 @@ resource "grafana_alert_notification" "slack_1" {
 }
 
 resource "grafana_alert_notification" "slack_2" {
-  name          = "slack_2"
+  name          = "${var.name}-slack_2"
   type          = "slack"
   is_default    = false
   send_reminder = true
