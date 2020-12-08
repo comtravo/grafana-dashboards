@@ -29,7 +29,7 @@ from lib.commons import (
     TIMEZONE,
     TRANSPARENT,
 )
-from lib.templating import get_release_template
+from lib.templating import get_release_templating
 from lib import colors
 from typing import List
 

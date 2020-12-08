@@ -29,7 +29,7 @@ from lib.commons import (
     TRANSPARENT,
 )
 from lib.sns import create_sns_graph
-from lib.templating import get_release_template
+from lib.templating import get_release_templating
 from lib import colors
 
 from typing import List
@@ -236,7 +236,7 @@ def create_lambda_only_dashboard(
         title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
         annotations=get_release_annotations(data_source),
-        templating=get_release_template(data_source),
+        templating=get_release_templating(data_source),
         tags=tags + ["lambda", environment],
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
@@ -348,7 +348,7 @@ def lambda_sqs_dashboard(
         title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
         annotations=get_release_annotations(data_source),
-        templating=get_release_template(data_source),
+        templating=get_release_templating(data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
@@ -389,7 +389,7 @@ def lambda_sns_sqs_dashboard(
         title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
         annotations=get_release_annotations(data_source),
-        templating=get_release_template(data_source),
+        templating=get_release_templating(data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,

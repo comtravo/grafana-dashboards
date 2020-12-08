@@ -29,7 +29,7 @@ from lib.commons import (
     TRANSPARENT,
 )
 
-from lib.templating import get_release_template
+from lib.templating import get_release_templating
 from lib.lambdas import lambda_generate_graph
 from lib import colors
 
@@ -271,7 +271,7 @@ def generate_api_gateways_dashboard(
         title="{} {}".format("API Gateway:", name),
         editable=EDITABLE,
         annotations=get_release_annotations(data_source),
-        templating=get_release_template(data_source),
+        templating=get_release_templating(data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
