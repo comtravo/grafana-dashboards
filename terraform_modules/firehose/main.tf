@@ -1,9 +1,9 @@
 variable "grafana_configuration" {
   description = "Configuration for creating Grafana dashboards and alerts"
   type = object({
-    environment   = string
-    data_source   = string
-    folder        = string
+    environment = string
+    data_source = string
+    folder      = string
   })
 }
 
@@ -13,7 +13,7 @@ variable "enable" {
 }
 
 locals {
-  dahboard_path     = "${path.module}/dashboard.json"
+  dahboard_path = "${path.module}/dashboard.json"
 }
 
 resource "null_resource" "generate_dashboard" {

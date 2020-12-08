@@ -17,9 +17,9 @@ module "dashboard" {
 
   enable = true
   grafana_configuration = {
-    environment   = "prod"
-    data_source   = "prod"
-    folder        = grafana_folder.this.id
+    environment = "prod"
+    data_source = "prod"
+    folder      = grafana_folder.this.id
   }
 }
 
