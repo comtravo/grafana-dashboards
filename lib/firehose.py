@@ -44,9 +44,7 @@ def get_firehose_template(data_source: str):
         allValue="",
         sort=5,
         multi=True,
-        # multi=False,
         includeAll=True,
-        # includeAll=False,
         hide=0,
     )
 
