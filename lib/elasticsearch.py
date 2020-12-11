@@ -245,6 +245,7 @@ def generate_elasticsearch_storage_graph(data_source: str):
         lines=False,
     ).auto_ref_ids()
 
+
 def generate_elasticsearch_requests_graph(data_source: str):
     """
     Generate Elasticsearch graph
