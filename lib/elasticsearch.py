@@ -2,15 +2,24 @@
     https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains-cloudwatchmetrics.html
 """
 
+from typing import List
 from grafanalib.core import (
+    Alert,
+    AlertCondition,
     Dashboard,
+    LowerThan,
     Graph,
+    GreaterThan,
+    OP_OR,
     PERCENT_FORMAT,
     Repeat,
     Row,
+    RTYPE_MAX,
     SHORT_FORMAT,
+    Target,
     Template,
     Templating,
+    TimeRange,
     single_y_axis,
     YAxes,
     YAxis,
@@ -260,8 +269,6 @@ def generate_elasticsearch_requests_graph(data_source: str):
     xx4_alias = "4xx"
     xx5_alias = "5xx"
 
-    cluster_used_space_alias = "Used space"
-
     targets = [
         InfluxDBTarget(
             alias=xx2_alias,
@@ -333,8 +340,153 @@ def generate_elasticsearch_requests_graph(data_source: str):
     ).auto_ref_ids()
 
 
+def generate_elasticsearch_alerts_graph(data_source: str, notifications: List[str]):
+    """
+    Generate Elasticsearch graph
+    """
+
+    y_axes = YAxes(
+        YAxis(format=SHORT_FORMAT),
+        YAxis(format=SHORT_FORMAT),
+    )
+
+    targets = [
+        InfluxDBTarget(
+            alias="cluster_red",
+            query='SELECT max("cluster_status.red_maximum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, ES_MEASUREMENT
+            ),
+            rawQuery=RAW_QUERY,
+            refId="A",
+        ),
+        InfluxDBTarget(
+            alias="number_of_nodes",
+            query='SELECT min("nodes_minimum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, ES_MEASUREMENT
+            ),
+            rawQuery=RAW_QUERY,
+            refId="B",
+        ),
+        InfluxDBTarget(
+            alias="storage_used_percent",
+            query='SELECT max("cluster_used_space_maximum") / min("free_storage_space_minimum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, ES_MEASUREMENT
+            ),
+            rawQuery=RAW_QUERY,
+            refId="C",
+        ),
+        InfluxDBTarget(
+            alias="writes_blocked",
+            query='SELECT max("cluster_index_writes_blocked_maximum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, ES_MEASUREMENT
+            ),
+            rawQuery=RAW_QUERY,
+            refId="D",
+        ),
+        InfluxDBTarget(
+            alias="jvm_memory_pressure",
+            query='SELECT max("jvm_memory_pressure_maximum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, ES_MEASUREMENT
+            ),
+            rawQuery=RAW_QUERY,
+            refId="E",
+        ),
+        InfluxDBTarget(
+            alias="automated_snapshot_failure",
+            query='SELECT max("automated_snapshot_failure_maximum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, ES_MEASUREMENT
+            ),
+            rawQuery=RAW_QUERY,
+            refId="F",
+        ),
+        InfluxDBTarget(
+            alias="5xx",
+            query='SELECT max("5xx_sum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
+                RETENTION_POLICY, ES_MEASUREMENT
+            ),
+            rawQuery=RAW_QUERY,
+            refId="G",
+        ),
+    ]
+
+    alert = None
+
+    if notifications:
+        alert = Alert(
+            name="Elasticsearch errors",
+            message="Elasticsearch is facing some issues",
+            executionErrorState="alerting",
+            noDataState="keep_state",
+            alertConditions=[
+                AlertCondition(
+                    Target(refId="A"),
+                    timeRange=TimeRange("5m", "now"),
+                    evaluator=GreaterThan(0),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_OR,
+                ),
+                AlertCondition(
+                    Target(refId="B"),
+                    timeRange=TimeRange("5m", "now"),
+                    evaluator=LowerThan(1),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_OR,
+                ),
+                AlertCondition(
+                    Target(refId="C"),
+                    timeRange=TimeRange("5m", "now"),
+                    evaluator=GreaterThan(0.7),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_OR,
+                ),
+                AlertCondition(
+                    Target(refId="D"),
+                    timeRange=TimeRange("5m", "now"),
+                    evaluator=GreaterThan(0),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_OR,
+                ),
+                AlertCondition(
+                    Target(refId="E"),
+                    timeRange=TimeRange("5m", "now"),
+                    evaluator=GreaterThan(80),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_OR,
+                ),
+                AlertCondition(
+                    Target(refId="F"),
+                    timeRange=TimeRange("5m", "now"),
+                    evaluator=GreaterThan(0),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_OR,
+                ),
+                AlertCondition(
+                    Target(refId="G"),
+                    timeRange=TimeRange("5m", "now"),
+                    evaluator=GreaterThan(0),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_OR,
+                ),
+            ],
+            frequency="2m",
+            gracePeriod="2m",
+            notifications=notifications,
+        )
+
+    return Graph(
+        title="Alert queries",
+        dataSource=data_source,
+        targets=targets,
+        yAxes=y_axes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=True,
+        lines=False,
+    ).auto_ref_ids()
+
+
 def generate_elasticsearch_dashboard(
-    data_source: str, environment: str, *args, **kwargs
+    data_source: str, environment: str, notifications: List[str], *args, **kwargs
 ):
     """Generate Elasticsearch dashboard"""
     tags = ["elasticsearch", environment]
@@ -366,6 +518,14 @@ def generate_elasticsearch_dashboard(
         ),
         Row(
             panels=[generate_elasticsearch_requests_graph(data_source=data_source)],
+            editable=EDITABLE,
+        ),
+        Row(
+            panels=[
+                generate_elasticsearch_alerts_graph(
+                    data_source=data_source, notifications=notifications
+                )
+            ],
             editable=EDITABLE,
         ),
     ]

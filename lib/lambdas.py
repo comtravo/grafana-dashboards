@@ -5,7 +5,7 @@ from grafanalib.core import (
     Graph,
     GreaterThan,
     MILLISECONDS_FORMAT,
-    OP_AND,
+    OP_OR,
     RTYPE_MAX,
     single_y_axis,
     SHORT_FORMAT,
