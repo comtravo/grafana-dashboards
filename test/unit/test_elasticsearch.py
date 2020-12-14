@@ -9,17 +9,40 @@ from grafanalib.core import (
     Templating,
 )
 
-# from grafanalib.influxdb import InfluxDBTarget
+from grafanalib.influxdb import InfluxDBTarget
 
 from lib.elasticsearch import (
+    get_elasticsearch_template,
+    generate_elasticsearch_cpu_graph,
     generate_elasticsearch_dashboard,
     generate_elasticsearch_alerts_dashboard,
 )
 
-import re
+# import re
 
 
 class TestElasticsearchDashboards:
+    def test_should_get_elasticsearch_template(self):
+        template = get_elasticsearch_template(data_source="prod")
+        template.name.should.equal("elasticsearch")
+        template.label.should.equal("Elasticsearch")
+        template.query.should.equal(
+            'SHOW TAG VALUES WITH KEY = "domain_name" WHERE $timeFilter'
+        )
+        template.multi.should.equal(False)
+        template.includeAll.should.equal(False)
+
+    def test_should_generate_elasticsearch_cpu_graph(self):
+        data_source = "prod"
+        generated_graph = generate_elasticsearch_cpu_graph(data_source=data_source)
+        generated_graph.title.should.match(r"CPU utilization")
+        generated_graph.dataSource.should.match(data_source)
+        generated_graph.targets.should.have.length_of(1)
+        generated_graph.targets[0].should.be.a(InfluxDBTarget)
+        generated_graph.targets[0].query.should.equal(
+            'SELECT max("cpu_utilization_maximum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'
+        )
+
     def test_should_generate_elasticsearch_dashboard(self):
         data_source = "prod"
         environment = "prod"
