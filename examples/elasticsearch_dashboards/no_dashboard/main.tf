@@ -16,7 +16,7 @@ module "dashboard" {
     environment   = "prod"
     data_source   = "prod"
     folder        = null
-    notifications = null
+    notifications = []
   }
 }
 

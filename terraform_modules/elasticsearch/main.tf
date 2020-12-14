@@ -16,8 +16,8 @@ variable "enable" {
 locals {
   dahboard_path           = "${path.module}/dashboard.json"
   alert_dahboard_path     = "${path.module}/alert_dashboard.json"
-  create_alerts_dashboard = var.grafana_configuration.notifications != null && length(var.grafana_configuration.notifications) > 0 ? true : false
-  notification_args       = var.grafana_configuration.notifications != null && length(var.grafana_configuration.notifications) > 0 ? "--notifications ${join(" ", var.grafana_configuration.notifications)}" : ""
+  create_alerts_dashboard = length(var.grafana_configuration.notifications) > 0 ? true : false
+  notification_args       = length(var.grafana_configuration.notifications) > 0 ? "--notifications ${join(" ", var.grafana_configuration.notifications)}" : ""
 }
 
 resource "null_resource" "generate_dashboard" {
