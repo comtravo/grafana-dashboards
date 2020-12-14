@@ -2,7 +2,7 @@ from grafanalib.core import (
     # Alert,
     # AlertCondition,
     # Dashboard,
-    # Graph,
+    Graph,
     # Target,
     # Annotations,
     Template,
@@ -14,11 +14,12 @@ from grafanalib.influxdb import InfluxDBTarget
 from lib.elasticsearch import (
     get_elasticsearch_template,
     generate_elasticsearch_cpu_graph,
+    generate_elasticsearch_jvm_memory_pressure_graph,
+    generate_elasticsearch_documents_graph,
+    generate_elasticsearch_storage_graph,
     generate_elasticsearch_dashboard,
     generate_elasticsearch_alerts_dashboard,
 )
-
-# import re
 
 
 class TestElasticsearchDashboards:
@@ -41,6 +42,54 @@ class TestElasticsearchDashboards:
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
             'SELECT max("cpu_utilization_maximum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'
+        )
+
+    def test_should_generate_elasticsearch_jvm_memory_pressure_graph(self):
+        data_source = "prod"
+        generated_graph = generate_elasticsearch_jvm_memory_pressure_graph(
+            data_source=data_source
+        )
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(r"JVM memory pressure")
+        generated_graph.dataSource.should.match(data_source)
+        generated_graph.targets.should.have.length_of(1)
+        generated_graph.targets[0].should.be.a(InfluxDBTarget)
+        generated_graph.targets[0].query.should.equal(
+            'SELECT max("jvm_memory_pressure_maximum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'
+        )
+
+    def test_should_generate_elasticsearch_documents_graph(self):
+        data_source = "prod"
+        generated_graph = generate_elasticsearch_documents_graph(
+            data_source=data_source
+        )
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(r"Documents")
+        generated_graph.dataSource.should.match(data_source)
+        generated_graph.targets.should.have.length_of(2)
+        generated_graph.targets[0].should.be.a(InfluxDBTarget)
+        generated_graph.targets[0].query.should.equal(
+            'SELECT max("searchable_documents_maximum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'
+        )
+        generated_graph.targets[1].should.be.a(InfluxDBTarget)
+        generated_graph.targets[1].query.should.equal(
+            'SELECT max("deleted_documents_maximum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'
+        )
+
+    def test_should_generate_elasticsearch_storage_graph(self):
+        data_source = "prod"
+        generated_graph = generate_elasticsearch_storage_graph(data_source=data_source)
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(r"Storage")
+        generated_graph.dataSource.should.match(data_source)
+        generated_graph.targets.should.have.length_of(2)
+        generated_graph.targets[0].should.be.a(InfluxDBTarget)
+        generated_graph.targets[0].query.should.equal(
+            'SELECT min("free_storage_space_minimum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'
+        )
+        generated_graph.targets[1].should.be.a(InfluxDBTarget)
+        generated_graph.targets[1].query.should.equal(
+            'SELECT max("cluster_used_space_maximum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'
         )
 
     def test_should_generate_elasticsearch_dashboard(self):
