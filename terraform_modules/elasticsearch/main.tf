@@ -16,7 +16,8 @@ variable "enable" {
 locals {
   dahboard_path           = "${path.module}/dashboard.json"
   alert_dahboard_path     = "${path.module}/alert_dashboard.json"
-  create_alerts_dashboard = try(length(var.grafana_configuration.notifications), 0) > 0 ? true : false
+  create_alerts_dashboard = var.grafana_configuration.notifications != null && length(var.grafana_configuration.notifications) > 0 ? true : false
+  notification_args       = var.grafana_configuration.notifications != null && length(var.grafana_configuration.notifications) > 0 ? "--notifications ${join(" ", var.grafana_configuration.notifications)}" : ""
 }
 
 resource "null_resource" "generate_dashboard" {
@@ -50,7 +51,7 @@ resource "null_resource" "generate_alerts_dashboard" {
   count = var.enable && local.create_alerts_dashboard ? 1 : 0
 
   provisioner "local-exec" {
-    command = "python3 ${path.module}/../../bin.py --name elasticsearch --environment ${var.grafana_configuration.environment} --data_source ${var.grafana_configuration.data_source} elasticsearch-alerts | json_pp > ${local.alert_dahboard_path}"
+    command = "python3 ${path.module}/../../bin.py --name elasticsearch --environment ${var.grafana_configuration.environment} ${local.notification_args} --data_source ${var.grafana_configuration.data_source} elasticsearch-alerts | json_pp > ${local.alert_dahboard_path}"
   }
 
   triggers = {

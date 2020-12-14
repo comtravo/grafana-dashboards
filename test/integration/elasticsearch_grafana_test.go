@@ -26,17 +26,17 @@ func TestElasticsearch_noDashboard(t *testing.T) {
 	require.Equal(t, resourceCount.Destroy, 0)
 }
 
-// func TestElasticsearch_dashboard(t *testing.T) {
+func TestElasticsearch_dashboard(t *testing.T) {
 
-// 	dashboardName := fmt.Sprintf("es-%s", random.UniqueId())
-// 	exampleDir := "../../examples/elasticsearch_dashboards/dashboard/"
+	dashboardName := fmt.Sprintf("es-%s", random.UniqueId())
+	exampleDir := "../../examples/elasticsearch_dashboards/dashboard/"
 
-// 	terraformOptions := SetupExample(t, dashboardName, exampleDir)
-// 	t.Logf("Terraform module inputs: %+v", *terraformOptions)
-// 	defer terraform.Destroy(t, terraformOptions)
+	terraformOptions := SetupExample(t, dashboardName, exampleDir)
+	t.Logf("Terraform module inputs: %+v", *terraformOptions)
+	defer terraform.Destroy(t, terraformOptions)
 
-// 	TerraformApplyAndValidateElasticsearchOutputs(t, terraformOptions)
-// }
+	TerraformApplyAndValidateElasticsearchOutputs(t, terraformOptions)
+}
 
 func TestElasticsearch_folder(t *testing.T) {
 
