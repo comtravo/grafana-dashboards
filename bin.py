@@ -99,13 +99,8 @@ def apply_options(args):
     return args
 
 
-def main():  # pragma: no cover
-    """
-    main
-    """
-    args = parse_options()
-    args = apply_options(args)
-    dispatch = {
+def dispatcher():
+    return {
         "lambda": lambda_dispatcher,
         "api-gateway": apig_dispatcher,
         "step-function": sfn_dispatcher,
@@ -113,8 +108,16 @@ def main():  # pragma: no cover
         "elasticsearch": elasticsearch_dispatcher,
         "elasticsearch-alerts": elasticsearch_alert_dispatcher,
     }
+
+
+def main():  # pragma: no cover
+    """
+    main
+    """
+    args = parse_options()
+    args = apply_options(args)
+    dispatch = dispatcher()
     dashboard = dispatch[args.service](**args.__dict__)
-    # print(dashboard)
     dashboard_json = json.dumps(dashboard.to_json_data(), cls=DashboardEncoder)
     print(dashboard_json)
 
