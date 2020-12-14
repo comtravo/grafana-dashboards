@@ -400,6 +400,7 @@ def generate_elasticsearch_status_red_alert_graph(
         editable=EDITABLE,
         bars=True,
         lines=False,
+        alert=alert,
     ).auto_ref_ids()
 
 
@@ -457,6 +458,7 @@ def generate_elasticsearch_nodes_alert_graph(
         editable=EDITABLE,
         bars=False,
         lines=True,
+        alert=alert,
     ).auto_ref_ids()
 
 

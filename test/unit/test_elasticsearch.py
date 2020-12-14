@@ -1,5 +1,5 @@
 from grafanalib.core import (
-    # Alert,
+    Alert,
     # AlertCondition,
     # Dashboard,
     Graph,
@@ -17,6 +17,9 @@ from lib.elasticsearch import (
     generate_elasticsearch_jvm_memory_pressure_graph,
     generate_elasticsearch_documents_graph,
     generate_elasticsearch_storage_graph,
+    generate_elasticsearch_requests_graph,
+    generate_elasticsearch_status_red_alert_graph,
+    generate_elasticsearch_nodes_alert_graph,
     generate_elasticsearch_dashboard,
     generate_elasticsearch_alerts_dashboard,
 )
@@ -91,6 +94,72 @@ class TestElasticsearchDashboards:
         generated_graph.targets[1].query.should.equal(
             'SELECT max("cluster_used_space_maximum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'
         )
+
+    def test_should_generate_elasticsearch_requests_graph(self):
+        data_source = "prod"
+        generated_graph = generate_elasticsearch_requests_graph(data_source=data_source)
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(r"Requests")
+        generated_graph.dataSource.should.match(data_source)
+        generated_graph.targets.should.have.length_of(4)
+        generated_graph.targets[0].should.be.a(InfluxDBTarget)
+        generated_graph.targets[0].query.should.equal(
+            'SELECT max("2xx_sum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(0)'
+        )
+        generated_graph.targets[1].should.be.a(InfluxDBTarget)
+        generated_graph.targets[1].query.should.equal(
+            'SELECT max("3xx_sum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(0)'
+        )
+        generated_graph.targets[2].should.be.a(InfluxDBTarget)
+        generated_graph.targets[2].query.should.equal(
+            'SELECT max("4xx_sum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(0)'
+        )
+        generated_graph.targets[3].should.be.a(InfluxDBTarget)
+        generated_graph.targets[3].query.should.equal(
+            'SELECT max("5xx_sum") FROM "autogen"."cloudwatch_aws_es" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(0)'
+        )
+
+    def test_should_generate_elasticsearch_status_red_alert_graph(self):
+        data_source = "prod"
+        notifications = ["slack-1", "slack-2"]
+
+        generated_graph = generate_elasticsearch_status_red_alert_graph(
+            data_source=data_source, notifications=notifications
+        )
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(r"Status RED alerts")
+        generated_graph.dataSource.should.match(data_source)
+        generated_graph.targets.should.have.length_of(1)
+        generated_graph.targets[0].should.be.a(InfluxDBTarget)
+        generated_graph.targets[0].query.should.equal(
+            'SELECT max("cluster_status.red_maximum") AS "status_red" FROM "autogen"."cloudwatch_aws_es" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'
+        )
+        generated_graph.targets[0].refId.should.equal("A")
+        generated_graph.alert.should.be.a(Alert)
+        generated_graph.alert.frequency.should.equal("2m")
+        generated_graph.alert.gracePeriod.should.equal("2m")
+        generated_graph.alert.notifications.should.equal(notifications)
+
+    def test_should_generate_elasticsearch_nodes_alert_graph(self):
+        data_source = "prod"
+        notifications = ["slack-1", "slack-2"]
+
+        generated_graph = generate_elasticsearch_nodes_alert_graph(
+            data_source=data_source, notifications=notifications
+        )
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(r"Elasticsearch node alerts")
+        generated_graph.dataSource.should.match(data_source)
+        generated_graph.targets.should.have.length_of(1)
+        generated_graph.targets[0].should.be.a(InfluxDBTarget)
+        generated_graph.targets[0].query.should.equal(
+            'SELECT min("nodes_minimum") AS "nodes" FROM "autogen"."cloudwatch_aws_es" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'
+        )
+        generated_graph.targets[0].refId.should.equal("A")
+        generated_graph.alert.should.be.a(Alert)
+        generated_graph.alert.frequency.should.equal("2m")
+        generated_graph.alert.gracePeriod.should.equal("2m")
+        generated_graph.alert.notifications.should.equal(notifications)
 
     def test_should_generate_elasticsearch_dashboard(self):
         data_source = "prod"
