@@ -677,7 +677,7 @@ def generate_elasticsearch_jvm_memory_pressure_alert_graph(
 
 
 def generate_elasticsearch_dashboard(
-    data_source: str, environment: str, notifications: List[str], *args, **kwargs
+    data_source: str, environment: str, *args, **kwargs
 ):
     """Generate Elasticsearch dashboard"""
     tags = ["elasticsearch", environment]
