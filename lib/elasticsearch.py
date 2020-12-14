@@ -412,7 +412,6 @@ def generate_elasticsearch_nodes_alert_graph(
 
     targets = [
         InfluxDBTarget(
-            # alias=alias,
             query='SELECT min("nodes_minimum") AS "nodes" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
                 RETENTION_POLICY, ES_MEASUREMENT
             ),
