@@ -42,6 +42,12 @@ from lib.commons import (
 
 ES_MEASUREMENT = "cloudwatch_aws_es"
 
+DOCUMENTATION_LINK = {
+    "targetBlank": True,
+    "title": "Documentation",
+    "url": "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains-cloudwatchmetrics.html",
+}
+
 
 def get_elasticsearch_template(data_source: str):
     """Get template for elasticsearch"""
@@ -716,6 +722,7 @@ def generate_elasticsearch_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=rows,
+        links=[DOCUMENTATION_LINK],
     ).auto_panel_ids()
 
 
@@ -776,4 +783,5 @@ def generate_elasticsearch_alerts_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=rows,
+        links=[DOCUMENTATION_LINK],
     ).auto_panel_ids()
