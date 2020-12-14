@@ -13,13 +13,14 @@ resource "grafana_folder" "this" {
 
 module "dashboard" {
 
-  source = "get_release_templating../../../terraform_modules/elasticsearch/"
+  source = "../../../terraform_modules/elasticsearch/"
 
   enable = true
   grafana_configuration = {
-    environment = "prod"
-    data_source = "prod"
-    folder      = grafana_folder.this.id
+    environment   = "prod"
+    data_source   = "prod"
+    folder        = grafana_folder.this.id
+    notifications = []
   }
 }
 

@@ -46,7 +46,7 @@ resource "grafana_alert_notification" "slack_2" {
 
 module "dashboard" {
 
-  source = "get_release_templating../../../terraform_modules/elasticsearch/"
+  source = "../../../terraform_modules/elasticsearch/"
 
   enable = true
   grafana_configuration = {

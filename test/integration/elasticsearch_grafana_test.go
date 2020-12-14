@@ -24,30 +24,19 @@ func TestElasticsearch_noDashboard(t *testing.T) {
 	require.Equal(t, resourceCount.Add, 0)
 	require.Equal(t, resourceCount.Change, 0)
 	require.Equal(t, resourceCount.Destroy, 0)
-
-	output := terraform.OutputMap(t, terraformOptions, "op")
-
-	expectedLen := 2
-	expectedMap := map[string]string{
-		"dashboard_id": "",
-		"slug":         "",
-	}
-
-	require.Len(t, output, expectedLen, "Output should contain %d items", expectedLen)
-	require.Equal(t, expectedMap, output, "Map %q should match %q", expectedMap, output)
 }
 
-func TestElasticsearch_dashboard(t *testing.T) {
+// func TestElasticsearch_dashboard(t *testing.T) {
 
-	dashboardName := fmt.Sprintf("es-%s", random.UniqueId())
-	exampleDir := "../../examples/elasticsearch_dashboards/dashboard/"
+// 	dashboardName := fmt.Sprintf("es-%s", random.UniqueId())
+// 	exampleDir := "../../examples/elasticsearch_dashboards/dashboard/"
 
-	terraformOptions := SetupExample(t, dashboardName, exampleDir)
-	t.Logf("Terraform module inputs: %+v", *terraformOptions)
-	defer terraform.Destroy(t, terraformOptions)
+// 	terraformOptions := SetupExample(t, dashboardName, exampleDir)
+// 	t.Logf("Terraform module inputs: %+v", *terraformOptions)
+// 	defer terraform.Destroy(t, terraformOptions)
 
-	TerraformApplyAndValidateOutputs(t, terraformOptions)
-}
+// 	TerraformApplyAndValidateElasticsearchOutputs(t, terraformOptions)
+// }
 
 func TestElasticsearch_folder(t *testing.T) {
 
@@ -58,5 +47,14 @@ func TestElasticsearch_folder(t *testing.T) {
 	t.Logf("Terraform module inputs: %+v", *terraformOptions)
 	defer terraform.Destroy(t, terraformOptions)
 
-	TerraformApplyAndValidateOutputs(t, terraformOptions)
+	TerraformApplyAndValidateElasticsearchOutputs(t, terraformOptions)
+}
+
+func TerraformApplyAndValidateElasticsearchOutputs(t *testing.T, terraformOptions *terraform.Options) {
+	terraformApplyOutput := terraform.InitAndApply(t, terraformOptions)
+	resourceCount := terraform.GetResourceCount(t, terraformApplyOutput)
+
+	require.Greater(t, resourceCount.Add, 0)
+	require.Equal(t, resourceCount.Change, 0)
+	require.Equal(t, resourceCount.Destroy, 0)
 }

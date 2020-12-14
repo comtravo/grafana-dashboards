@@ -9,13 +9,14 @@ variable "name" {
 
 module "dashboard" {
 
-  source = "get_release_templating../../../terraform_modules/elasticsearch/"
+  source = "../../../terraform_modules/elasticsearch/"
 
   enable = false
   grafana_configuration = {
-    environment = "prod"
-    data_source = "prod"
-    folder      = null
+    environment   = "prod"
+    data_source   = "prod"
+    folder        = null
+    notifications = null
   }
 }
 
