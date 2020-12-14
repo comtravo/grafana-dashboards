@@ -5,6 +5,10 @@ from lib.lambdas import dispatcher as lambda_dispatcher
 from lib.api_gateways import generate_api_gateways_dashboard as apig_dispatcher
 from lib.step_functions import generate_sfn_dashboard as sfn_dispatcher
 from lib.firehose import generate_firehose_dashboard as firehose_dispatcher
+from lib.elasticsearch import (
+    generate_elasticsearch_dashboard as elasticsearch_dispatcher,
+    generate_elasticsearch_alerts_dashboard as elasticsearch_alert_dispatcher,
+)
 import argparse
 import json
 
@@ -34,6 +38,12 @@ def parse_options():  # pragma: no cover
 
     firehose = subparsers.add_parser(
         "firehose", help="Create dashboard for API gateways"
+    )
+    elasticsearch = subparsers.add_parser(
+        "elasticsearch", help="Create dashboard for API gateways"
+    )
+    elasticsearch_alerts = subparsers.add_parser(
+        "elasticsearch-alerts", help="Create dashboard for API gateways"
     )
     apig.add_argument(
         "--lambdas", nargs="+", help="List of Lambda names or arns", default=[]
@@ -89,20 +99,25 @@ def apply_options(args):
     return args
 
 
+def dispatcher():
+    return {
+        "lambda": lambda_dispatcher,
+        "api-gateway": apig_dispatcher,
+        "step-function": sfn_dispatcher,
+        "firehose": firehose_dispatcher,
+        "elasticsearch": elasticsearch_dispatcher,
+        "elasticsearch-alerts": elasticsearch_alert_dispatcher,
+    }
+
+
 def main():  # pragma: no cover
     """
     main
     """
     args = parse_options()
     args = apply_options(args)
-    dispatch = {
-        "lambda": lambda_dispatcher,
-        "api-gateway": apig_dispatcher,
-        "step-function": sfn_dispatcher,
-        "firehose": firehose_dispatcher,
-    }
+    dispatch = dispatcher()
     dashboard = dispatch[args.service](**args.__dict__)
-    # print(dashboard)
     dashboard_json = json.dumps(dashboard.to_json_data(), cls=DashboardEncoder)
     print(dashboard_json)
 
