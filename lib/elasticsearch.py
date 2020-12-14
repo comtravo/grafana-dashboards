@@ -561,6 +561,59 @@ def generate_elasticsearch_writes_blocked_alert_graph(
         lines=True,
     ).auto_ref_ids()
 
+def generate_elasticsearch_jvm_memory_pressure_alert_graph(
+    data_source: str, notifications: List[str]
+):
+    """
+    Generate Elasticsearch graph
+    """
+
+    alias = "query"
+    y_axes = single_y_axis(format=SHORT_FORMAT)
+
+    targets = [
+        InfluxDBTarget(
+            query='SELECT max("jvm_memory_pressure_maximum") AS "nodes" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
+                RETENTION_POLICY, ES_MEASUREMENT
+            ),
+            rawQuery=RAW_QUERY,
+            refId=ALERT_REF_ID,
+        ),
+    ]
+
+    if not notifications:
+        raise Exception("Notifications is None")
+
+    alert = Alert(
+        name="Elasticsearch JVM memory pressure alert",
+        message="Elasticsearch JVM memory pressure alert",
+        executionErrorState="alerting",
+        noDataState="keep_state",
+        alertConditions=[
+            AlertCondition(
+                Target(refId=ALERT_REF_ID),
+                timeRange=TimeRange("5m", "now"),
+                evaluator=GreaterThan(80),
+                reducerType=RTYPE_MAX,
+                operator=OP_OR,
+            ),
+        ],
+        frequency="2m",
+        gracePeriod="2m",
+        notifications=notifications,
+    )
+
+    return Graph(
+        title="Elasticsearch JVM memory pressure alerts",
+        dataSource=data_source,
+        targets=targets,
+        yAxes=y_axes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=False,
+        lines=True,
+    ).auto_ref_ids()
+
 
 def generate_elasticsearch_dashboard(
     data_source: str, environment: str, notifications: List[str], *args, **kwargs
@@ -635,12 +688,15 @@ def generate_elasticsearch_alerts_dashboard(
                 generate_elasticsearch_storage_alert_graph(
                     data_source=data_source, notifications=notifications
                 ),
+                generate_elasticsearch_writes_blocked_alert_graph(
+                    data_source=data_source, notifications=notifications
+                ),
             ],
             editable=EDITABLE,
         ),
         Row(
             panels=[
-                generate_elasticsearch_writes_blocked_alert_graph(
+                generate_elasticsearch_jvm_memory_pressure_alert_graph(
                     data_source=data_source, notifications=notifications
                 ),
             ],
