@@ -70,3 +70,17 @@ resource "grafana_dashboard" "alert" {
   folder      = var.grafana_configuration.folder
   config_json = data.local_file.alerts_dashboard[0].content
 }
+
+output "output" {
+  description = "Grafana slug and dashboard_id"
+  value = {
+    slug = [
+      try(grafana_dashboard.this[0].slug, ""),
+      try(grafana_dashboard.alert[0].slug, "")
+    ]
+    dashboard_id = [
+      try(grafana_dashboard.this[0].dashboard_id, ""),
+      try(grafana_dashboard.alert[0].dashboard_id, "")
+    ]
+  }
+}

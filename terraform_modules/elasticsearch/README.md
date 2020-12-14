@@ -19,5 +19,7 @@ No requirements.
 
 ## Outputs
 
-No output.
+| Name | Description |
+|------|-------------|
+| output | Grafana slug and dashboard\_id |
 
