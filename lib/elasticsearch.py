@@ -31,6 +31,7 @@ from lib.annotations import get_release_annotations
 from lib.templating import get_release_template
 from lib import colors
 from lib.commons import (
+    ALERT_REF_ID,
     EDITABLE,
     RAW_QUERY,
     RETENTION_POLICY,
@@ -340,7 +341,9 @@ def generate_elasticsearch_requests_graph(data_source: str):
     ).auto_ref_ids()
 
 
-def generate_elasticsearch_alerts_graph(data_source: str, notifications: List[str]):
+def generate_elasticsearch_status_red_alert_graph(
+    data_source: str, notifications: List[str]
+):
     """
     Generate Elasticsearch graph
     """
@@ -352,60 +355,11 @@ def generate_elasticsearch_alerts_graph(data_source: str, notifications: List[st
 
     targets = [
         InfluxDBTarget(
-            alias="cluster_red",
-            query='SELECT max("cluster_status.red_maximum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+            query='SELECT max("cluster_status.red_maximum") AS "status_red" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
                 RETENTION_POLICY, ES_MEASUREMENT
             ),
             rawQuery=RAW_QUERY,
-            refId="A",
-        ),
-        InfluxDBTarget(
-            alias="number_of_nodes",
-            query='SELECT min("nodes_minimum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, ES_MEASUREMENT
-            ),
-            rawQuery=RAW_QUERY,
-            refId="B",
-        ),
-        InfluxDBTarget(
-            alias="storage_used_percent",
-            query='SELECT max("cluster_used_space_maximum") / min("free_storage_space_minimum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, ES_MEASUREMENT
-            ),
-            rawQuery=RAW_QUERY,
-            refId="C",
-        ),
-        InfluxDBTarget(
-            alias="writes_blocked",
-            query='SELECT max("cluster_index_writes_blocked_maximum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, ES_MEASUREMENT
-            ),
-            rawQuery=RAW_QUERY,
-            refId="D",
-        ),
-        InfluxDBTarget(
-            alias="jvm_memory_pressure",
-            query='SELECT max("jvm_memory_pressure_maximum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, ES_MEASUREMENT
-            ),
-            rawQuery=RAW_QUERY,
-            refId="E",
-        ),
-        InfluxDBTarget(
-            alias="automated_snapshot_failure",
-            query='SELECT max("automated_snapshot_failure_maximum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, ES_MEASUREMENT
-            ),
-            rawQuery=RAW_QUERY,
-            refId="F",
-        ),
-        InfluxDBTarget(
-            alias="5xx",
-            query='SELECT max("5xx_sum") FROM "{}"."{}" WHERE ("domain_name" =~ /^$elasticsearch$/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, ES_MEASUREMENT
-            ),
-            rawQuery=RAW_QUERY,
-            refId="G",
+            refId=ALERT_REF_ID,
         ),
     ]
 
@@ -413,55 +367,13 @@ def generate_elasticsearch_alerts_graph(data_source: str, notifications: List[st
 
     if notifications:
         alert = Alert(
-            name="Elasticsearch errors",
-            message="Elasticsearch is facing some issues",
+            name="Elasticsearch is in status red",
+            message="Elasticsearch is in status red",
             executionErrorState="alerting",
             noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
-                    Target(refId="A"),
-                    timeRange=TimeRange("5m", "now"),
-                    evaluator=GreaterThan(0),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_OR,
-                ),
-                AlertCondition(
-                    Target(refId="B"),
-                    timeRange=TimeRange("5m", "now"),
-                    evaluator=LowerThan(1),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_OR,
-                ),
-                AlertCondition(
-                    Target(refId="C"),
-                    timeRange=TimeRange("5m", "now"),
-                    evaluator=GreaterThan(0.7),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_OR,
-                ),
-                AlertCondition(
-                    Target(refId="D"),
-                    timeRange=TimeRange("5m", "now"),
-                    evaluator=GreaterThan(0),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_OR,
-                ),
-                AlertCondition(
-                    Target(refId="E"),
-                    timeRange=TimeRange("5m", "now"),
-                    evaluator=GreaterThan(80),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_OR,
-                ),
-                AlertCondition(
-                    Target(refId="F"),
-                    timeRange=TimeRange("5m", "now"),
-                    evaluator=GreaterThan(0),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_OR,
-                ),
-                AlertCondition(
-                    Target(refId="G"),
+                    Target(refId=ALERT_REF_ID),
                     timeRange=TimeRange("5m", "now"),
                     evaluator=GreaterThan(0),
                     reducerType=RTYPE_MAX,
@@ -474,7 +386,7 @@ def generate_elasticsearch_alerts_graph(data_source: str, notifications: List[st
         )
 
     return Graph(
-        title="Alert queries",
+        title="Status RED alerts",
         dataSource=data_source,
         targets=targets,
         yAxes=y_axes,
@@ -482,6 +394,64 @@ def generate_elasticsearch_alerts_graph(data_source: str, notifications: List[st
         editable=EDITABLE,
         bars=True,
         lines=False,
+    ).auto_ref_ids()
+
+
+def generate_elasticsearch_nodes_alert_graph(
+    data_source: str, notifications: List[str]
+):
+    """
+    Generate Elasticsearch graph
+    """
+
+    alias = "query"
+    y_axes = YAxes(
+        YAxis(format=SHORT_FORMAT),
+        YAxis(format=SHORT_FORMAT),
+    )
+
+    targets = [
+        InfluxDBTarget(
+            # alias=alias,
+            query='SELECT min("nodes_minimum") AS "nodes" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
+                RETENTION_POLICY, ES_MEASUREMENT
+            ),
+            rawQuery=RAW_QUERY,
+            refId=ALERT_REF_ID,
+        ),
+    ]
+
+    if not notifications:
+        raise Exception("Notifications is None")
+
+    alert = Alert(
+        name="Elasticsearch nodes alert",
+        message="Elasticsearch might have no nodes",
+        executionErrorState="alerting",
+        noDataState="keep_state",
+        alertConditions=[
+            AlertCondition(
+                Target(refId=ALERT_REF_ID),
+                timeRange=TimeRange("5m", "now"),
+                evaluator=LowerThan(1),
+                reducerType=RTYPE_MAX,
+                operator=OP_OR,
+            ),
+        ],
+        frequency="2m",
+        gracePeriod="2m",
+        notifications=notifications,
+    )
+
+    return Graph(
+        title="Elasticsearch node alerts",
+        dataSource=data_source,
+        targets=targets,
+        yAxes=y_axes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=False,
+        lines=True,
     ).auto_ref_ids()
 
 
@@ -520,18 +490,48 @@ def generate_elasticsearch_dashboard(
             panels=[generate_elasticsearch_requests_graph(data_source=data_source)],
             editable=EDITABLE,
         ),
+    ]
+
+    return Dashboard(
+        title="Elasticsearch",
+        editable=EDITABLE,
+        annotations=get_release_annotations(data_source=data_source),
+        templating=templating,
+        tags=tags,
+        timezone=TIMEZONE,
+        sharedCrosshair=SHARED_CROSSHAIR,
+        rows=rows,
+    ).auto_panel_ids()
+
+
+def generate_elasticsearch_alerts_dashboard(
+    data_source: str, environment: str, notifications: List[str], *args, **kwargs
+):
+    """Generate Elasticsearch dashboard"""
+    tags = ["elasticsearch", environment]
+
+    templating = Templating(
+        [
+            get_release_template(data_source=data_source),
+        ]
+    )
+
+    rows = [
         Row(
             panels=[
-                generate_elasticsearch_alerts_graph(
+                generate_elasticsearch_status_red_alert_graph(
                     data_source=data_source, notifications=notifications
-                )
+                ),
+                generate_elasticsearch_nodes_alert_graph(
+                    data_source=data_source, notifications=notifications
+                ),
             ],
             editable=EDITABLE,
         ),
     ]
 
     return Dashboard(
-        title="Elasticsearch",
+        title="Elasticsearch Alerts",
         editable=EDITABLE,
         annotations=get_release_annotations(data_source=data_source),
         templating=templating,
