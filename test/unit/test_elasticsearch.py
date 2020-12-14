@@ -20,6 +20,9 @@ from lib.elasticsearch import (
     generate_elasticsearch_requests_graph,
     generate_elasticsearch_status_red_alert_graph,
     generate_elasticsearch_nodes_alert_graph,
+    generate_elasticsearch_storage_alert_graph,
+    generate_elasticsearch_writes_blocked_alert_graph,
+    generate_elasticsearch_automated_snapshot_failure_alert_graph,
     generate_elasticsearch_dashboard,
     generate_elasticsearch_alerts_dashboard,
 )
@@ -161,6 +164,71 @@ class TestElasticsearchDashboards:
         generated_graph.alert.gracePeriod.should.equal("2m")
         generated_graph.alert.notifications.should.equal(notifications)
 
+    def test_should_generate_elasticsearch_storage_alert_graph(self):
+        data_source = "prod"
+        notifications = ["slack-1", "slack-2"]
+
+        generated_graph = generate_elasticsearch_storage_alert_graph(
+            data_source=data_source, notifications=notifications
+        )
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(r"Elasticsearch storage alerts")
+        generated_graph.dataSource.should.match(data_source)
+        generated_graph.targets.should.have.length_of(1)
+        generated_graph.targets[0].should.be.a(InfluxDBTarget)
+        generated_graph.targets[0].query.should.equal(
+            'SELECT min("free_storage_space_minimum") AS "free_storage" FROM "autogen"."cloudwatch_aws_es" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'
+        )
+        generated_graph.targets[0].refId.should.equal("A")
+        generated_graph.alert.should.be.a(Alert)
+        generated_graph.alert.frequency.should.equal("2m")
+        generated_graph.alert.gracePeriod.should.equal("2m")
+        generated_graph.alert.notifications.should.equal(notifications)
+
+    def test_should_generate_elasticsearch_writes_blocked_alert_graph(self):
+        data_source = "prod"
+        notifications = ["slack-1", "slack-2"]
+
+        generated_graph = generate_elasticsearch_writes_blocked_alert_graph(
+            data_source=data_source, notifications=notifications
+        )
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(r"Elasticsearch write blocked alerts")
+        generated_graph.dataSource.should.match(data_source)
+        generated_graph.targets.should.have.length_of(1)
+        generated_graph.targets[0].should.be.a(InfluxDBTarget)
+        generated_graph.targets[0].query.should.equal(
+            'SELECT max("cluster_index_writes_blocked_maximum") AS "writes_blocked" FROM "autogen"."cloudwatch_aws_es" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'
+        )
+        generated_graph.targets[0].refId.should.equal("A")
+        generated_graph.alert.should.be.a(Alert)
+        generated_graph.alert.frequency.should.equal("2m")
+        generated_graph.alert.gracePeriod.should.equal("2m")
+        generated_graph.alert.notifications.should.equal(notifications)
+
+    def test_should_generate_elasticsearch_automated_snapshot_failure_alert_graph(self):
+        data_source = "prod"
+        notifications = ["slack-1", "slack-2"]
+
+        generated_graph = generate_elasticsearch_automated_snapshot_failure_alert_graph(
+            data_source=data_source, notifications=notifications
+        )
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(
+            r"Elasticsearch automated snapshot failure alerts"
+        )
+        generated_graph.dataSource.should.match(data_source)
+        generated_graph.targets.should.have.length_of(1)
+        generated_graph.targets[0].should.be.a(InfluxDBTarget)
+        generated_graph.targets[0].query.should.equal(
+            'SELECT max("automated_snapshot_failure_maximum") AS "automated_snapshot_failures" FROM "autogen"."cloudwatch_aws_es" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'
+        )
+        generated_graph.targets[0].refId.should.equal("A")
+        generated_graph.alert.should.be.a(Alert)
+        generated_graph.alert.frequency.should.equal("2m")
+        generated_graph.alert.gracePeriod.should.equal("2m")
+        generated_graph.alert.notifications.should.equal(notifications)
+
     def test_should_generate_elasticsearch_dashboard(self):
         data_source = "prod"
         environment = "prod"
@@ -177,7 +245,7 @@ class TestElasticsearchDashboards:
         generated_dashboard.rows.should.have.length_of(4)
         generated_dashboard.links.should.have.length_of(1)
 
-    def test_should_generate_elasticsearch_dashboard(self):
+    def test_should_generate_elasticsearch_alerts_dashboard(self):
         data_source = "prod"
         environment = "prod"
         notifications = ["lorem", "ipsum"]

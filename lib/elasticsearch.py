@@ -427,9 +427,6 @@ def generate_elasticsearch_nodes_alert_graph(
         ),
     ]
 
-    if not notifications:
-        raise Exception("Notifications is None")
-
     alert = Alert(
         name="Elasticsearch nodes alert",
         message="Elasticsearch might have no nodes",
@@ -474,16 +471,13 @@ def generate_elasticsearch_storage_alert_graph(
 
     targets = [
         InfluxDBTarget(
-            query='SELECT min("free_storage_space_minimum") AS "nodes" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
+            query='SELECT min("free_storage_space_minimum") AS "free_storage" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
                 RETENTION_POLICY, ES_MEASUREMENT
             ),
             rawQuery=RAW_QUERY,
             refId=ALERT_REF_ID,
         ),
     ]
-
-    if not notifications:
-        raise Exception("Notifications is None")
 
     alert = Alert(
         name="Elasticsearch storage alert",
@@ -513,6 +507,7 @@ def generate_elasticsearch_storage_alert_graph(
         editable=EDITABLE,
         bars=False,
         lines=True,
+        alert=alert,
     ).auto_ref_ids()
 
 
@@ -528,16 +523,13 @@ def generate_elasticsearch_writes_blocked_alert_graph(
 
     targets = [
         InfluxDBTarget(
-            query='SELECT max("cluster_index_writes_blocked_maximum") AS "nodes" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
+            query='SELECT max("cluster_index_writes_blocked_maximum") AS "writes_blocked" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
                 RETENTION_POLICY, ES_MEASUREMENT
             ),
             rawQuery=RAW_QUERY,
             refId=ALERT_REF_ID,
         ),
     ]
-
-    if not notifications:
-        raise Exception("Notifications is None")
 
     alert = Alert(
         name="Elasticsearch writed blocked alert",
@@ -567,6 +559,7 @@ def generate_elasticsearch_writes_blocked_alert_graph(
         editable=EDITABLE,
         bars=False,
         lines=True,
+        alert=alert,
     ).auto_ref_ids()
 
 
@@ -582,16 +575,13 @@ def generate_elasticsearch_automated_snapshot_failure_alert_graph(
 
     targets = [
         InfluxDBTarget(
-            query='SELECT max("automated_snapshot_failure_maximum") AS "nodes" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
+            query='SELECT max("automated_snapshot_failure_maximum") AS "automated_snapshot_failures" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
                 RETENTION_POLICY, ES_MEASUREMENT
             ),
             rawQuery=RAW_QUERY,
             refId=ALERT_REF_ID,
         ),
     ]
-
-    if not notifications:
-        raise Exception("Notifications is None")
 
     alert = Alert(
         name="Elasticsearch automated snapshot failure alert",
@@ -621,6 +611,7 @@ def generate_elasticsearch_automated_snapshot_failure_alert_graph(
         editable=EDITABLE,
         bars=False,
         lines=True,
+        alert=alert,
     ).auto_ref_ids()
 
 
@@ -643,9 +634,6 @@ def generate_elasticsearch_jvm_memory_pressure_alert_graph(
             refId=ALERT_REF_ID,
         ),
     ]
-
-    if not notifications:
-        raise Exception("Notifications is None")
 
     alert = Alert(
         name="Elasticsearch JVM memory pressure alert",
@@ -732,6 +720,9 @@ def generate_elasticsearch_alerts_dashboard(
     data_source: str, environment: str, notifications: List[str], *args, **kwargs
 ):
     """Generate Elasticsearch dashboard"""
+
+    if not notifications:
+        raise Exception("Notifications is None")
     tags = ["elasticsearch", environment]
 
     templating = Templating(
