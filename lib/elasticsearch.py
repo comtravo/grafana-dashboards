@@ -663,7 +663,7 @@ def generate_elasticsearch_jvm_memory_pressure_alert_graph(
         editable=EDITABLE,
         bars=False,
         lines=True,
-        alert=alert
+        alert=alert,
     ).auto_ref_ids()
 
 
