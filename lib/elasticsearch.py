@@ -627,7 +627,7 @@ def generate_elasticsearch_jvm_memory_pressure_alert_graph(
 
     targets = [
         InfluxDBTarget(
-            query='SELECT max("jvm_memory_pressure_maximum") AS "nodes" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
+            query='SELECT max("jvm_memory_pressure_maximum") AS "jvm_mem_pressure" FROM "{}"."{}" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'.format(
                 RETENTION_POLICY, ES_MEASUREMENT
             ),
             rawQuery=RAW_QUERY,
@@ -663,6 +663,7 @@ def generate_elasticsearch_jvm_memory_pressure_alert_graph(
         editable=EDITABLE,
         bars=False,
         lines=True,
+        alert=alert
     ).auto_ref_ids()
 
 

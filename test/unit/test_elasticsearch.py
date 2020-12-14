@@ -23,6 +23,7 @@ from lib.elasticsearch import (
     generate_elasticsearch_storage_alert_graph,
     generate_elasticsearch_writes_blocked_alert_graph,
     generate_elasticsearch_automated_snapshot_failure_alert_graph,
+    generate_elasticsearch_jvm_memory_pressure_alert_graph,
     generate_elasticsearch_dashboard,
     generate_elasticsearch_alerts_dashboard,
 )
@@ -222,6 +223,27 @@ class TestElasticsearchDashboards:
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
             'SELECT max("automated_snapshot_failure_maximum") AS "automated_snapshot_failures" FROM "autogen"."cloudwatch_aws_es" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'
+        )
+        generated_graph.targets[0].refId.should.equal("A")
+        generated_graph.alert.should.be.a(Alert)
+        generated_graph.alert.frequency.should.equal("2m")
+        generated_graph.alert.gracePeriod.should.equal("2m")
+        generated_graph.alert.notifications.should.equal(notifications)
+
+    def test_should_generate_elasticsearch_jvm_memory_pressure_alert_graph(self):
+        data_source = "prod"
+        notifications = ["slack-1", "slack-2"]
+
+        generated_graph = generate_elasticsearch_jvm_memory_pressure_alert_graph(
+            data_source=data_source, notifications=notifications
+        )
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(r"Elasticsearch JVM memory pressure alerts")
+        generated_graph.dataSource.should.match(data_source)
+        generated_graph.targets.should.have.length_of(1)
+        generated_graph.targets[0].should.be.a(InfluxDBTarget)
+        generated_graph.targets[0].query.should.equal(
+            'SELECT max("jvm_memory_pressure_maximum") AS "jvm_mem_pressure" FROM "autogen"."cloudwatch_aws_es" WHERE $timeFilter GROUP BY time(1m),"domain_name" fill(previous)'
         )
         generated_graph.targets[0].refId.should.equal("A")
         generated_graph.alert.should.be.a(Alert)
