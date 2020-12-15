@@ -10,7 +10,6 @@ from grafanalib.core import (
     Graph,
     GreaterThan,
     LowerThan,
-    # MILLISECONDS_FORMAT,
     OP_AND,
     PERCENT_FORMAT,
     RTYPE_MAX,
@@ -22,7 +21,7 @@ from grafanalib.core import (
     YAxes,
     YAxis,
 )
-from grafanalib.formatunits import BYTES
+from grafanalib.formatunits import BYTES, BYTES_SEC, SECONDS
 from grafanalib.influxdb import InfluxDBTarget
 
 from lib import colors
@@ -286,6 +285,132 @@ def generate_rds_free_storage_space_graph(name: str, data_source: str):
     ).auto_ref_ids()
 
 
+def generate_rds_disk_latency_graph(name: str, data_source: str):
+    """
+    Generate rds graph
+    """
+
+    y_axes = single_y_axis(format=SECONDS)
+
+    targets = [
+        InfluxDBTarget(
+            alias="read latency",
+            query='SELECT max("read_latency_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, RDS_MEASUREMENT, name
+            ),
+            rawQuery=RAW_QUERY,
+        ),
+        InfluxDBTarget(
+            alias="write latency",
+            query='SELECT max("write_latency_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, RDS_MEASUREMENT, name
+            ),
+            rawQuery=RAW_QUERY,
+        ),
+    ]
+
+    return Graph(
+        title="Disk latency",
+        dataSource=data_source,
+        targets=targets,
+        yAxes=y_axes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=False,
+        lines=True,
+    ).auto_ref_ids()
+
+
+def generate_rds_disk_ops_graph(name: str, data_source: str):
+    """
+    Generate rds graph
+    """
+
+    y_axes = single_y_axis(format=SHORT_FORMAT, min=None)
+
+    targets = [
+        InfluxDBTarget(
+            alias="write iops",
+            query='SELECT max("write_iops_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, RDS_MEASUREMENT, name
+            ),
+            rawQuery=RAW_QUERY,
+        ),
+        InfluxDBTarget(
+            alias="read iops",
+            query='SELECT max("read_iops_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, RDS_MEASUREMENT, name
+            ),
+            rawQuery=RAW_QUERY,
+        ),
+        InfluxDBTarget(
+            alias="disk queue depth",
+            query='SELECT max("disk_queue_depth_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, RDS_MEASUREMENT, name
+            ),
+            rawQuery=RAW_QUERY,
+        ),
+    ]
+
+    return Graph(
+        title="Disk iops",
+        dataSource=data_source,
+        targets=targets,
+        yAxes=y_axes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=False,
+        lines=True,
+    ).auto_ref_ids()
+
+
+def generate_rds_network_throughput_graph(name: str, data_source: str):
+    """
+    Generate rds graph
+    """
+
+    y_axes = single_y_axis(format=BYTES_SEC, min=None)
+
+    targets = [
+        InfluxDBTarget(
+            alias="RX",
+            query='SELECT max("network_receive_throughput_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, RDS_MEASUREMENT, name
+            ),
+            rawQuery=RAW_QUERY,
+        ),
+        InfluxDBTarget(
+            alias="TX",
+            query='SELECT max("network_transmit_throughput_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, RDS_MEASUREMENT, name
+            ),
+            rawQuery=RAW_QUERY,
+        ),
+    ]
+
+    series_overrides = [
+        {
+            "alias": "TX",
+            "color": colors.GREEN,
+            "transform": "negative-Y",
+            "fillGradient": 10,
+        },
+        {"alias": "RX", "color": colors.YELLOW, "fillGradient": 10},
+    ]
+
+    return Graph(
+        title="Network throughput",
+        dataSource=data_source,
+        targets=targets,
+        yAxes=y_axes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=False,
+        lines=True,
+        seriesOverrides=series_overrides,
+    ).auto_ref_ids()
+
+
 def generate_rds_dashboard(
     name: str,
     environment: str,
@@ -324,6 +449,15 @@ def generate_rds_dashboard(
         rows=[
             Row(panels=[cpu_graph, burst_graph]),
             Row(panels=[connections_graph, freeable_memory_graph, free_storage_graph]),
+            Row(
+                panels=[
+                    generate_rds_disk_latency_graph(name=name, data_source=data_source),
+                    generate_rds_disk_ops_graph(name=name, data_source=data_source),
+                    generate_rds_network_throughput_graph(
+                        name=name, data_source=data_source
+                    ),
+                ]
+            ),
         ],
         links=[
             get_documentation_link(

@@ -411,7 +411,6 @@ def generate_elasticsearch_nodes_alert_graph(
     Generate Elasticsearch graph
     """
 
-    alias = "query"
     y_axes = YAxes(
         YAxis(format=SHORT_FORMAT),
         YAxis(format=SHORT_FORMAT),
@@ -466,7 +465,6 @@ def generate_elasticsearch_storage_alert_graph(
     Generate Elasticsearch graph
     """
 
-    alias = "query"
     y_axes = single_y_axis(format=MEGA_BYTES)
 
     targets = [
@@ -518,7 +516,6 @@ def generate_elasticsearch_writes_blocked_alert_graph(
     Generate Elasticsearch graph
     """
 
-    alias = "query"
     y_axes = single_y_axis(format=SHORT_FORMAT)
 
     targets = [
@@ -570,7 +567,6 @@ def generate_elasticsearch_automated_snapshot_failure_alert_graph(
     Generate Elasticsearch graph
     """
 
-    alias = "query"
     y_axes = single_y_axis(format=SHORT_FORMAT)
 
     targets = [
@@ -622,7 +618,6 @@ def generate_elasticsearch_jvm_memory_pressure_alert_graph(
     Generate Elasticsearch graph
     """
 
-    alias = "query"
     y_axes = single_y_axis(format=SHORT_FORMAT)
 
     targets = [
