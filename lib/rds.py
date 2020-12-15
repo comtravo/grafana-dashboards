@@ -218,6 +218,60 @@ def generate_rds_burst_balance_graph(
     ).auto_ref_ids()
 
 
+def generate_rds_transaction_id_graph(
+    name: str, data_source: str, notifications: List[str]
+):
+    """
+    Generate rds graph
+    """
+
+    y_axes = single_y_axis(format=SHORT_FORMAT)
+
+    targets = [
+        InfluxDBTarget(
+            alias="Transaction ids used",
+            query='SELECT max("maximum_used_transaction_i_ds_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, RDS_MEASUREMENT, name
+            ),
+            rawQuery=RAW_QUERY,
+            refId=ALERT_REF_ID,
+        ),
+    ]
+
+    alert = None
+
+    if notifications:
+        alert = Alert(
+            name="{} transaction ids used Errors".format(name),
+            message="{} is having transaction ids used errors".format(name),
+            executionErrorState="alerting",
+            noDataState="keep_state",
+            alertConditions=[
+                AlertCondition(
+                    Target(refId=ALERT_REF_ID),
+                    timeRange=TimeRange("5m", "now"),
+                    evaluator=GreaterThan(1000000000),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_AND,
+                )
+            ],
+            gracePeriod="1m",
+            notifications=notifications,
+        )
+
+    return Graph(
+        title="Transaction ids used",
+        dataSource=data_source,
+        targets=targets,
+        yAxes=y_axes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=False,
+        lines=True,
+        alert=alert,
+    ).auto_ref_ids()
+
+
 def generate_rds_freeable_memory_graph(name: str, data_source: str):
     """
     Generate rds graph
@@ -438,6 +492,31 @@ def generate_rds_dashboard(
         name=name, data_source=data_source
     )
 
+    rows = [
+        Row(panels=[cpu_graph, burst_graph]),
+        Row(panels=[connections_graph, freeable_memory_graph, free_storage_graph]),
+        Row(
+            panels=[
+                generate_rds_disk_latency_graph(name=name, data_source=data_source),
+                generate_rds_disk_ops_graph(name=name, data_source=data_source),
+                generate_rds_network_throughput_graph(
+                    name=name, data_source=data_source
+                ),
+            ]
+        ),
+    ]
+
+    if engine == "postgres":
+        rows += [
+            Row(
+                panels=[
+                    generate_rds_transaction_id_graph(
+                        name=name, data_source=data_source, notifications=notifications
+                    )
+                ]
+            )
+        ]
+
     return Dashboard(
         title="RDS: {}".format(name),
         editable=EDITABLE,
@@ -446,19 +525,7 @@ def generate_rds_dashboard(
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
-        rows=[
-            Row(panels=[cpu_graph, burst_graph]),
-            Row(panels=[connections_graph, freeable_memory_graph, free_storage_graph]),
-            Row(
-                panels=[
-                    generate_rds_disk_latency_graph(name=name, data_source=data_source),
-                    generate_rds_disk_ops_graph(name=name, data_source=data_source),
-                    generate_rds_network_throughput_graph(
-                        name=name, data_source=data_source
-                    ),
-                ]
-            ),
-        ],
+        rows=rows,
         links=[
             get_documentation_link(
                 "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MonitoringOverview.html"
