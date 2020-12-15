@@ -6,3 +6,7 @@ EDITABLE = False
 TRANSPARENT = True
 RAW_QUERY = True
 RETENTION_POLICY = "autogen"
+
+
+def get_documentation_link(url: str):
+    return {"targetBlank": True, "title": "Link to Documentation", "url": url}

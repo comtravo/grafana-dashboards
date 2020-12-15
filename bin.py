@@ -9,6 +9,8 @@ from lib.elasticsearch import (
     generate_elasticsearch_dashboard as elasticsearch_dispatcher,
     generate_elasticsearch_alerts_dashboard as elasticsearch_alert_dispatcher,
 )
+from lib.rds import generate_rds_dashboard as rds_dispatcher
+
 import argparse
 import json
 
@@ -35,18 +37,23 @@ def parse_options():  # pragma: no cover
     apig = subparsers.add_parser(
         "api-gateway", help="Create dashboard for API gateways"
     )
-
-    firehose = subparsers.add_parser(
-        "firehose", help="Create dashboard for API gateways"
-    )
-    elasticsearch = subparsers.add_parser(
-        "elasticsearch", help="Create dashboard for API gateways"
-    )
-    elasticsearch_alerts = subparsers.add_parser(
-        "elasticsearch-alerts", help="Create dashboard for API gateways"
-    )
     apig.add_argument(
         "--lambdas", nargs="+", help="List of Lambda names or arns", default=[]
+    )
+
+    rds = subparsers.add_parser("rds", help="Create dashboard for RDS")
+    rds.add_argument(
+        "--engine",
+        type=str,
+        help="DB engine",
+        required=True,
+        choices=["mysql", "postgres"],
+    )
+
+    subparsers.add_parser("firehose", help="Create dashboard for AWS Firehose")
+    subparsers.add_parser("elasticsearch", help="Create dashboard for AWS ES")
+    subparsers.add_parser(
+        "elasticsearch-alerts", help="Create alert dashboard for AWS ES"
     )
 
     sfn = subparsers.add_parser(
@@ -107,6 +114,7 @@ def dispatcher():
         "firehose": firehose_dispatcher,
         "elasticsearch": elasticsearch_dispatcher,
         "elasticsearch-alerts": elasticsearch_alert_dispatcher,
+        "rds": rds_dispatcher,
     }
 
 
