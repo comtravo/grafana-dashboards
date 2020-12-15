@@ -235,10 +235,17 @@ def generate_rds_freeable_memory_graph(name: str, data_source: str):
             rawQuery=RAW_QUERY,
             refId=ALERT_REF_ID,
         ),
+        InfluxDBTarget(
+            alias="Swap memory",
+            query='SELECT max("swap_usage_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
+                RETENTION_POLICY, RDS_MEASUREMENT, name
+            ),
+            rawQuery=RAW_QUERY,
+        ),
     ]
 
     return Graph(
-        title="Freeable memory",
+        title="Memory",
         dataSource=data_source,
         targets=targets,
         yAxes=y_axes,
