@@ -176,6 +176,7 @@ def generate_rds_burst_balance_graph(
 
     targets = [
         InfluxDBTarget(
+            alias="Burst balance",
             query='SELECT min("burst_balance_minimum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
                 RETENTION_POLICY, RDS_MEASUREMENT, name
             ),
