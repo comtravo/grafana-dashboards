@@ -14,12 +14,13 @@ class TestRDSMySqlDashboard:
         environment = "prod"
         data_source = "prod"
         engine = "mysql"
+        notifications = ["lorem", "ipsum"]
 
         generated_dashboard = generate_rds_dashboard(
             name=name,
             environment=environment,
             data_source=data_source,
-            notifications=[],
+            notifications=notifications,
             engine=engine,
         )
         generated_dashboard.should.be.a(Dashboard)
@@ -38,12 +39,13 @@ class TestRDSPostgresDashboard:
         environment = "prod"
         data_source = "prod"
         engine = "postgres"
+        notifications = ["lorem", "ipsum"]
 
         generated_dashboard = generate_rds_dashboard(
             name=name,
             environment=environment,
             data_source=data_source,
-            notifications=[],
+            notifications=notifications,
             engine=engine,
         )
         generated_dashboard.should.be.a(Dashboard)
