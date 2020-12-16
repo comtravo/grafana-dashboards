@@ -1,0 +1,1055 @@
+{
+   "gnetId" : null,
+   "templating" : {
+      "list" : [
+         {
+            "name" : "release",
+            "label" : "Filter by Branch/Release",
+            "options" : [],
+            "includeAll" : true,
+            "regex" : null,
+            "allValue" : "",
+            "refresh" : 2,
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE $timeFilter",
+            "type" : "query",
+            "sort" : 1,
+            "useTags" : false,
+            "datasource" : "prod",
+            "tagValuesQuery" : null,
+            "tagsQuery" : null,
+            "current" : {
+               "value" : null,
+               "tags" : [],
+               "text" : null
+            },
+            "multi" : true,
+            "hide" : 2
+         }
+      ]
+   },
+   "annotations" : {
+      "list" : [
+         {
+            "hide" : false,
+            "type" : "tags",
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='0') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "tags" : [],
+            "datasource" : "prod",
+            "name" : "Show Deployments in Graphs (green dashed line)",
+            "iconColor" : "#7EB26D",
+            "limit" : 100,
+            "showIn" : 0,
+            "enable" : true
+         },
+         {
+            "name" : "Show Failed Deployments in Graphs (red dashed line)",
+            "datasource" : "prod",
+            "enable" : false,
+            "showIn" : 0,
+            "limit" : 100,
+            "iconColor" : "#E24D42",
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='2') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "hide" : false,
+            "type" : "tags Deployments in Graphs",
+            "tags" : []
+         },
+         {
+            "datasource" : "prod",
+            "name" : "Show Aborted Deployments in Graphs (orange dashed line)",
+            "iconColor" : "#EF843C",
+            "showIn" : 0,
+            "limit" : 100,
+            "enable" : false,
+            "type" : "tags",
+            "hide" : false,
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='1') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "tags" : []
+         }
+      ]
+   },
+   "uid" : null,
+   "refresh" : "10s",
+   "timezone" : "",
+   "hideControls" : false,
+   "description" : "",
+   "tags" : [
+      "elasticsearch",
+      "prod"
+   ],
+   "__inputs" : [],
+   "version" : 0,
+   "style" : "dark",
+   "links" : [
+      {
+         "url" : "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains-cloudwatchmetrics.html",
+         "targetBlank" : true,
+         "title" : "Documentation"
+      }
+   ],
+   "sharedCrosshair" : true,
+   "timepicker" : {
+      "refresh_intervals" : [
+         "5s",
+         "10s",
+         "30s",
+         "1m",
+         "5m",
+         "15m",
+         "30m",
+         "1h",
+         "2h",
+         "1d"
+      ],
+      "time_options" : [
+         "5m",
+         "15m",
+         "1h",
+         "6h",
+         "12h",
+         "24h",
+         "2d",
+         "7d",
+         "30d"
+      ]
+   },
+   "rows" : [
+      {
+         "height" : "250px",
+         "showTitle" : false,
+         "collapse" : false,
+         "panels" : [
+            {
+               "timeShift" : null,
+               "stack" : false,
+               "pointradius" : 5,
+               "type" : "graph",
+               "points" : false,
+               "renderer" : "flot",
+               "transparent" : true,
+               "lines" : false,
+               "aliasColors" : {},
+               "isNew" : true,
+               "title" : "Status RED alerts",
+               "span" : 3,
+               "editable" : false,
+               "yaxes" : [
+                  {
+                     "label" : null,
+                     "show" : true,
+                     "max" : null,
+                     "format" : "short",
+                     "logBase" : 1,
+                     "min" : 0,
+                     "decimals" : null
+                  },
+                  {
+                     "decimals" : null,
+                     "min" : 0,
+                     "logBase" : 1,
+                     "max" : null,
+                     "format" : "short",
+                     "show" : true,
+                     "label" : null
+                  }
+               ],
+               "seriesOverrides" : [],
+               "timeFrom" : null,
+               "percentage" : false,
+               "datasource" : "prod",
+               "alert" : {
+                  "conditions" : [
+                     {
+                        "reducer" : {
+                           "params" : [],
+                           "type" : "max"
+                        },
+                        "evaluator" : {
+                           "params" : [
+                              0
+                           ],
+                           "type" : "gt"
+                        },
+                        "type" : "query",
+                        "query" : {
+                           "model" : {
+                              "step" : 10,
+                              "instant" : false,
+                              "metric" : "",
+                              "refId" : "A",
+                              "target" : "",
+                              "interval" : "",
+                              "intervalFactor" : 2,
+                              "expr" : "",
+                              "legendFormat" : "",
+                              "format" : "time_series",
+                              "datasource" : ""
+                           },
+                           "params" : [
+                              "A",
+                              "5m",
+                              "now"
+                           ]
+                        },
+                        "operator" : {
+                           "type" : "or"
+                        }
+                     }
+                  ],
+                  "noDataState" : "keep_state",
+                  "for" : "2m",
+                  "notifications" : [
+                     {
+                        "uid" : "z4Vsv81Gz"
+                     },
+                     {
+                        "uid" : "y7VyD81Gz"
+                     }
+                  ],
+                  "frequency" : "2m",
+                  "name" : "Elasticsearch is in status red",
+                  "message" : "Elasticsearch is in status red",
+                  "executionErrorState" : "alerting",
+                  "handler" : 1
+               },
+               "grid" : {
+                  "threshold1" : null,
+                  "threshold2" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)"
+               },
+               "legend" : {
+                  "sort" : null,
+                  "values" : false,
+                  "hideEmpty" : false,
+                  "rightSide" : false,
+                  "min" : false,
+                  "max" : false,
+                  "avg" : false,
+                  "sideWidth" : null,
+                  "sortDesc" : false,
+                  "alignAsTable" : false,
+                  "total" : false,
+                  "show" : true,
+                  "hideZero" : false,
+                  "current" : false
+               },
+               "bars" : true,
+               "tooltip" : {
+                  "msResolution" : true,
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "shared" : true
+               },
+               "steppedLine" : false,
+               "description" : null,
+               "targets" : [
+                  {
+                     "resultFormat" : "time_series",
+                     "rawQuery" : true,
+                     "measurement" : "",
+                     "alias" : "",
+                     "query" : "SELECT max(\"cluster_status.red_maximum\") AS \"status_red\" FROM \"autogen\".\"cloudwatch_aws_es\" WHERE $timeFilter GROUP BY time(1m),\"domain_name\" fill(previous)",
+                     "refId" : "A"
+                  }
+               ],
+               "nullPointMode" : "connected",
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "repeat" : null,
+               "error" : false,
+               "minSpan" : null,
+               "id" : 1,
+               "fill" : 1,
+               "xaxis" : {
+                  "show" : true
+               },
+               "links" : [],
+               "linewidth" : 2
+            },
+            {
+               "linewidth" : 2,
+               "fill" : 1,
+               "links" : [],
+               "xaxis" : {
+                  "show" : true
+               },
+               "id" : 2,
+               "minSpan" : null,
+               "error" : false,
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "repeat" : null,
+               "nullPointMode" : "connected",
+               "targets" : [
+                  {
+                     "resultFormat" : "time_series",
+                     "query" : "SELECT min(\"nodes_minimum\") AS \"nodes\" FROM \"autogen\".\"cloudwatch_aws_es\" WHERE $timeFilter GROUP BY time(1m),\"domain_name\" fill(previous)",
+                     "refId" : "A",
+                     "alias" : "",
+                     "measurement" : "",
+                     "rawQuery" : true
+                  }
+               ],
+               "bars" : false,
+               "tooltip" : {
+                  "msResolution" : true,
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "shared" : true
+               },
+               "steppedLine" : false,
+               "description" : null,
+               "grid" : {
+                  "threshold1" : null,
+                  "threshold2" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)"
+               },
+               "legend" : {
+                  "sort" : null,
+                  "rightSide" : false,
+                  "hideEmpty" : false,
+                  "values" : false,
+                  "min" : false,
+                  "max" : false,
+                  "avg" : false,
+                  "sortDesc" : false,
+                  "sideWidth" : null,
+                  "alignAsTable" : false,
+                  "total" : false,
+                  "current" : false,
+                  "hideZero" : false,
+                  "show" : true
+               },
+               "alert" : {
+                  "conditions" : [
+                     {
+                        "query" : {
+                           "params" : [
+                              "A",
+                              "5m",
+                              "now"
+                           ],
+                           "model" : {
+                              "datasource" : "",
+                              "format" : "time_series",
+                              "legendFormat" : "",
+                              "expr" : "",
+                              "interval" : "",
+                              "intervalFactor" : 2,
+                              "target" : "",
+                              "refId" : "A",
+                              "metric" : "",
+                              "instant" : false,
+                              "step" : 10
+                           }
+                        },
+                        "type" : "query",
+                        "evaluator" : {
+                           "type" : "lt",
+                           "params" : [
+                              1
+                           ]
+                        },
+                        "reducer" : {
+                           "params" : [],
+                           "type" : "max"
+                        },
+                        "operator" : {
+                           "type" : "or"
+                        }
+                     }
+                  ],
+                  "notifications" : [
+                     {
+                        "uid" : "z4Vsv81Gz"
+                     },
+                     {
+                        "uid" : "y7VyD81Gz"
+                     }
+                  ],
+                  "for" : "2m",
+                  "noDataState" : "keep_state",
+                  "message" : "Elasticsearch might have no nodes",
+                  "name" : "Elasticsearch nodes alert",
+                  "frequency" : "2m",
+                  "handler" : 1,
+                  "executionErrorState" : "alerting"
+               },
+               "datasource" : "prod",
+               "percentage" : false,
+               "seriesOverrides" : [],
+               "timeFrom" : null,
+               "yaxes" : [
+                  {
+                     "logBase" : 1,
+                     "max" : null,
+                     "format" : "short",
+                     "show" : true,
+                     "label" : null,
+                     "decimals" : null,
+                     "min" : 0
+                  },
+                  {
+                     "logBase" : 1,
+                     "format" : "short",
+                     "max" : null,
+                     "show" : true,
+                     "label" : null,
+                     "decimals" : null,
+                     "min" : 0
+                  }
+               ],
+               "editable" : false,
+               "title" : "Elasticsearch node alerts",
+               "span" : 3,
+               "isNew" : true,
+               "lines" : true,
+               "aliasColors" : {},
+               "renderer" : "flot",
+               "transparent" : true,
+               "points" : false,
+               "stack" : false,
+               "pointradius" : 5,
+               "type" : "graph",
+               "timeShift" : null
+            },
+            {
+               "percentage" : false,
+               "datasource" : "prod",
+               "alert" : {
+                  "frequency" : "2m",
+                  "name" : "Elasticsearch writed blocked alert",
+                  "message" : "Elasticsearch might be blocking writes",
+                  "executionErrorState" : "alerting",
+                  "handler" : 1,
+                  "conditions" : [
+                     {
+                        "evaluator" : {
+                           "params" : [
+                              0
+                           ],
+                           "type" : "gt"
+                        },
+                        "type" : "query",
+                        "query" : {
+                           "model" : {
+                              "instant" : false,
+                              "step" : 10,
+                              "metric" : "",
+                              "refId" : "A",
+                              "intervalFactor" : 2,
+                              "interval" : "",
+                              "target" : "",
+                              "expr" : "",
+                              "format" : "time_series",
+                              "legendFormat" : "",
+                              "datasource" : ""
+                           },
+                           "params" : [
+                              "A",
+                              "5m",
+                              "now"
+                           ]
+                        },
+                        "reducer" : {
+                           "params" : [],
+                           "type" : "max"
+                        },
+                        "operator" : {
+                           "type" : "or"
+                        }
+                     }
+                  ],
+                  "for" : "2m",
+                  "noDataState" : "keep_state",
+                  "notifications" : [
+                     {
+                        "uid" : "z4Vsv81Gz"
+                     },
+                     {
+                        "uid" : "y7VyD81Gz"
+                     }
+                  ]
+               },
+               "span" : 3,
+               "title" : "Elasticsearch write blocked alerts",
+               "editable" : false,
+               "yaxes" : [
+                  {
+                     "decimals" : null,
+                     "min" : 0,
+                     "logBase" : 1,
+                     "max" : null,
+                     "format" : "short",
+                     "show" : true,
+                     "label" : null
+                  },
+                  {
+                     "min" : 0,
+                     "decimals" : null,
+                     "label" : null,
+                     "show" : true,
+                     "format" : "short",
+                     "max" : null,
+                     "logBase" : 1
+                  }
+               ],
+               "timeFrom" : null,
+               "seriesOverrides" : [],
+               "transparent" : true,
+               "renderer" : "flot",
+               "lines" : true,
+               "aliasColors" : {},
+               "isNew" : true,
+               "timeShift" : null,
+               "stack" : false,
+               "pointradius" : 5,
+               "type" : "graph",
+               "points" : false,
+               "fill" : 1,
+               "links" : [],
+               "xaxis" : {
+                  "show" : true
+               },
+               "linewidth" : 2,
+               "id" : 3,
+               "nullPointMode" : "connected",
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "repeat" : null,
+               "error" : false,
+               "minSpan" : null,
+               "grid" : {
+                  "threshold1" : null,
+                  "threshold2" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)"
+               },
+               "legend" : {
+                  "current" : false,
+                  "hideZero" : false,
+                  "show" : true,
+                  "alignAsTable" : false,
+                  "total" : false,
+                  "sortDesc" : false,
+                  "sideWidth" : null,
+                  "min" : false,
+                  "rightSide" : false,
+                  "values" : false,
+                  "hideEmpty" : false,
+                  "sort" : null,
+                  "avg" : false,
+                  "max" : false
+               },
+               "bars" : false,
+               "tooltip" : {
+                  "value_type" : "cumulative",
+                  "msResolution" : true,
+                  "sort" : 0,
+                  "shared" : true
+               },
+               "steppedLine" : false,
+               "description" : null,
+               "targets" : [
+                  {
+                     "measurement" : "",
+                     "alias" : "",
+                     "query" : "SELECT max(\"cluster_index_writes_blocked_maximum\") AS \"writes_blocked\" FROM \"autogen\".\"cloudwatch_aws_es\" WHERE $timeFilter GROUP BY time(1m),\"domain_name\" fill(previous)",
+                     "refId" : "A",
+                     "rawQuery" : true,
+                     "resultFormat" : "time_series"
+                  }
+               ]
+            },
+            {
+               "lines" : true,
+               "aliasColors" : {},
+               "renderer" : "flot",
+               "transparent" : true,
+               "isNew" : true,
+               "stack" : false,
+               "pointradius" : 5,
+               "type" : "graph",
+               "timeShift" : null,
+               "points" : false,
+               "percentage" : false,
+               "datasource" : "prod",
+               "alert" : {
+                  "executionErrorState" : "alerting",
+                  "handler" : 1,
+                  "frequency" : "2m",
+                  "name" : "Elasticsearch automated snapshot failure alert",
+                  "message" : "Elasticsearch automated snapshot failure alert",
+                  "noDataState" : "keep_state",
+                  "for" : "2m",
+                  "notifications" : [
+                     {
+                        "uid" : "z4Vsv81Gz"
+                     },
+                     {
+                        "uid" : "y7VyD81Gz"
+                     }
+                  ],
+                  "conditions" : [
+                     {
+                        "evaluator" : {
+                           "type" : "gt",
+                           "params" : [
+                              0
+                           ]
+                        },
+                        "type" : "query",
+                        "query" : {
+                           "model" : {
+                              "interval" : "",
+                              "intervalFactor" : 2,
+                              "target" : "",
+                              "refId" : "A",
+                              "metric" : "",
+                              "instant" : false,
+                              "step" : 10,
+                              "datasource" : "",
+                              "format" : "time_series",
+                              "legendFormat" : "",
+                              "expr" : ""
+                           },
+                           "params" : [
+                              "A",
+                              "5m",
+                              "now"
+                           ]
+                        },
+                        "reducer" : {
+                           "params" : [],
+                           "type" : "max"
+                        },
+                        "operator" : {
+                           "type" : "or"
+                        }
+                     }
+                  ]
+               },
+               "yaxes" : [
+                  {
+                     "min" : 0,
+                     "decimals" : null,
+                     "label" : null,
+                     "show" : true,
+                     "max" : null,
+                     "format" : "short",
+                     "logBase" : 1
+                  },
+                  {
+                     "min" : 0,
+                     "decimals" : null,
+                     "label" : null,
+                     "show" : true,
+                     "max" : null,
+                     "format" : "short",
+                     "logBase" : 1
+                  }
+               ],
+               "editable" : false,
+               "span" : 3,
+               "title" : "Elasticsearch automated snapshot failure alerts",
+               "seriesOverrides" : [],
+               "timeFrom" : null,
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "repeat" : null,
+               "nullPointMode" : "connected",
+               "minSpan" : null,
+               "error" : false,
+               "legend" : {
+                  "max" : false,
+                  "avg" : false,
+                  "rightSide" : false,
+                  "values" : false,
+                  "hideEmpty" : false,
+                  "sort" : null,
+                  "min" : false,
+                  "sortDesc" : false,
+                  "sideWidth" : null,
+                  "current" : false,
+                  "hideZero" : false,
+                  "show" : true,
+                  "alignAsTable" : false,
+                  "total" : false
+               },
+               "grid" : {
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1" : null,
+                  "threshold2" : null
+               },
+               "targets" : [
+                  {
+                     "resultFormat" : "time_series",
+                     "measurement" : "",
+                     "refId" : "A",
+                     "query" : "SELECT max(\"automated_snapshot_failure_maximum\") AS \"automated_snapshot_failures\" FROM \"autogen\".\"cloudwatch_aws_es\" WHERE $timeFilter GROUP BY time(1m),\"domain_name\" fill(previous)",
+                     "alias" : "",
+                     "rawQuery" : true
+                  }
+               ],
+               "bars" : false,
+               "tooltip" : {
+                  "value_type" : "cumulative",
+                  "msResolution" : true,
+                  "shared" : true,
+                  "sort" : 0
+               },
+               "steppedLine" : false,
+               "description" : null,
+               "linewidth" : 2,
+               "fill" : 1,
+               "xaxis" : {
+                  "show" : true
+               },
+               "links" : [],
+               "id" : 4
+            }
+         ],
+         "title" : "New row",
+         "editable" : false,
+         "repeat" : null
+      },
+      {
+         "editable" : false,
+         "repeat" : null,
+         "title" : "New row",
+         "showTitle" : false,
+         "collapse" : false,
+         "panels" : [
+            {
+               "targets" : [
+                  {
+                     "resultFormat" : "time_series",
+                     "rawQuery" : true,
+                     "measurement" : "",
+                     "alias" : "",
+                     "query" : "SELECT max(\"jvm_memory_pressure_maximum\") AS \"jvm_mem_pressure\" FROM \"autogen\".\"cloudwatch_aws_es\" WHERE $timeFilter GROUP BY time(1m),\"domain_name\" fill(previous)",
+                     "refId" : "A"
+                  }
+               ],
+               "steppedLine" : false,
+               "description" : null,
+               "tooltip" : {
+                  "sort" : 0,
+                  "shared" : true,
+                  "msResolution" : true,
+                  "value_type" : "cumulative"
+               },
+               "bars" : false,
+               "legend" : {
+                  "max" : false,
+                  "avg" : false,
+                  "sort" : null,
+                  "rightSide" : false,
+                  "values" : false,
+                  "hideEmpty" : false,
+                  "min" : false,
+                  "sortDesc" : false,
+                  "sideWidth" : null,
+                  "alignAsTable" : false,
+                  "total" : false,
+                  "current" : false,
+                  "hideZero" : false,
+                  "show" : true
+               },
+               "grid" : {
+                  "threshold2" : null,
+                  "threshold1" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "minSpan" : null,
+               "error" : false,
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "repeat" : null,
+               "nullPointMode" : "connected",
+               "id" : 5,
+               "linewidth" : 2,
+               "links" : [],
+               "xaxis" : {
+                  "show" : true
+               },
+               "fill" : 1,
+               "points" : false,
+               "type" : "graph",
+               "pointradius" : 5,
+               "stack" : false,
+               "timeShift" : null,
+               "isNew" : true,
+               "aliasColors" : {},
+               "lines" : true,
+               "renderer" : "flot",
+               "transparent" : true,
+               "seriesOverrides" : [],
+               "timeFrom" : null,
+               "editable" : false,
+               "yaxes" : [
+                  {
+                     "logBase" : 1,
+                     "format" : "short",
+                     "max" : null,
+                     "show" : true,
+                     "label" : null,
+                     "decimals" : null,
+                     "min" : 0
+                  },
+                  {
+                     "label" : null,
+                     "show" : true,
+                     "max" : null,
+                     "format" : "short",
+                     "logBase" : 1,
+                     "min" : 0,
+                     "decimals" : null
+                  }
+               ],
+               "span" : 12,
+               "title" : "Elasticsearch JVM memory pressure alerts",
+               "alert" : {
+                  "conditions" : [
+                     {
+                        "reducer" : {
+                           "params" : [],
+                           "type" : "max"
+                        },
+                        "type" : "query",
+                        "evaluator" : {
+                           "type" : "gt",
+                           "params" : [
+                              80
+                           ]
+                        },
+                        "query" : {
+                           "params" : [
+                              "A",
+                              "5m",
+                              "now"
+                           ],
+                           "model" : {
+                              "expr" : "",
+                              "format" : "time_series",
+                              "legendFormat" : "",
+                              "datasource" : "",
+                              "instant" : false,
+                              "step" : 10,
+                              "metric" : "",
+                              "refId" : "A",
+                              "interval" : "",
+                              "intervalFactor" : 2,
+                              "target" : ""
+                           }
+                        },
+                        "operator" : {
+                           "type" : "or"
+                        }
+                     }
+                  ],
+                  "notifications" : [
+                     {
+                        "uid" : "z4Vsv81Gz"
+                     },
+                     {
+                        "uid" : "y7VyD81Gz"
+                     }
+                  ],
+                  "for" : "2m",
+                  "noDataState" : "keep_state",
+                  "message" : "Elasticsearch JVM memory pressure alert",
+                  "name" : "Elasticsearch JVM memory pressure alert",
+                  "frequency" : "2m",
+                  "handler" : 1,
+                  "executionErrorState" : "alerting"
+               },
+               "percentage" : false,
+               "datasource" : "prod"
+            }
+         ],
+         "height" : "250px"
+      },
+      {
+         "collapse" : false,
+         "panels" : [
+            {
+               "type" : "graph",
+               "stack" : false,
+               "pointradius" : 5,
+               "timeShift" : null,
+               "points" : false,
+               "aliasColors" : {},
+               "lines" : true,
+               "transparent" : true,
+               "renderer" : "flot",
+               "isNew" : true,
+               "editable" : false,
+               "yaxes" : [
+                  {
+                     "decimals" : null,
+                     "min" : 0,
+                     "max" : null,
+                     "format" : "decmbytes",
+                     "logBase" : 1,
+                     "label" : null,
+                     "show" : true
+                  },
+                  {
+                     "decimals" : null,
+                     "min" : 0,
+                     "format" : "short",
+                     "max" : null,
+                     "logBase" : 1,
+                     "label" : null,
+                     "show" : true
+                  }
+               ],
+               "title" : "Elasticsearch storage alerts",
+               "span" : 12,
+               "seriesOverrides" : [],
+               "timeFrom" : null,
+               "percentage" : false,
+               "datasource" : "prod",
+               "alert" : {
+                  "handler" : 1,
+                  "executionErrorState" : "alerting",
+                  "frequency" : "2m",
+                  "message" : "Elasticsearch might be low on storage",
+                  "name" : "Elasticsearch storage alert",
+                  "for" : "2m",
+                  "noDataState" : "keep_state",
+                  "notifications" : [
+                     {
+                        "uid" : "z4Vsv81Gz"
+                     },
+                     {
+                        "uid" : "y7VyD81Gz"
+                     }
+                  ],
+                  "conditions" : [
+                     {
+                        "reducer" : {
+                           "type" : "max",
+                           "params" : []
+                        },
+                        "query" : {
+                           "model" : {
+                              "datasource" : "",
+                              "expr" : "",
+                              "format" : "time_series",
+                              "legendFormat" : "",
+                              "refId" : "A",
+                              "metric" : "",
+                              "intervalFactor" : 2,
+                              "interval" : "",
+                              "target" : "",
+                              "step" : 10,
+                              "instant" : false
+                           },
+                           "params" : [
+                              "A",
+                              "5m",
+                              "now"
+                           ]
+                        },
+                        "type" : "query",
+                        "evaluator" : {
+                           "type" : "lt",
+                           "params" : [
+                              10240
+                           ]
+                        },
+                        "operator" : {
+                           "type" : "or"
+                        }
+                     }
+                  ]
+               },
+               "legend" : {
+                  "sideWidth" : null,
+                  "sortDesc" : false,
+                  "hideZero" : false,
+                  "show" : true,
+                  "current" : false,
+                  "total" : false,
+                  "alignAsTable" : false,
+                  "hideEmpty" : false,
+                  "values" : false,
+                  "rightSide" : false,
+                  "sort" : null,
+                  "min" : false,
+                  "max" : false,
+                  "avg" : false
+               },
+               "grid" : {
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold1" : null,
+                  "threshold2" : null
+               },
+               "targets" : [
+                  {
+                     "resultFormat" : "time_series",
+                     "rawQuery" : true,
+                     "measurement" : "",
+                     "refId" : "A",
+                     "query" : "SELECT min(\"free_storage_space_minimum\") AS \"free_storage\" FROM \"autogen\".\"cloudwatch_aws_es\" WHERE $timeFilter GROUP BY time(1m),\"domain_name\" fill(previous)",
+                     "alias" : ""
+                  }
+               ],
+               "description" : null,
+               "steppedLine" : false,
+               "tooltip" : {
+                  "shared" : true,
+                  "sort" : 0,
+                  "value_type" : "cumulative",
+                  "msResolution" : true
+               },
+               "bars" : false,
+               "repeat" : null,
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "nullPointMode" : "connected",
+               "minSpan" : null,
+               "error" : false,
+               "id" : 6,
+               "linewidth" : 2,
+               "xaxis" : {
+                  "show" : true
+               },
+               "links" : [],
+               "fill" : 1
+            }
+         ],
+         "showTitle" : false,
+         "height" : "250px",
+         "repeat" : null,
+         "editable" : false,
+         "title" : "New row"
+      }
+   ],
+   "schemaVersion" : 12,
+   "id" : null,
+   "title" : "Elasticsearch Alerts",
+   "editable" : false,
+   "time" : {
+      "from" : "now-1h",
+      "to" : "now"
+   }
+}
