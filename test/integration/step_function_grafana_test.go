@@ -11,6 +11,7 @@ import (
 
 func TestStepFunction_noDashboard(t *testing.T) {
 
+	t.Parallel()
 	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
 	exampleDir := "../../examples/step_function_dashboards/no_dashboard/"
 
@@ -39,6 +40,7 @@ func TestStepFunction_noDashboard(t *testing.T) {
 
 func TestStepFunction_alert(t *testing.T) {
 
+	t.Parallel()
 	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
 	exampleDir := "../../examples/step_function_dashboards/step_function_alert/"
 
@@ -51,6 +53,7 @@ func TestStepFunction_alert(t *testing.T) {
 
 func TestStepFunction_folder(t *testing.T) {
 
+	t.Parallel()
 	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
 	exampleDir := "../../examples/step_function_dashboards/step_function_folder/"
 
@@ -63,6 +66,7 @@ func TestStepFunction_folder(t *testing.T) {
 
 func TestStepFunction_withoutLambda(t *testing.T) {
 
+	t.Parallel()
 	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
 	exampleDir := "../../examples/step_function_dashboards/step_function_without_lambda/"
 
