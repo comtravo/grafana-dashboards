@@ -11,6 +11,7 @@ import (
 
 func TestAPIGateway_noDashboard(t *testing.T) {
 
+	// t.Parallel()
 	dashboardName := fmt.Sprintf("apig-%s", random.UniqueId())
 	exampleDir := "../../examples/api_gateway_dashboards/no_dashboard/"
 
@@ -39,6 +40,7 @@ func TestAPIGateway_noDashboard(t *testing.T) {
 
 func TestAPIGateway_alert(t *testing.T) {
 
+	// t.Parallel()
 	dashboardName := fmt.Sprintf("apig-%s", random.UniqueId())
 	exampleDir := "../../examples/api_gateway_dashboards/api_gateway_alert/"
 
@@ -51,6 +53,7 @@ func TestAPIGateway_alert(t *testing.T) {
 
 func TestAPIGateway_folder(t *testing.T) {
 
+	// t.Parallel()
 	dashboardName := fmt.Sprintf("apig-%s", random.UniqueId())
 	exampleDir := "../../examples/api_gateway_dashboards/api_gateway_folder/"
 
@@ -63,6 +66,7 @@ func TestAPIGateway_folder(t *testing.T) {
 
 func TestAPIGateway_withoutLambda(t *testing.T) {
 
+	// t.Parallel()
 	dashboardName := fmt.Sprintf("apig-%s", random.UniqueId())
 	exampleDir := "../../examples/api_gateway_dashboards/api_gateway_without_lambda/"
 

@@ -53,6 +53,4 @@ The [examples](./examples) directory showcases various possibilies on using the 
 
  - [ ] Create snapshots of dasboards in the [examples](./examples) directory
  - [ ] Add ECS
- - [ ] Add RDS
- - [ ] Add SNS
  - [ ] Add MongoDB
