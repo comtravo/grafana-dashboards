@@ -1,10 +1,6 @@
 from grafanalib.core import (
     Alert,
-    # AlertCondition,
-    # Dashboard,
     Graph,
-    # Target,
-    # Annotations,
     Template,
     Templating,
 )
