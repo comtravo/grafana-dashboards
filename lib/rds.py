@@ -96,7 +96,8 @@ def generate_rds_cpu_graph(name: str, data_source: str, notifications: List[str]
                     operator=OP_AND,
                 )
             ],
-            gracePeriod="1m",
+            gracePeriod="2m",
+            frequency="2m",
             notifications=notifications,
         )
 
@@ -201,7 +202,8 @@ def generate_rds_burst_balance_graph(
                     operator=OP_AND,
                 )
             ],
-            gracePeriod="1m",
+            gracePeriod="2m",
+            frequency="2m",
             notifications=notifications,
         )
 
@@ -255,7 +257,8 @@ def generate_rds_transaction_id_graph(
                     operator=OP_AND,
                 )
             ],
-            gracePeriod="1m",
+            gracePeriod="2m",
+            frequency="2m",
             notifications=notifications,
         )
 
