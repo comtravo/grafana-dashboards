@@ -1,3 +1,7 @@
+"""
+    https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics.html
+"""
+
 from grafanalib.core import (
     Alert,
     AlertCondition,
@@ -15,7 +19,7 @@ from grafanalib.core import (
     YAxes,
     YAxis,
 )
-from grafanalib.influxdb import InfluxDBTarget
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.annotations import get_release_annotations
 from lib.commons import (
@@ -34,7 +38,7 @@ from lib import colors
 
 from typing import List
 
-LAMBDA_MEASUREMENT = "cloudwatch_aws_lambda"
+NAMESPACE = "AWS/Lambda"
 LAMBDA_DASHBOARD_PREFIX = "Lambda: "
 
 
@@ -69,48 +73,52 @@ def dispatcher(service, trigger, *args, **kwargs):
 
 
 def lambda_generate_graph(
-    name: str, data_source: str, notifications: List[str], *args, **kwargs
+    name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
 ):
     """
     Generate lambda graph
     """
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=DURATION_MINIMUM_ALIAS,
-            query='SELECT min("duration_minimum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(null)'.format(
-                RETENTION_POLICY, LAMBDA_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period=LAMBDA_INVOCATION_METRIC_GROUP_BY,
+            statistics=["Minimum"],
+            metricName="Duration",
+            dimensions={"FunctionName": name},
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=DURATION_AVERGAE_ALIAS,
-            query='SELECT mean("duration_average") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(null)'.format(
-                RETENTION_POLICY, LAMBDA_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period=LAMBDA_INVOCATION_METRIC_GROUP_BY,
+            statistics=["Average"],
+            metricName="Duration",
+            dimensions={"FunctionName": name},
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=DURATION_MAXIMUM_ALIAS,
-            query='SELECT max("duration_maximum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(null)'.format(
-                RETENTION_POLICY, LAMBDA_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period=LAMBDA_INVOCATION_METRIC_GROUP_BY,
+            statistics=["Maximum"],
+            metricName="Duration",
+            dimensions={"FunctionName": name},
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=LAMBDA_INVOCATIONS_ALIAS,
-            query='SELECT max("invocations_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
-                RETENTION_POLICY, LAMBDA_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period=LAMBDA_INVOCATION_METRIC_GROUP_BY,
+            statistics=["Sum"],
+            metricName="Invocations",
+            dimensions={"FunctionName": name},
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=LAMBDA_ERRORS_ALIAS,
-            query='SELECT max("errors_sum") FROM "{}"."{}" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
-                RETENTION_POLICY, LAMBDA_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
-            refId=ALERT_REF_ID if notifications else None,
+            namespace=NAMESPACE,
+            period=LAMBDA_INVOCATION_METRIC_GROUP_BY,
+            statistics=["Sum"],
+            metricName="Errors",
+            dimensions={"FunctionName": name},
         ),
     ]
 
@@ -170,7 +178,7 @@ def lambda_generate_graph(
 
     return Graph(
         title="Lambda: {}".format(name),
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
         yAxes=yAxes,
@@ -224,7 +232,8 @@ def lambda_logs_dashboard(*args, **kwargs):
 def create_lambda_only_dashboard(
     tags: List[str],
     name: str,
-    data_source: str,
+    cloudwatch_data_source: str,
+    influxdb_data_source: str,
     notifications: List[str],
     environment: str,
     *args,
@@ -235,8 +244,8 @@ def create_lambda_only_dashboard(
     return Dashboard(
         title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
-        annotations=get_release_annotations(data_source),
-        templating=get_release_templating(data_source),
+        annotations=get_release_annotations(influxdb_data_source),
+        templating=get_release_templating(influxdb_data_source),
         tags=tags + ["lambda", environment],
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
@@ -244,7 +253,7 @@ def create_lambda_only_dashboard(
             Row(
                 panels=[
                     lambda_generate_graph(
-                        name, data_source, notifications=notifications
+                        name, cloudwatch_data_source, notifications=notifications
                     )
                 ]
             )
@@ -252,16 +261,19 @@ def create_lambda_only_dashboard(
     ).auto_panel_ids()
 
 
-def create_lambda_sqs_dlq_graph(name: str, data_source: str, notifications: List[str]):
+def create_lambda_sqs_dlq_graph(
+    name: str, cloudwatch_data_source: str, notifications: List[str]
+):
     """Create SQS Deadletter graph"""
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="Approximate number of messages available",
-            query='SELECT max("approximate_number_of_messages_visible_maximum") FROM "{}"."cloudwatch_aws_sqs" WHERE ("queue_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace="AWS/SQS",
+            period="1m",
+            statistics=["Sum"],
+            metricName="ApproximateNumberOfMessagesVisible",
+            dimensions={"QueueName": name},
             refId=ALERT_REF_ID if notifications else None,
         )
     ]
@@ -292,7 +304,7 @@ def create_lambda_sqs_dlq_graph(name: str, data_source: str, notifications: List
 
     return Graph(
         title="SQS Dead Letter Queue: {}".format(name),
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=yAxes,
         transparent=TRANSPARENT,
@@ -302,16 +314,17 @@ def create_lambda_sqs_dlq_graph(name: str, data_source: str, notifications: List
     ).auto_ref_ids()
 
 
-def create_lambda_sqs_graph(name: str, data_source: str):
+def create_lambda_sqs_graph(name: str, cloudwatch_data_source: str):
     """Create SQS graph"""
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="Number of messages sent to the queue",
-            query='SELECT max("number_of_messages_sent_sum") FROM "{}"."cloudwatch_aws_sqs" WHERE ("queue_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace="AWS/SQS",
+            period="1m",
+            statistics=["Sum"],
+            metricName="NumberOfMessagesSent",
+            dimensions={"QueueName": name},
         )
     ]
 
@@ -319,7 +332,7 @@ def create_lambda_sqs_graph(name: str, data_source: str):
 
     return Graph(
         title="SQS: {}".format(name),
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=yAxes,
         transparent=TRANSPARENT,
@@ -329,7 +342,8 @@ def create_lambda_sqs_graph(name: str, data_source: str):
 
 def lambda_sqs_dashboard(
     name: str,
-    data_source: str,
+    cloudwatch_data_source: str,
+    influxdb_data_source: str,
     notifications: List[str],
     environment: str,
     *args,
@@ -338,17 +352,23 @@ def lambda_sqs_dashboard(
     """Create a dashboard with Lambda and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment]
 
-    lambda_graph = lambda_generate_graph(name, data_source, notifications=notifications)
-    sqs_graph = create_lambda_sqs_graph(name=name, data_source=data_source)
+    lambda_graph = lambda_generate_graph(
+        name, cloudwatch_data_source, notifications=notifications
+    )
+    sqs_graph = create_lambda_sqs_graph(
+        name=name, cloudwatch_data_source=cloudwatch_data_source
+    )
     dead_letter_sqs_graph = create_lambda_sqs_dlq_graph(
-        name=name + "-dlq", data_source=data_source, notifications=notifications
+        name=name + "-dlq",
+        cloudwatch_data_source=cloudwatch_data_source,
+        notifications=notifications,
     )
 
     return Dashboard(
         title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
-        annotations=get_release_annotations(data_source),
-        templating=get_release_templating(data_source),
+        annotations=get_release_annotations(influxdb_data_source),
+        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
@@ -362,7 +382,8 @@ def lambda_sqs_dashboard(
 
 def lambda_sns_sqs_dashboard(
     name: str,
-    data_source: str,
+    cloudwatch_data_source: str,
+    influxdb_data_source: str,
     notifications: List[str],
     environment: str,
     topics: List[str],
@@ -372,15 +393,23 @@ def lambda_sns_sqs_dashboard(
     """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment, "sns"]
 
-    lambda_graph = lambda_generate_graph(name, data_source, notifications=notifications)
-    sqs_graph = create_lambda_sqs_graph(name=name, data_source=data_source)
+    lambda_graph = lambda_generate_graph(
+        name, cloudwatch_data_source, notifications=notifications
+    )
+    sqs_graph = create_lambda_sqs_graph(
+        name=name, cloudwatch_data_source=cloudwatch_data_source
+    )
     dead_letter_sqs_graph = create_lambda_sqs_dlq_graph(
-        name=name + "-dlq", data_source=data_source, notifications=notifications
+        name=name + "-dlq",
+        cloudwatch_data_source=cloudwatch_data_source,
+        notifications=notifications,
     )
 
     sns_topic_panels = [
         create_sns_graph(
-            name=topic, data_source=data_source, notifications=notifications
+            name=topic,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
         )
         for topic in topics
     ]
@@ -388,8 +417,8 @@ def lambda_sns_sqs_dashboard(
     return Dashboard(
         title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
-        annotations=get_release_annotations(data_source),
-        templating=get_release_templating(data_source),
+        annotations=get_release_annotations(influxdb_data_source),
+        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,

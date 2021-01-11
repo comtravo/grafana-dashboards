@@ -27,7 +27,10 @@ def parse_options():  # pragma: no cover
         "--environment", type=str, required=True, help="Environment name"
     )
     parser.add_argument(
-        "--data_source", type=str, required=True, help="Datasource name"
+        "--cloudwatch_data_source", type=str, help="Cloudwatch datasource name"
+    )
+    parser.add_argument(
+        "--influxdb_data_source", type=str, help="influxDB datasource name"
     )
     parser.add_argument("--notifications", nargs="+", help="Notify alerts")
 
