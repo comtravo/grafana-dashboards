@@ -49,13 +49,13 @@ DOCUMENTATION_LINK = {
 }
 
 
-def get_elasticsearch_template(data_source: str):
+def get_elasticsearch_template(influxdb_data_source: str):
     """Get template for elasticsearch"""
 
     return Template(
         name="elasticsearch",
         query='SHOW TAG VALUES WITH KEY = "domain_name" WHERE $timeFilter',
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         label="Elasticsearch",
         refresh=2,
         allValue="",
@@ -66,7 +66,7 @@ def get_elasticsearch_template(data_source: str):
     )
 
 
-def generate_elasticsearch_cpu_graph(data_source: str):
+def generate_elasticsearch_cpu_graph(influxdb_data_source: str):
     """
     Generate Elasticsearch graph
     """
@@ -95,7 +95,7 @@ def generate_elasticsearch_cpu_graph(data_source: str):
 
     return Graph(
         title=alias,
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         seriesOverrides=series_overrides,
@@ -106,7 +106,7 @@ def generate_elasticsearch_cpu_graph(data_source: str):
     ).auto_ref_ids()
 
 
-def generate_elasticsearch_jvm_memory_pressure_graph(data_source: str):
+def generate_elasticsearch_jvm_memory_pressure_graph(influxdb_data_source: str):
     """
     Generate Elasticsearch graph
     """
@@ -135,7 +135,7 @@ def generate_elasticsearch_jvm_memory_pressure_graph(data_source: str):
 
     return Graph(
         title=alias,
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         seriesOverrides=series_overrides,
@@ -146,7 +146,7 @@ def generate_elasticsearch_jvm_memory_pressure_graph(data_source: str):
     ).auto_ref_ids()
 
 
-def generate_elasticsearch_documents_graph(data_source: str):
+def generate_elasticsearch_documents_graph(influxdb_data_source: str):
     """
     Generate Elasticsearch graph
     """
@@ -193,7 +193,7 @@ def generate_elasticsearch_documents_graph(data_source: str):
 
     return Graph(
         title="Documents",
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         seriesOverrides=series_overrides,
@@ -204,7 +204,7 @@ def generate_elasticsearch_documents_graph(data_source: str):
     ).auto_ref_ids()
 
 
-def generate_elasticsearch_storage_graph(data_source: str):
+def generate_elasticsearch_storage_graph(influxdb_data_source: str):
     """
     Generate Elasticsearch graph
     """
@@ -251,7 +251,7 @@ def generate_elasticsearch_storage_graph(data_source: str):
 
     return Graph(
         title="Storage",
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         seriesOverrides=series_overrides,
@@ -262,7 +262,7 @@ def generate_elasticsearch_storage_graph(data_source: str):
     ).auto_ref_ids()
 
 
-def generate_elasticsearch_requests_graph(data_source: str):
+def generate_elasticsearch_requests_graph(influxdb_data_source: str):
     """
     Generate Elasticsearch graph
     """
@@ -336,7 +336,7 @@ def generate_elasticsearch_requests_graph(data_source: str):
 
     return Graph(
         title="Requests",
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         seriesOverrides=series_overrides,
@@ -348,7 +348,7 @@ def generate_elasticsearch_requests_graph(data_source: str):
 
 
 def generate_elasticsearch_status_red_alert_graph(
-    data_source: str, notifications: List[str]
+    influxdb_data_source: str, notifications: List[str]
 ):
     """
     Generate Elasticsearch graph
@@ -393,7 +393,7 @@ def generate_elasticsearch_status_red_alert_graph(
 
     return Graph(
         title="Status RED alerts",
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -405,7 +405,7 @@ def generate_elasticsearch_status_red_alert_graph(
 
 
 def generate_elasticsearch_nodes_alert_graph(
-    data_source: str, notifications: List[str]
+    influxdb_data_source: str, notifications: List[str]
 ):
     """
     Generate Elasticsearch graph
@@ -447,7 +447,7 @@ def generate_elasticsearch_nodes_alert_graph(
 
     return Graph(
         title="Elasticsearch node alerts",
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -459,7 +459,7 @@ def generate_elasticsearch_nodes_alert_graph(
 
 
 def generate_elasticsearch_storage_alert_graph(
-    data_source: str, notifications: List[str]
+    influxdb_data_source: str, notifications: List[str]
 ):
     """
     Generate Elasticsearch graph
@@ -498,7 +498,7 @@ def generate_elasticsearch_storage_alert_graph(
 
     return Graph(
         title="Elasticsearch storage alerts",
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -510,7 +510,7 @@ def generate_elasticsearch_storage_alert_graph(
 
 
 def generate_elasticsearch_writes_blocked_alert_graph(
-    data_source: str, notifications: List[str]
+    influxdb_data_source: str, notifications: List[str]
 ):
     """
     Generate Elasticsearch graph
@@ -549,7 +549,7 @@ def generate_elasticsearch_writes_blocked_alert_graph(
 
     return Graph(
         title="Elasticsearch write blocked alerts",
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -561,7 +561,7 @@ def generate_elasticsearch_writes_blocked_alert_graph(
 
 
 def generate_elasticsearch_automated_snapshot_failure_alert_graph(
-    data_source: str, notifications: List[str]
+    influxdb_data_source: str, notifications: List[str]
 ):
     """
     Generate Elasticsearch graph
@@ -600,7 +600,7 @@ def generate_elasticsearch_automated_snapshot_failure_alert_graph(
 
     return Graph(
         title="Elasticsearch automated snapshot failure alerts",
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -612,7 +612,7 @@ def generate_elasticsearch_automated_snapshot_failure_alert_graph(
 
 
 def generate_elasticsearch_jvm_memory_pressure_alert_graph(
-    data_source: str, notifications: List[str]
+    influxdb_data_source: str, notifications: List[str]
 ):
     """
     Generate Elasticsearch graph
@@ -651,7 +651,7 @@ def generate_elasticsearch_jvm_memory_pressure_alert_graph(
 
     return Graph(
         title="Elasticsearch JVM memory pressure alerts",
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -663,38 +663,52 @@ def generate_elasticsearch_jvm_memory_pressure_alert_graph(
 
 
 def generate_elasticsearch_dashboard(
-    data_source: str, environment: str, *args, **kwargs
+    influxdb_data_source: str, environment: str, *args, **kwargs
 ):
     """Generate Elasticsearch dashboard"""
     tags = ["elasticsearch", environment]
 
     templating = Templating(
         [
-            get_elasticsearch_template(data_source=data_source),
-            get_release_template(data_source=data_source),
+            get_elasticsearch_template(influxdb_data_source=influxdb_data_source),
+            get_release_template(data_source=influxdb_data_source),
         ]
     )
 
     rows = [
         Row(
             panels=[
-                generate_elasticsearch_cpu_graph(data_source=data_source),
+                generate_elasticsearch_cpu_graph(
+                    influxdb_data_source=influxdb_data_source
+                ),
                 generate_elasticsearch_jvm_memory_pressure_graph(
-                    data_source=data_source
+                    influxdb_data_source=influxdb_data_source
                 ),
             ],
             editable=EDITABLE,
         ),
         Row(
-            panels=[generate_elasticsearch_documents_graph(data_source=data_source)],
+            panels=[
+                generate_elasticsearch_documents_graph(
+                    influxdb_data_source=influxdb_data_source
+                )
+            ],
             editable=EDITABLE,
         ),
         Row(
-            panels=[generate_elasticsearch_storage_graph(data_source=data_source)],
+            panels=[
+                generate_elasticsearch_storage_graph(
+                    influxdb_data_source=influxdb_data_source
+                )
+            ],
             editable=EDITABLE,
         ),
         Row(
-            panels=[generate_elasticsearch_requests_graph(data_source=data_source)],
+            panels=[
+                generate_elasticsearch_requests_graph(
+                    influxdb_data_source=influxdb_data_source
+                )
+            ],
             editable=EDITABLE,
         ),
     ]
@@ -702,7 +716,7 @@ def generate_elasticsearch_dashboard(
     return Dashboard(
         title="Elasticsearch",
         editable=EDITABLE,
-        annotations=get_release_annotations(data_source=data_source),
+        annotations=get_release_annotations(data_source=influxdb_data_source),
         templating=templating,
         tags=tags,
         timezone=TIMEZONE,
@@ -713,7 +727,11 @@ def generate_elasticsearch_dashboard(
 
 
 def generate_elasticsearch_alerts_dashboard(
-    data_source: str, environment: str, notifications: List[str], *args, **kwargs
+    influxdb_data_source: str,
+    environment: str,
+    notifications: List[str],
+    *args,
+    **kwargs
 ):
     """Generate Elasticsearch dashboard"""
 
@@ -723,7 +741,7 @@ def generate_elasticsearch_alerts_dashboard(
 
     templating = Templating(
         [
-            get_release_template(data_source=data_source),
+            get_release_template(data_source=influxdb_data_source),
         ]
     )
 
@@ -731,16 +749,20 @@ def generate_elasticsearch_alerts_dashboard(
         Row(
             panels=[
                 generate_elasticsearch_status_red_alert_graph(
-                    data_source=data_source, notifications=notifications
+                    influxdb_data_source=influxdb_data_source,
+                    notifications=notifications,
                 ),
                 generate_elasticsearch_nodes_alert_graph(
-                    data_source=data_source, notifications=notifications
+                    influxdb_data_source=influxdb_data_source,
+                    notifications=notifications,
                 ),
                 generate_elasticsearch_writes_blocked_alert_graph(
-                    data_source=data_source, notifications=notifications
+                    influxdb_data_source=influxdb_data_source,
+                    notifications=notifications,
                 ),
                 generate_elasticsearch_automated_snapshot_failure_alert_graph(
-                    data_source=data_source, notifications=notifications
+                    influxdb_data_source=influxdb_data_source,
+                    notifications=notifications,
                 ),
             ],
             editable=EDITABLE,
@@ -748,7 +770,8 @@ def generate_elasticsearch_alerts_dashboard(
         Row(
             panels=[
                 generate_elasticsearch_jvm_memory_pressure_alert_graph(
-                    data_source=data_source, notifications=notifications
+                    influxdb_data_source=influxdb_data_source,
+                    notifications=notifications,
                 ),
             ],
             editable=EDITABLE,
@@ -756,7 +779,8 @@ def generate_elasticsearch_alerts_dashboard(
         Row(
             panels=[
                 generate_elasticsearch_storage_alert_graph(
-                    data_source=data_source, notifications=notifications
+                    influxdb_data_source=influxdb_data_source,
+                    notifications=notifications,
                 ),
             ],
             editable=EDITABLE,
@@ -766,7 +790,7 @@ def generate_elasticsearch_alerts_dashboard(
     return Dashboard(
         title="Elasticsearch Alerts",
         editable=EDITABLE,
-        annotations=get_release_annotations(data_source=data_source),
+        annotations=get_release_annotations(data_source=influxdb_data_source),
         templating=templating,
         tags=tags,
         timezone=TIMEZONE,

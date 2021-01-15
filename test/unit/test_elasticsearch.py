@@ -27,7 +27,7 @@ from lib.elasticsearch import (
 
 class TestElasticsearchDashboards:
     def test_should_get_elasticsearch_template(self):
-        template = get_elasticsearch_template(data_source="prod")
+        template = get_elasticsearch_template(influxdb_data_source="prod")
         template.name.should.equal("elasticsearch")
         template.label.should.equal("Elasticsearch")
         template.query.should.equal(
@@ -37,10 +37,12 @@ class TestElasticsearchDashboards:
         template.includeAll.should.equal(False)
 
     def test_should_generate_elasticsearch_cpu_graph(self):
-        data_source = "prod"
-        generated_graph = generate_elasticsearch_cpu_graph(data_source=data_source)
+        influxdb_data_source = "prod"
+        generated_graph = generate_elasticsearch_cpu_graph(
+            influxdb_data_source=influxdb_data_source
+        )
         generated_graph.title.should.match(r"CPU utilization")
-        generated_graph.dataSource.should.match(data_source)
+        generated_graph.dataSource.should.match(influxdb_data_source)
         generated_graph.targets.should.have.length_of(1)
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
@@ -48,13 +50,13 @@ class TestElasticsearchDashboards:
         )
 
     def test_should_generate_elasticsearch_jvm_memory_pressure_graph(self):
-        data_source = "prod"
+        influxdb_data_source = "prod"
         generated_graph = generate_elasticsearch_jvm_memory_pressure_graph(
-            data_source=data_source
+            influxdb_data_source=influxdb_data_source
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"JVM memory pressure")
-        generated_graph.dataSource.should.match(data_source)
+        generated_graph.dataSource.should.match(influxdb_data_source)
         generated_graph.targets.should.have.length_of(1)
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
@@ -62,13 +64,13 @@ class TestElasticsearchDashboards:
         )
 
     def test_should_generate_elasticsearch_documents_graph(self):
-        data_source = "prod"
+        influxdb_data_source = "prod"
         generated_graph = generate_elasticsearch_documents_graph(
-            data_source=data_source
+            influxdb_data_source=influxdb_data_source
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"Documents")
-        generated_graph.dataSource.should.match(data_source)
+        generated_graph.dataSource.should.match(influxdb_data_source)
         generated_graph.targets.should.have.length_of(2)
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
@@ -80,11 +82,13 @@ class TestElasticsearchDashboards:
         )
 
     def test_should_generate_elasticsearch_storage_graph(self):
-        data_source = "prod"
-        generated_graph = generate_elasticsearch_storage_graph(data_source=data_source)
+        influxdb_data_source = "prod"
+        generated_graph = generate_elasticsearch_storage_graph(
+            influxdb_data_source=influxdb_data_source
+        )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"Storage")
-        generated_graph.dataSource.should.match(data_source)
+        generated_graph.dataSource.should.match(influxdb_data_source)
         generated_graph.targets.should.have.length_of(2)
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
@@ -96,11 +100,13 @@ class TestElasticsearchDashboards:
         )
 
     def test_should_generate_elasticsearch_requests_graph(self):
-        data_source = "prod"
-        generated_graph = generate_elasticsearch_requests_graph(data_source=data_source)
+        influxdb_data_source = "prod"
+        generated_graph = generate_elasticsearch_requests_graph(
+            influxdb_data_source=influxdb_data_source
+        )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"Requests")
-        generated_graph.dataSource.should.match(data_source)
+        generated_graph.dataSource.should.match(influxdb_data_source)
         generated_graph.targets.should.have.length_of(4)
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
@@ -120,15 +126,15 @@ class TestElasticsearchDashboards:
         )
 
     def test_should_generate_elasticsearch_status_red_alert_graph(self):
-        data_source = "prod"
+        influxdb_data_source = "prod"
         notifications = ["slack-1", "slack-2"]
 
         generated_graph = generate_elasticsearch_status_red_alert_graph(
-            data_source=data_source, notifications=notifications
+            influxdb_data_source=influxdb_data_source, notifications=notifications
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"Status RED alerts")
-        generated_graph.dataSource.should.match(data_source)
+        generated_graph.dataSource.should.match(influxdb_data_source)
         generated_graph.targets.should.have.length_of(1)
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
@@ -141,15 +147,15 @@ class TestElasticsearchDashboards:
         generated_graph.alert.notifications.should.equal(notifications)
 
     def test_should_generate_elasticsearch_nodes_alert_graph(self):
-        data_source = "prod"
+        influxdb_data_source = "prod"
         notifications = ["slack-1", "slack-2"]
 
         generated_graph = generate_elasticsearch_nodes_alert_graph(
-            data_source=data_source, notifications=notifications
+            influxdb_data_source=influxdb_data_source, notifications=notifications
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"Elasticsearch node alerts")
-        generated_graph.dataSource.should.match(data_source)
+        generated_graph.dataSource.should.match(influxdb_data_source)
         generated_graph.targets.should.have.length_of(1)
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
@@ -162,15 +168,15 @@ class TestElasticsearchDashboards:
         generated_graph.alert.notifications.should.equal(notifications)
 
     def test_should_generate_elasticsearch_storage_alert_graph(self):
-        data_source = "prod"
+        influxdb_data_source = "prod"
         notifications = ["slack-1", "slack-2"]
 
         generated_graph = generate_elasticsearch_storage_alert_graph(
-            data_source=data_source, notifications=notifications
+            influxdb_data_source=influxdb_data_source, notifications=notifications
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"Elasticsearch storage alerts")
-        generated_graph.dataSource.should.match(data_source)
+        generated_graph.dataSource.should.match(influxdb_data_source)
         generated_graph.targets.should.have.length_of(1)
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
@@ -183,15 +189,15 @@ class TestElasticsearchDashboards:
         generated_graph.alert.notifications.should.equal(notifications)
 
     def test_should_generate_elasticsearch_writes_blocked_alert_graph(self):
-        data_source = "prod"
+        influxdb_data_source = "prod"
         notifications = ["slack-1", "slack-2"]
 
         generated_graph = generate_elasticsearch_writes_blocked_alert_graph(
-            data_source=data_source, notifications=notifications
+            influxdb_data_source=influxdb_data_source, notifications=notifications
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"Elasticsearch write blocked alerts")
-        generated_graph.dataSource.should.match(data_source)
+        generated_graph.dataSource.should.match(influxdb_data_source)
         generated_graph.targets.should.have.length_of(1)
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
@@ -204,17 +210,17 @@ class TestElasticsearchDashboards:
         generated_graph.alert.notifications.should.equal(notifications)
 
     def test_should_generate_elasticsearch_automated_snapshot_failure_alert_graph(self):
-        data_source = "prod"
+        influxdb_data_source = "prod"
         notifications = ["slack-1", "slack-2"]
 
         generated_graph = generate_elasticsearch_automated_snapshot_failure_alert_graph(
-            data_source=data_source, notifications=notifications
+            influxdb_data_source=influxdb_data_source, notifications=notifications
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(
             r"Elasticsearch automated snapshot failure alerts"
         )
-        generated_graph.dataSource.should.match(data_source)
+        generated_graph.dataSource.should.match(influxdb_data_source)
         generated_graph.targets.should.have.length_of(1)
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
@@ -227,15 +233,15 @@ class TestElasticsearchDashboards:
         generated_graph.alert.notifications.should.equal(notifications)
 
     def test_should_generate_elasticsearch_jvm_memory_pressure_alert_graph(self):
-        data_source = "prod"
+        influxdb_data_source = "prod"
         notifications = ["slack-1", "slack-2"]
 
         generated_graph = generate_elasticsearch_jvm_memory_pressure_alert_graph(
-            data_source=data_source, notifications=notifications
+            influxdb_data_source=influxdb_data_source, notifications=notifications
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"Elasticsearch JVM memory pressure alerts")
-        generated_graph.dataSource.should.match(data_source)
+        generated_graph.dataSource.should.match(influxdb_data_source)
         generated_graph.targets.should.have.length_of(1)
         generated_graph.targets[0].should.be.a(InfluxDBTarget)
         generated_graph.targets[0].query.should.equal(
@@ -248,11 +254,11 @@ class TestElasticsearchDashboards:
         generated_graph.alert.notifications.should.equal(notifications)
 
     def test_should_generate_elasticsearch_dashboard(self):
-        data_source = "prod"
+        influxdb_data_source = "prod"
         environment = "prod"
 
         generated_dashboard = generate_elasticsearch_dashboard(
-            data_source=data_source, environment=environment
+            influxdb_data_source=influxdb_data_source, environment=environment
         )
         generated_dashboard.title.should.equal("Elasticsearch")
         generated_dashboard.templating.should.be.a(Templating)
@@ -264,12 +270,12 @@ class TestElasticsearchDashboards:
         generated_dashboard.links.should.have.length_of(1)
 
     def test_should_generate_elasticsearch_alerts_dashboard(self):
-        data_source = "prod"
+        influxdb_data_source = "prod"
         environment = "prod"
         notifications = ["lorem", "ipsum"]
 
         generated_dashboard = generate_elasticsearch_alerts_dashboard(
-            data_source=data_source,
+            influxdb_data_source=influxdb_data_source,
             environment=environment,
             notifications=notifications,
         )
@@ -282,12 +288,12 @@ class TestElasticsearchDashboards:
         generated_dashboard.links.should.have.length_of(1)
 
     def test_should_raise_exception_when_notifications_is_empty(self):
-        data_source = "prod"
+        influxdb_data_source = "prod"
         environment = "prod"
         notifications = []
 
         generate_elasticsearch_alerts_dashboard.when.called_with(
-            data_source=data_source,
+            influxdb_data_source=influxdb_data_source,
             environment=environment,
             notifications=notifications,
         ).should.throw(Exception, r"Notifications is None")
