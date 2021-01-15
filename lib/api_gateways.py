@@ -15,7 +15,7 @@ from grafanalib.core import (
     YAxes,
     YAxis,
 )
-from grafanalib.influxdb import InfluxDBTarget
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.annotations import get_release_annotations
 from lib.commons import (
@@ -39,7 +39,7 @@ import re
 
 # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-metrics-and-dimensions.html
 API_GATEWAY_INVOCATION_METRIC_GROUP_BY = "1m"
-API_GATEWAY_MEASUREMENT = "cloudwatch_aws_api_gateway"
+NAMESPACE = "AWS/ApiGateway"
 API_GATEWAY_4XX_ALIAS = "4xx"
 API_GATEWAY_4XX_REF_ID = "B"
 API_GATEWAY_4XX_ALERT_ALIAS = "alert_query"
@@ -49,24 +49,26 @@ API_GATEWAY_REQUESTS_REF_ID = "C"
 
 
 def generate_api_gateway_requests_5xx_graph(
-    name: str, data_source: str, notifications: List[str], *args, **kwargs
+    name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
 ):
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=API_GATEWAY_5XX_ALIAS,
-            query='SELECT sum("5xx_error_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, API_GATEWAY_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
-            refId=ALERT_REF_ID if notifications else None,
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Sum"],
+            metricName="5XXError",
+            dimensions={"ApiName": name},
+            refId=ALERT_REF_ID,
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=API_GATEWAY_REQUESTS_ALIAS,
-            query='SELECT sum("count_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, API_GATEWAY_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
-            refId=API_GATEWAY_REQUESTS_REF_ID if notifications else None,
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Sum"],
+            metricName="Count",
+            dimensions={"ApiName": name},
+            refId=API_GATEWAY_REQUESTS_REF_ID,
         ),
     ]
 
@@ -119,7 +121,7 @@ def generate_api_gateway_requests_5xx_graph(
 
     return Graph(
         title="API Gateway Requests and 5XX errors: {}".format(name),
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
         yAxes=yAxes,
@@ -131,32 +133,27 @@ def generate_api_gateway_requests_5xx_graph(
 
 
 def generate_api_gateway_requests_4xx_graph(
-    name: str, data_source: str, notifications: List[str], *args, **kwargs
+    name: str, cloudwatch_data_source: str, *args, **kwargs
 ):
+
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=API_GATEWAY_4XX_ALIAS,
-            query='SELECT sum("4xx_error_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, API_GATEWAY_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
-            refId=API_GATEWAY_4XX_REF_ID if notifications else None,
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Sum"],
+            metricName="4XXError",
+            dimensions={"ApiName": name},
+            refId="A",
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=API_GATEWAY_REQUESTS_ALIAS,
-            query='SELECT sum("count_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, API_GATEWAY_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
-            refId=API_GATEWAY_REQUESTS_REF_ID if notifications else None,
-        ),
-        InfluxDBTarget(
-            alias=API_GATEWAY_4XX_ALERT_ALIAS,
-            query='SELECT sum("4xx_error_sum")/sum("count_sum") FROM "{}"."{}" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, API_GATEWAY_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
-            refId=ALERT_REF_ID if notifications else None,
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Sum"],
+            metricName="Count",
+            dimensions={"ApiName": name},
+            refId="B",
         ),
     ]
 
@@ -182,49 +179,13 @@ def generate_api_gateway_requests_4xx_graph(
             "color": colors.RED,
             "zindex": 1,
         },
-        {
-            "alias": API_GATEWAY_4XX_ALERT_ALIAS,
-            "yaxis": 2,
-            "lines": False,
-            "points": False,
-            "bars": False,
-            "color": colors.RED,
-        },
     ]
 
     alert = None
 
-    # https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics.html
-    if notifications:
-        alert = Alert(
-            name="{} API Gateway 4XX Errors".format(name),
-            message="{} is having 4XX errors".format(name),
-            executionErrorState="alerting",
-            noDataState="keep_state",
-            alertConditions=[
-                AlertCondition(
-                    Target(refId=API_GATEWAY_REQUESTS_REF_ID),
-                    timeRange=TimeRange("15m", "now"),
-                    evaluator=GreaterThan(9),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_AND,
-                ),
-                AlertCondition(
-                    Target(refId=ALERT_REF_ID),
-                    timeRange=TimeRange("15m", "now"),
-                    evaluator=GreaterThan(0.1),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_AND,
-                ),
-            ],
-            frequency="2m",
-            gracePeriod="2m",
-            notifications=notifications,
-        )
-
     return Graph(
         title="API Gateway Requests and 4XX errors: {}".format(name),
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
         yAxes=yAxes,
@@ -237,7 +198,8 @@ def generate_api_gateway_requests_4xx_graph(
 
 def generate_api_gateways_dashboard(
     name: str,
-    data_source: str,
+    cloudwatch_data_source: str,
+    influxdb_data_source: str,
     notifications: List[str],
     environment: str,
     lambdas: List[str],
@@ -250,14 +212,16 @@ def generate_api_gateways_dashboard(
         tags = tags + ["lambda"]
 
     api_gateway_4xx_graph = generate_api_gateway_requests_4xx_graph(
-        name, data_source, []
+        name, cloudwatch_data_source
     )
     api_gateway_5xx_graph = generate_api_gateway_requests_5xx_graph(
-        name, data_source, notifications
+        name, cloudwatch_data_source, notifications
     )
     lambda_panels = [
         lambda_generate_graph(
-            name=l, data_source=data_source, notifications=notifications
+            name=l,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
         )
         for l in lambdas
     ]
@@ -270,8 +234,8 @@ def generate_api_gateways_dashboard(
     return Dashboard(
         title="{} {}".format("API Gateway:", name),
         editable=EDITABLE,
-        annotations=get_release_annotations(data_source),
-        templating=get_release_templating(data_source),
+        annotations=get_release_annotations(influxdb_data_source),
+        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
