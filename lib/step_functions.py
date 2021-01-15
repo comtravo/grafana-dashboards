@@ -15,7 +15,7 @@ from grafanalib.core import (
     YAxes,
     YAxis,
 )
-from grafanalib.influxdb import InfluxDBTarget
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.annotations import get_release_annotations
 from lib.commons import (
@@ -37,7 +37,7 @@ from typing import List
 
 # https://docs.aws.amazon.com/step-functions/latest/dg/procedure-cw-metrics.html
 
-SFN_MEASUREMENT = "cloudwatch_aws_states"
+NAMESPACE = "AWS/States"
 SFN_DASHBOARD_PREFIX = "Step Function: "
 
 DURATION_MINIMUM_ALIAS = "Duration - Minimum"
@@ -57,78 +57,87 @@ SFN_EXECUTIONS_TIMEDOUT_REF_ID = "D"
 
 
 def generate_sfn_graph(
-    name: str, data_source: str, notifications: List[str], *args, **kwargs
+    name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
 ):
     """
     Generate step function graph
     """
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=DURATION_MINIMUM_ALIAS,
-            query='SELECT min("execution_time_minimum") FROM "{}"."{}" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, SFN_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period="1m",
+            metricName="ExecutionTime",
+            statistics=["Minimum"],
+            dimensions={"StateMachineArn": name},
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=DURATION_AVERAGE_ALIAS,
-            query='SELECT mean("execution_time_average") FROM "{}"."{}" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, SFN_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period="1m",
+            metricName="ExecutionTime",
+            statistics=["Average"],
+            dimensions={"StateMachineArn": name},
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=DURATION_MAXIMUM_ALIAS,
-            query='SELECT max("execution_time_maximum") FROM "{}"."{}" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, SFN_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period="1m",
+            metricName="ExecutionTime",
+            statistics=["Maximum"],
+            dimensions={"StateMachineArn": name},
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_STARTED_ALIAS,
-            query='SELECT max("executions_started_sum") FROM "{}"."{}" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, SFN_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period="1m",
+            metricName="ExecutionsStarted",
+            statistics=["Sum"],
+            dimensions={"StateMachineArn": name},
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_SUCCEEDED_ALIAS,
-            query='SELECT max("executions_succeeded_sum") FROM "{}"."{}" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, SFN_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period="1m",
+            metricName="ExecutionsSucceeded",
+            statistics=["Sum"],
+            dimensions={"StateMachineArn": name},
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_ABORTED_ALIAS,
-            query='SELECT max("executions_aborted_sum") FROM "{}"."{}" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, SFN_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period="1m",
+            metricName="ExecutionsAborted",
+            statistics=["Sum"],
+            dimensions={"StateMachineArn": name},
             refId=SFN_EXECUTIONS_ABORTED_REF_ID,
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_FAILED_ALIAS,
-            query='SELECT max("executions_failed_sum") FROM "{}"."{}" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, SFN_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period="1m",
+            metricName="ExecutionsFailed",
+            statistics=["Sum"],
+            dimensions={"StateMachineArn": name},
             refId=SFN_EXECUTIONS_FAILED_REF_ID,
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_THROTTLED_ALIAS,
-            query='SELECT max("execution_throttled_sum") FROM "{}"."{}" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, SFN_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period="1m",
+            metricName="ExecutionsThrottled",
+            statistics=["Sum"],
+            dimensions={"StateMachineArn": name},
             refId=SFN_EXECUTIONS_THROTTLED_REF_ID,
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_TIMEDOUT_ALIAS,
-            query='SELECT max("execution_timed_out_sum") FROM "{}"."{}" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                RETENTION_POLICY, SFN_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period="1m",
+            metricName="ExecutionsTimedOut",
+            statistics=["Sum"],
+            dimensions={"StateMachineArn": name},
             refId=SFN_EXECUTIONS_TIMEDOUT_REF_ID,
         ),
     ]
@@ -245,7 +254,7 @@ def generate_sfn_graph(
 
     return Graph(
         title="Step function execution metrics",
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
         yAxes=yAxes,
@@ -258,7 +267,8 @@ def generate_sfn_graph(
 
 def generate_sfn_dashboard(
     name: str,
-    data_source: str,
+    cloudwatch_data_source: str,
+    influxdb_data_source: str,
     notifications: List[str],
     environment: str,
     lambdas: List[str],
@@ -269,12 +279,15 @@ def generate_sfn_dashboard(
 
     tags = ["step-function", environment]
 
-    sfn_name = name
-    if sfn_name.startswith("arn:aws:states"):
-        sfn_name = sfn_name.split(":")[-1]
+    if not name.startswith("arn:aws:states"):
+        raise Exception("Statemachine ARN should be provided")
+
+    sfn_name = name.split(":")[-1]
 
     sfn_graph = generate_sfn_graph(
-        name=sfn_name, data_source=data_source, notifications=notifications
+        name=sfn_name,
+        cloudwatch_data_source=cloudwatch_data_source,
+        notifications=notifications,
     )
 
     rows = [Row(panels=[sfn_graph])]
@@ -283,7 +296,9 @@ def generate_sfn_dashboard(
         tags = tags + ["lambda"]
 
         lambda_graphs = [
-            lambda_generate_graph(name=l, data_source=data_source, notifications=[])
+            lambda_generate_graph(
+                name=l, cloudwatch_data_source=cloudwatch_data_source, notifications=[]
+            )
             for l in lambdas
         ]
 
@@ -294,8 +309,8 @@ def generate_sfn_dashboard(
     return Dashboard(
         title="{}{}".format(SFN_DASHBOARD_PREFIX, sfn_name),
         editable=EDITABLE,
-        annotations=get_release_annotations(data_source),
-        templating=get_release_templating(data_source),
+        annotations=get_release_annotations(influxdb_data_source),
+        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
