@@ -48,6 +48,7 @@ DURATION_MAXIMUM_ALIAS = "Duration - Maximum"
 LAMBDA_INVOCATIONS_ALIAS = "Invocations - Sum"
 LAMBDA_ERRORS_ALIAS = "Errors - Sum"
 
+LAMBDA_DURATION_METRIC_GROUP_BY = "5m"
 LAMBDA_INVOCATION_METRIC_GROUP_BY = "1m"
 
 
@@ -83,7 +84,7 @@ def lambda_generate_graph(
         CloudwatchMetricsTarget(
             alias=DURATION_MINIMUM_ALIAS,
             namespace=NAMESPACE,
-            period=LAMBDA_INVOCATION_METRIC_GROUP_BY,
+            period=LAMBDA_DURATION_METRIC_GROUP_BY,
             statistics=["Minimum"],
             metricName="Duration",
             dimensions={"FunctionName": name},
@@ -91,7 +92,7 @@ def lambda_generate_graph(
         CloudwatchMetricsTarget(
             alias=DURATION_AVERGAE_ALIAS,
             namespace=NAMESPACE,
-            period=LAMBDA_INVOCATION_METRIC_GROUP_BY,
+            period=LAMBDA_DURATION_METRIC_GROUP_BY,
             statistics=["Average"],
             metricName="Duration",
             dimensions={"FunctionName": name},
@@ -99,7 +100,7 @@ def lambda_generate_graph(
         CloudwatchMetricsTarget(
             alias=DURATION_MAXIMUM_ALIAS,
             namespace=NAMESPACE,
-            period=LAMBDA_INVOCATION_METRIC_GROUP_BY,
+            period=LAMBDA_DURATION_METRIC_GROUP_BY,
             statistics=["Maximum"],
             metricName="Duration",
             dimensions={"FunctionName": name},
@@ -119,6 +120,7 @@ def lambda_generate_graph(
             statistics=["Sum"],
             metricName="Errors",
             dimensions={"FunctionName": name},
+            refId=ALERT_REF_ID,
         ),
     ]
 
@@ -271,7 +273,7 @@ def create_lambda_sqs_dlq_graph(
             alias="Approximate number of messages available",
             namespace="AWS/SQS",
             period="1m",
-            statistics=["Sum"],
+            statistics=["Maximum"],
             metricName="ApproximateNumberOfMessagesVisible",
             dimensions={"QueueName": name},
             refId=ALERT_REF_ID if notifications else None,
