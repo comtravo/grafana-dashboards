@@ -50,12 +50,13 @@ module "dashboard" {
 
   enable = true
   grafana_configuration = {
-    name          = var.name
-    engine        = "postgres"
-    environment   = "prod"
-    data_source   = "prod"
-    folder        = null
-    notifications = [grafana_alert_notification.slack_1.uid, grafana_alert_notification.slack_2.uid]
+    name                   = var.name
+    engine                 = "postgres"
+    environment            = "prod"
+    cloudwatch_data_source = "cloudwatch"
+    influxdb_data_source   = "influxdb"
+    folder                 = null
+    notifications          = [grafana_alert_notification.slack_1.uid, grafana_alert_notification.slack_2.uid]
   }
 }
 

@@ -49,12 +49,13 @@ module "dashboard" {
 
   enable = true
   grafana_configuration = {
-    name          = var.name
-    environment   = "prod"
-    data_source   = "prod"
-    notifications = [grafana_alert_notification.slack_1.id, grafana_alert_notification.slack_2.id]
-    folder        = null
-    lambdas       = []
+    name                   = var.name
+    environment            = "prod"
+    cloudwatch_data_source = "cloudwatch"
+    influxdb_data_source   = "influxdb"
+    notifications          = [grafana_alert_notification.slack_1.id, grafana_alert_notification.slack_2.id]
+    folder                 = null
+    lambdas                = []
   }
 }
 

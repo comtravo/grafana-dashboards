@@ -13,12 +13,13 @@ module "dashboard" {
 
   enable = false
   grafana_configuration = {
-    name          = var.name
-    engine        = "mysql"
-    environment   = "prod"
-    data_source   = "prod"
-    folder        = null
-    notifications = []
+    name                   = var.name
+    engine                 = "mysql"
+    environment            = "prod"
+    cloudwatch_data_source = "cloudwatch"
+    influxdb_data_source   = "influxdb"
+    folder                 = null
+    notifications          = []
   }
 }
 

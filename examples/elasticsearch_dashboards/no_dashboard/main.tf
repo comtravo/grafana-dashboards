@@ -13,10 +13,11 @@ module "dashboard" {
 
   enable = false
   grafana_configuration = {
-    environment   = "prod"
-    data_source   = "prod"
-    folder        = null
-    notifications = []
+    environment            = "prod"
+    cloudwatch_data_source = "cloudwatch"
+    influxdb_data_source   = "influxdb"
+    folder                 = null
+    notifications          = []
   }
 }
 
