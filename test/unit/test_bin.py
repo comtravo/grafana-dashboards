@@ -23,7 +23,6 @@ class TestApplyOptions:
             "step-function",
             "firehose",
             "elasticsearch",
-            "elasticsearch-alerts",
             "rds",
         ]
 

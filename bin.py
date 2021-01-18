@@ -7,7 +7,6 @@ from lib.step_functions import generate_sfn_dashboard as sfn_dispatcher
 from lib.firehose import generate_firehose_dashboard as firehose_dispatcher
 from lib.elasticsearch import (
     generate_elasticsearch_dashboard as elasticsearch_dispatcher,
-    generate_elasticsearch_alerts_dashboard as elasticsearch_alert_dispatcher,
 )
 from lib.rds import generate_rds_dashboard as rds_dispatcher
 
@@ -54,10 +53,8 @@ def parse_options():  # pragma: no cover
     )
 
     subparsers.add_parser("firehose", help="Create dashboard for AWS Firehose")
-    subparsers.add_parser("elasticsearch", help="Create dashboard for AWS ES")
-    subparsers.add_parser(
-        "elasticsearch-alerts", help="Create alert dashboard for AWS ES"
-    )
+    es = subparsers.add_parser("elasticsearch", help="Create dashboard for AWS ES")
+    es.add_argument("--client_id", type=str, help="Client id", required=True)
 
     sfn = subparsers.add_parser(
         "step-function", help="Create dashboard for Step function"
@@ -116,7 +113,6 @@ def dispatcher():
         "step-function": sfn_dispatcher,
         "firehose": firehose_dispatcher,
         "elasticsearch": elasticsearch_dispatcher,
-        "elasticsearch-alerts": elasticsearch_alert_dispatcher,
         "rds": rds_dispatcher,
     }
 

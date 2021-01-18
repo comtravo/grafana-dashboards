@@ -1,10 +1,13 @@
 variable "grafana_configuration" {
   description = "Configuration for creating Grafana dashboards and alerts"
   type = object({
-    environment          = string
-    influxdb_data_source = string
-    folder               = string
-    notifications        = list(string)
+    name                   = string
+    client_id              = string
+    environment            = string
+    influxdb_data_source   = string
+    cloudwatch_data_source = string
+    folder                 = string
+    notifications          = list(string)
   })
 }
 
@@ -25,7 +28,7 @@ resource "null_resource" "generate_dashboard" {
   count = var.enable ? 1 : 0
 
   provisioner "local-exec" {
-    command = "python3 ${path.module}/../../bin.py --name elasticsearch --environment ${var.grafana_configuration.environment} --influxdb_data_source ${var.grafana_configuration.influxdb_data_source} elasticsearch | json_pp > ${local.dahboard_path}"
+    command = "python3 ${path.module}/../../bin.py --name ${var.grafana_configuration.name} --client_id ${var.grafana_configuration.client_id} --environment ${var.grafana_configuration.environment} --cloudwatch_data_source ${var.grafana_configuration.cloudwatch_data_source} --influxdb_data_source ${var.grafana_configuration.influxdb_data_source} elasticsearch | json_pp > ${local.dahboard_path}"
   }
 
   triggers = {
