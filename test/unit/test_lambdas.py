@@ -1,5 +1,5 @@
 from grafanalib.core import Alert, AlertCondition, Dashboard, Graph, Target
-from grafanalib.influxdb import InfluxDBTarget
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from lib.lambdas import (
     dispatcher,
     lambda_generate_graph,
@@ -33,13 +33,13 @@ class TestDispatcher:
             "null",
         ]
         lambda_name = "lambda-1"
-        data_source = "influxdb"
         environment = "alpha"
         topics = ["topic-1", "topic-2"]
         call_args = {
             "name": lambda_name,
             "environment": environment,
-            "data_source": data_source,
+            "influxdb_data_source": "influxdb",
+            "cloudwatch_data_source": "cloudwatch",
             "notifications": [],
             "topics": topics,
         }
@@ -51,56 +51,92 @@ class TestDispatcher:
 
     def test_should_generate_lambda_graph(self):
         lambda_name = "lambda-1"
-        data_source = "influxdb"
-        expected_queries = [
-            'SELECT min("duration_minimum") FROM "autogen"."cloudwatch_aws_lambda" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(null)'.format(
-                lambda_name
+        cloudwatch_data_source = "influxdb"
+        influxdb_data_source = "influxdb"
+        expected_targets = [
+            CloudwatchMetricsTarget(
+                alias="Duration - Minimum",
+                namespace="AWS/Lambda",
+                period="5m",
+                statistics=["Minimum"],
+                metricName="Duration",
+                dimensions={"FunctionName": lambda_name},
+                refId="B",
             ),
-            'SELECT mean("duration_average") FROM "autogen"."cloudwatch_aws_lambda" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(null)'.format(
-                lambda_name
+            CloudwatchMetricsTarget(
+                alias="Duration - Average",
+                namespace="AWS/Lambda",
+                period="5m",
+                statistics=["Average"],
+                metricName="Duration",
+                dimensions={"FunctionName": lambda_name},
+                refId="C",
             ),
-            'SELECT max("duration_maximum") FROM "autogen"."cloudwatch_aws_lambda" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(null)'.format(
-                lambda_name
+            CloudwatchMetricsTarget(
+                alias="Duration - Maximum",
+                namespace="AWS/Lambda",
+                period="5m",
+                statistics=["Maximum"],
+                metricName="Duration",
+                dimensions={"FunctionName": lambda_name},
+                refId="D",
             ),
-            'SELECT max("invocations_sum") FROM "autogen"."cloudwatch_aws_lambda" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
-                lambda_name
+            CloudwatchMetricsTarget(
+                alias="Invocations - Sum",
+                namespace="AWS/Lambda",
+                period="1m",
+                statistics=["Sum"],
+                metricName="Invocations",
+                dimensions={"FunctionName": lambda_name},
+                refId="E",
             ),
-            'SELECT max("errors_sum") FROM "autogen"."cloudwatch_aws_lambda" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
-                lambda_name
+            CloudwatchMetricsTarget(
+                alias="Errors - Sum",
+                namespace="AWS/Lambda",
+                period="1m",
+                statistics=["Sum"],
+                metricName="Errors",
+                dimensions={"FunctionName": lambda_name},
+                refId="A",
             ),
         ]
         generated_lambd_graph = lambda_generate_graph(
-            name=lambda_name, data_source=data_source, notifications=[]
+            name=lambda_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            influxdb_data_source=influxdb_data_source,
+            notifications=[],
         )
         generated_lambd_graph.should.be.a(Graph)
         generated_lambd_graph.should.have.property("title").with_value.equal(
             "Lambda: {}".format(lambda_name)
         )
         generated_lambd_graph.should.have.property("dataSource").with_value.equal(
-            data_source
+            cloudwatch_data_source
         )
         generated_lambd_graph.should.have.property("alert").with_value.equal(None)
         generated_lambd_graph.should.have.property("targets")
         generated_lambd_graph.targets.should.have.length_of(5)
-        for target in generated_lambd_graph.targets:
-            target.query.should.be.within(expected_queries)
+        generated_lambd_graph.targets.should.equal(expected_targets)
 
     def test_should_generate_lambda_graph_with_alert_notifications(self):
         lambda_name = "lambda-1"
-        data_source = "influxdb"
+        cloudwatch_data_source = "influxdb"
         notifications = ["lorem", "ipsum"]
 
-        expected_alert_query = InfluxDBTarget(
+        expected_alert_query = CloudwatchMetricsTarget(
             alias="Errors - Sum",
-            query='SELECT max("errors_sum") FROM "autogen"."cloudwatch_aws_lambda" WHERE ("function_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(null)'.format(
-                lambda_name
-            ),
-            rawQuery=True,
+            namespace="AWS/Lambda",
+            period="1m",
+            statistics=["Sum"],
+            metricName="Errors",
+            dimensions={"FunctionName": lambda_name},
             refId="A",
         )
 
         generated_lambd_graph = lambda_generate_graph(
-            name=lambda_name, data_source=data_source, notifications=notifications
+            name=lambda_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
         )
         generated_lambd_graph.should.have.property("alert").be.a(Alert)
         generated_lambd_graph.alert.executionErrorState.should.eql("alerting")
@@ -114,12 +150,14 @@ class TestDispatcher:
 
     def test_should_generate_lambda_basic_dashboards(self):
         lambda_name = "lambda-1"
-        data_source = "influxdb"
+        cloudwatch_data_source = "influxdb"
+        influxdb_data_source = "influxdb"
         environment = "alpha"
         call_args = {
             "name": lambda_name,
             "environment": environment,
-            "data_source": data_source,
+            "cloudwatch_data_source": cloudwatch_data_source,
+            "influxdb_data_source": influxdb_data_source,
             "notifications": [],
         }
 
@@ -140,26 +178,29 @@ class TestDispatcher:
 
     def test_should_create_lambda_sqs_dlq_graph(self):
         lambda_name = "lambda-1"
-        data_source = "influxdb"
+        cloudwatch_data_source = "influxdb"
         notifications = ["lorem"]
 
-        expected_alert_query = InfluxDBTarget(
+        expected_alert_query = CloudwatchMetricsTarget(
             alias="Approximate number of messages available",
-            query='SELECT max("approximate_number_of_messages_visible_maximum") FROM "autogen"."cloudwatch_aws_sqs" WHERE ("queue_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                lambda_name
-            ),
-            rawQuery=True,
+            namespace="AWS/SQS",
+            period="1m",
+            statistics=["Maximum"],
+            metricName="ApproximateNumberOfMessagesVisible",
+            dimensions={"QueueName": lambda_name},
             refId="A",
         )
         generated_lambd_graph = create_lambda_sqs_dlq_graph(
-            name=lambda_name, data_source=data_source, notifications=notifications
+            name=lambda_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
         )
         generated_lambd_graph.should.be.a(Graph)
         generated_lambd_graph.should.have.property("title").with_value.equal(
             "SQS Dead Letter Queue: {}".format(lambda_name)
         )
         generated_lambd_graph.should.have.property("dataSource").with_value.equal(
-            data_source
+            cloudwatch_data_source
         )
         generated_lambd_graph.should.have.property("targets")
         generated_lambd_graph.targets.should.have.length_of(1)
@@ -170,25 +211,26 @@ class TestDispatcher:
 
     def test_should_create_lambda_sqs_graph(self):
         lambda_name = "lambda-1"
-        data_source = "influxdb"
+        cloudwatch_data_source = "cloudwatch"
 
-        expected_query = InfluxDBTarget(
+        expected_query = CloudwatchMetricsTarget(
             alias="Number of messages sent to the queue",
-            query='SELECT max("number_of_messages_sent_sum") FROM "autogen"."cloudwatch_aws_sqs" WHERE ("queue_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                lambda_name
-            ),
-            rawQuery=True,
+            namespace="AWS/SQS",
+            period="1m",
+            statistics=["Sum"],
+            metricName="NumberOfMessagesSent",
+            dimensions={"QueueName": lambda_name},
             refId="A",
         )
         generated_lambd_graph = create_lambda_sqs_graph(
-            name=lambda_name, data_source=data_source
+            name=lambda_name, cloudwatch_data_source=cloudwatch_data_source
         )
         generated_lambd_graph.should.be.a(Graph)
         generated_lambd_graph.should.have.property("title").with_value.equal(
             "SQS: {}".format(lambda_name)
         )
         generated_lambd_graph.should.have.property("dataSource").with_value.equal(
-            data_source
+            cloudwatch_data_source
         )
         generated_lambd_graph.should.have.property("targets")
         generated_lambd_graph.targets.should.have.length_of(1)
@@ -196,12 +238,14 @@ class TestDispatcher:
 
     def test_should_generate_lambda_sqs_dashboard(self):
         lambda_name = "lambda-1"
-        data_source = "influxdb"
+        cloudwatch_data_source = "cloudwatch"
+        influxdb_data_source = "influxdb"
         environment = "alpha"
         call_args = {
             "name": lambda_name,
             "environment": environment,
-            "data_source": data_source,
+            "cloudwatch_data_source": cloudwatch_data_source,
+            "influxdb_data_source": influxdb_data_source,
             "notifications": [],
         }
 
@@ -215,13 +259,15 @@ class TestDispatcher:
 
     def test_should_generate_lambda_sns_sqs_dashboard(self):
         lambda_name = "lambda-1"
-        data_source = "influxdb"
+        cloudwatch_data_source = "cloudwatch"
+        influxdb_data_source = "influxdb"
         environment = "alpha"
         topics = ["topic-1", "topic-2"]
         call_args = {
             "name": lambda_name,
             "environment": environment,
-            "data_source": data_source,
+            "cloudwatch_data_source": cloudwatch_data_source,
+            "influxdb_data_source": influxdb_data_source,
             "notifications": [],
             "topics": topics,
         }

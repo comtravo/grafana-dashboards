@@ -10,6 +10,9 @@ services:
       GF_AUTH_DISABLE_LOGIN_FORM: 'false'
       GF_AUTH_BASIC_ENABLED: 'true'
       GF_LOG_LEVEL: 'info'
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
     volumes:
       - .:/opt/ct
     ports:

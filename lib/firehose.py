@@ -32,7 +32,7 @@ FIREHOSE_DELIVERY_TO_S3_ALIAS = "Delivery to S3"
 FIREHOSE_DELIVERY_TO_S3_SUCCESS_ALIAS = "Delivery to S3 Success"
 
 
-def get_firehose_template(data_source: str):
+def get_firehose_template(data_source: str) -> Template:
     """Get template for firehose"""
 
     return Template(
@@ -49,7 +49,7 @@ def get_firehose_template(data_source: str):
     )
 
 
-def generate_firehose_graph(data_source: str):
+def generate_firehose_graph(influxdb_data_source: str) -> Graph:
     """
     Generate Firehose graph
     """
@@ -98,7 +98,7 @@ def generate_firehose_graph(data_source: str):
 
     return Graph(
         title="Firehose: $firehose",
-        dataSource=data_source,
+        dataSource=influxdb_data_source,
         targets=targets,
         yAxes=y_axes,
         seriesOverrides=series_overrides,
@@ -109,21 +109,23 @@ def generate_firehose_graph(data_source: str):
     ).auto_ref_ids()
 
 
-def generate_firehose_dashboard(data_source: str, environment: str, *args, **kwargs):
+def generate_firehose_dashboard(
+    influxdb_data_source: str, environment: str, *args, **kwargs
+) -> Dashboard:
     """Generate Firehose dashboard"""
     tags = ["firehose", environment]
 
     templating = Templating(
         [
-            get_firehose_template(data_source=data_source),
-            get_release_template(data_source=data_source),
+            get_firehose_template(data_source=influxdb_data_source),
+            get_release_template(data_source=influxdb_data_source),
         ]
     )
 
     repeat = Repeat(direction="v", variable="$firehose")
     rows = [
         Row(
-            panels=[generate_firehose_graph(data_source=data_source)],
+            panels=[generate_firehose_graph(influxdb_data_source=influxdb_data_source)],
             editable=EDITABLE,
             repeat="firehose",
             title="$firehose",
@@ -133,7 +135,7 @@ def generate_firehose_dashboard(data_source: str, environment: str, *args, **kwa
     return Dashboard(
         title="Firehose",
         editable=EDITABLE,
-        annotations=get_release_annotations(data_source=data_source),
+        annotations=get_release_annotations(data_source=influxdb_data_source),
         templating=templating,
         tags=tags,
         timezone=TIMEZONE,

@@ -7,7 +7,7 @@ from grafanalib.core import (
     Annotations,
     Templating,
 )
-from grafanalib.influxdb import InfluxDBTarget
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.api_gateways import (
     generate_api_gateway_requests_5xx_graph,
@@ -21,149 +21,134 @@ import re
 class TestAPIGatewayDashboards:
     def test_should_generate_proper_requests_5xx_graph(self):
         apig_name = "apig-1"
-        data_source = "prod"
+        cloudwatch_data_source = "prod"
+        influxdb_data_source = "influxdb"
         notifications = []
 
-        expected_targets = [
-            InfluxDBTarget(
+        targets = [
+            CloudwatchMetricsTarget(
                 alias="5xx",
-                query='SELECT sum("5xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    apig_name
-                ),
+                namespace="AWS/ApiGateway",
+                period="1m",
+                statistics=["Sum"],
+                metricName="5XXError",
+                dimensions={"ApiName": apig_name},
+                refId="A",
             ),
-            InfluxDBTarget(
+            CloudwatchMetricsTarget(
                 alias="requests",
-                query='SELECT sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    apig_name
-                ),
+                namespace="AWS/ApiGateway",
+                dimensions={"ApiName": apig_name},
+                period="1m",
+                statistics=["Sum"],
+                metricName="Count",
+                refId="B",
             ),
         ]
 
         generated_graph = generate_api_gateway_requests_5xx_graph(
-            name=apig_name, data_source=data_source, notifications=notifications
+            name=apig_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            influxdb_data_source=influxdb_data_source,
+            notifications=notifications,
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"API Gateway Requests and 5XX errors")
-        generated_graph.dataSource.should.eql(data_source)
-        generated_graph.targets.should.have.length_of(len(expected_targets))
+        generated_graph.dataSource.should.eql(cloudwatch_data_source)
+        generated_graph.targets.should.have.length_of(len(targets))
         generated_graph.alert.should.eql(None)
 
     def test_should_generate_proper_requests_5xx_graph_with_notifications(self):
         apig_name = "apig-1"
-        data_source = "prod"
+        cloudwatch_data_source = "prod"
+        influxdb_data_source = "influxdb"
         notifications = ["foo-1", "foo-2"]
 
-        expected_alert_query = InfluxDBTarget(
-            alias="5xx",
-            query='SELECT sum("5xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                apig_name
+        targets = [
+            CloudwatchMetricsTarget(
+                alias="5xx",
+                namespace="AWS/ApiGateway",
+                period="1m",
+                statistics=["Sum"],
+                metricName="5XXError",
+                dimensions={"ApiName": apig_name},
+                refId="A",
             ),
-            rawQuery=True,
-            refId="A",
-        )
+            CloudwatchMetricsTarget(
+                alias="requests",
+                namespace="AWS/ApiGateway",
+                dimensions={"ApiName": apig_name},
+                period="1m",
+                statistics=["Sum"],
+                metricName="Count",
+                refId="B",
+            ),
+        ]
 
         generated_graph = generate_api_gateway_requests_5xx_graph(
-            name=apig_name, data_source=data_source, notifications=notifications
+            name=apig_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            influxdb_data_source=influxdb_data_source,
+            notifications=notifications,
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"API Gateway Requests and 5XX errors")
-        generated_graph.dataSource.should.eql(data_source)
+        generated_graph.dataSource.should.eql(cloudwatch_data_source)
         generated_graph.alert.should.be.a(Alert)
         generated_graph.alert.alertConditions.should.have.length_of(1)
         generated_graph.alert.alertConditions[0].target.should.equal(Target(refId="A"))
-        generated_graph.targets[0].should.eql(expected_alert_query)
+        generated_graph.targets[0].should.eql(targets[0])
 
     def test_should_generate_proper_requests_4xx_graph(self):
         apig_name = "apig-1"
-        data_source = "prod"
-        notifications = []
+        cloudwatch_data_source = "prod"
+        influxdb_data_source = "influxdb"
 
-        expected_targets = [
-            InfluxDBTarget(
+        targets = [
+            CloudwatchMetricsTarget(
                 alias="4xx",
-                query='SELECT sum("4xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    apig_name
-                ),
-            ),
-            InfluxDBTarget(
-                alias="requests",
-                query='SELECT sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    apig_name
-                ),
-            ),
-            InfluxDBTarget(
-                alias="requests",
-                query='SELECT sum("4xx_error_sum")/sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    apig_name
-                ),
-            ),
-        ]
-
-        generated_graph = generate_api_gateway_requests_4xx_graph(
-            name=apig_name, data_source=data_source, notifications=notifications
-        )
-        generated_graph.should.be.a(Graph)
-        generated_graph.title.should.match(r"API Gateway Requests and 4XX errors")
-        generated_graph.dataSource.should.eql(data_source)
-        generated_graph.targets.should.have.length_of(len(expected_targets))
-        generated_graph.alert.should.eql(None)
-
-    def test_should_generate_proper_requests_4xx_graph_with_notifications(self):
-        apig_name = "apig-1"
-        data_source = "prod"
-        notifications = ["foo-1", "foo-2"]
-
-        expected_alert_query = targets = [
-            InfluxDBTarget(
-                alias="4xx",
-                query='SELECT sum("4xx_error_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    apig_name
-                ),
-                rawQuery=True,
-                refId="B",
-            ),
-            InfluxDBTarget(
-                alias="requests",
-                query='SELECT sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    apig_name
-                ),
-                rawQuery=True,
-                refId="C",
-            ),
-            InfluxDBTarget(
-                alias="alert_query",
-                query='SELECT sum("4xx_error_sum")/sum("count_sum") FROM "autogen"."cloudwatch_aws_api_gateway" WHERE ("api_name" = \'{}\') AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    apig_name
-                ),
-                rawQuery=True,
+                namespace="AWS/ApiGateway",
+                period="1m",
+                statistics=["Sum"],
+                metricName="4XXError",
+                dimensions={"ApiName": apig_name},
                 refId="A",
             ),
+            CloudwatchMetricsTarget(
+                alias="requests",
+                namespace="AWS/ApiGateway",
+                dimensions={"ApiName": apig_name},
+                period="1m",
+                statistics=["Sum"],
+                metricName="Count",
+                refId="B",
+            ),
         ]
 
         generated_graph = generate_api_gateway_requests_4xx_graph(
-            name=apig_name, data_source=data_source, notifications=notifications
+            name=apig_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            influxdb_data_source=influxdb_data_source,
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"API Gateway Requests and 4XX errors")
-        generated_graph.dataSource.should.eql(data_source)
-        generated_graph.alert.should.be.a(Alert)
-        generated_graph.alert.frequency.should.equal("2m")
-        generated_graph.alert.gracePeriod.should.equal("2m")
-        generated_graph.alert.alertConditions.should.have.length_of(2)
-        generated_graph.alert.alertConditions[0].target.should.equal(Target(refId="C"))
-        generated_graph.alert.alertConditions[1].target.should.equal(Target(refId="A"))
-        generated_graph.targets.should.eql(expected_alert_query)
+        generated_graph.dataSource.should.eql(cloudwatch_data_source)
+        generated_graph.alert.should.equal(None)
+        generated_graph.targets.should.have.length_of(2)
+        generated_graph.targets.should.equal(targets)
 
     def test_should_generate_proper_dashboard(self):
         apig_name = "apig-1"
-        data_source = "prod"
+        cloudwatch_data_source = "prod"
+        influxdb_data_source = "influxdb"
         environment = "prod"
         notifications = ["foo-1", "foo-2"]
         lambdas = []
 
         generated_dashboard = generate_api_gateways_dashboard(
             name=apig_name,
-            data_source=data_source,
+            cloudwatch_data_source=cloudwatch_data_source,
+            influxdb_data_source=influxdb_data_source,
             notifications=notifications,
             environment=environment,
             lambdas=lambdas,
@@ -178,14 +163,16 @@ class TestAPIGatewayDashboards:
 
     def test_should_generate_proper_dashboard_with_lambdas(self):
         apig_name = "apig-1"
-        data_source = "prod"
+        cloudwatch_data_source = "prod"
+        influxdb_data_source = "influxdb"
         environment = "prod"
         notifications = ["foo-1", "foo-2"]
         lambdas = ["lambda-1", "lambda-2"]
 
         generated_dashboard = generate_api_gateways_dashboard(
             name=apig_name,
-            data_source=data_source,
+            cloudwatch_data_source=cloudwatch_data_source,
+            influxdb_data_source=influxdb_data_source,
             notifications=notifications,
             environment=environment,
             lambdas=lambdas,

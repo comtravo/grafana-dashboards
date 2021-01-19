@@ -17,13 +17,14 @@ module "dashboard" {
 
   enable = true
   grafana_configuration = {
-    name          = var.name
-    environment   = "prod"
-    data_source   = "prod"
-    trigger       = "cloudwatch-event-schedule"
-    notifications = ["slack"]
-    folder        = grafana_folder.this.id
-    topics        = []
+    name                   = var.name
+    environment            = "prod"
+    cloudwatch_data_source = "cloudwatch"
+    influxdb_data_source   = "influxdb"
+    trigger                = "cloudwatch-event-schedule"
+    notifications          = ["slack"]
+    folder                 = grafana_folder.this.id
+    topics                 = []
   }
 }
 

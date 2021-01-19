@@ -13,12 +13,13 @@ module "dashboard" {
 
   enable = false
   grafana_configuration = {
-    name          = var.name
-    environment   = "prod"
-    data_source   = "prod"
-    notifications = ["slack"]
-    folder        = null
-    lambdas       = []
+    arn                    = var.name
+    environment            = "prod"
+    cloudwatch_data_source = "cloudwatch"
+    influxdb_data_source   = "influxdb"
+    notifications          = ["slack"]
+    folder                 = null
+    lambdas                = []
   }
 }
 

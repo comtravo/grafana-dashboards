@@ -8,7 +8,7 @@ from grafanalib.core import (
     Templating,
     OP_OR,
 )
-from grafanalib.influxdb import InfluxDBTarget
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.step_functions import generate_sfn_graph, generate_sfn_dashboard
 
@@ -17,101 +17,116 @@ import re
 
 class TestStepFunctionDashboards:
     def test_should_generate_sfn_graph_without_notifications(self):
-        sfn_name = "sfn-1"
-        data_source = "prod"
+        sfn_name = "arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-1"
+        cloudwatch_data_source = "prod"
+        influxdb_data_source = "prod"
         notifications = []
 
         generated_graph = generate_sfn_graph(
-            name=sfn_name, data_source=data_source, notifications=notifications
+            name=sfn_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            influxdb_data_source=influxdb_data_source,
+            notifications=notifications,
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"Step function execution metrics")
-        generated_graph.dataSource.should.equal(data_source)
+        generated_graph.dataSource.should.equal(cloudwatch_data_source)
         generated_graph.targets.should.have.length_of(9)
         generated_graph.alert.should.be(None)
 
     def test_should_generate_sfn_graph_with_notifications(self):
-        sfn_name = "sfn-1"
-        data_source = "prod"
+        sfn_name = "arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-1"
+        cloudwatch_data_source = "prod"
         notifications = ["lorem", "ipsum"]
 
         expected_targets = [
-            InfluxDBTarget(
+            CloudwatchMetricsTarget(
                 alias="Duration - Minimum",
-                query='SELECT min("execution_time_minimum") FROM "autogen"."cloudwatch_aws_states" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    sfn_name
-                ),
-                rawQuery=True,
+                namespace="AWS/States",
+                period="1m",
+                metricName="ExecutionTime",
+                statistics=["Minimum"],
+                dimensions={"StateMachineArn": sfn_name},
                 refId="E",
             ),
-            InfluxDBTarget(
+            CloudwatchMetricsTarget(
                 alias="Duration - Average",
-                query='SELECT mean("execution_time_average") FROM "autogen"."cloudwatch_aws_states" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    sfn_name
-                ),
-                rawQuery=True,
+                namespace="AWS/States",
+                period="1m",
+                metricName="ExecutionTime",
+                statistics=["Average"],
+                dimensions={"StateMachineArn": sfn_name},
                 refId="F",
             ),
-            InfluxDBTarget(
+            CloudwatchMetricsTarget(
                 alias="Duration - Maximum",
-                query='SELECT max("execution_time_maximum") FROM "autogen"."cloudwatch_aws_states" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    sfn_name
-                ),
-                rawQuery=True,
+                namespace="AWS/States",
+                period="1m",
+                metricName="ExecutionTime",
+                statistics=["Maximum"],
+                dimensions={"StateMachineArn": sfn_name},
                 refId="G",
             ),
-            InfluxDBTarget(
+            CloudwatchMetricsTarget(
                 alias="Executions - Started",
-                query='SELECT max("executions_started_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    sfn_name
-                ),
-                rawQuery=True,
+                namespace="AWS/States",
+                period="1m",
+                metricName="ExecutionsStarted",
+                statistics=["Sum"],
+                dimensions={"StateMachineArn": sfn_name},
                 refId="H",
             ),
-            InfluxDBTarget(
+            CloudwatchMetricsTarget(
                 alias="Executions - Succeeded",
-                query='SELECT max("executions_succeeded_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    sfn_name
-                ),
-                rawQuery=True,
+                namespace="AWS/States",
+                period="1m",
+                metricName="ExecutionsSucceeded",
+                statistics=["Sum"],
+                dimensions={"StateMachineArn": sfn_name},
                 refId="I",
             ),
-            InfluxDBTarget(
+            CloudwatchMetricsTarget(
                 alias="Executions - Aborted",
-                query='SELECT max("executions_aborted_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    sfn_name
-                ),
-                rawQuery=True,
+                namespace="AWS/States",
+                period="1m",
+                metricName="ExecutionsAborted",
+                statistics=["Sum"],
+                dimensions={"StateMachineArn": sfn_name},
                 refId="A",
             ),
-            InfluxDBTarget(
+            CloudwatchMetricsTarget(
                 alias="Executions - Failed",
-                query='SELECT max("executions_failed_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    sfn_name
-                ),
-                rawQuery=True,
+                namespace="AWS/States",
+                period="1m",
+                metricName="ExecutionsFailed",
+                statistics=["Sum"],
+                dimensions={"StateMachineArn": sfn_name},
                 refId="B",
             ),
-            InfluxDBTarget(
+            CloudwatchMetricsTarget(
                 alias="Executions - Throttled",
-                query='SELECT max("execution_throttled_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    sfn_name
-                ),
-                rawQuery=True,
+                namespace="AWS/States",
+                period="1m",
+                metricName="ExecutionsThrottled",
+                statistics=["Sum"],
+                dimensions={"StateMachineArn": sfn_name},
                 refId="C",
             ),
-            InfluxDBTarget(
+            CloudwatchMetricsTarget(
                 alias="Executions - Timeout",
-                query='SELECT max("execution_timed_out_sum") FROM "autogen"."cloudwatch_aws_states" WHERE ("state_machine_arn" =~ /{}/) AND $timeFilter GROUP BY time(1m) fill(0)'.format(
-                    sfn_name
-                ),
-                rawQuery=True,
+                namespace="AWS/States",
+                period="1m",
+                metricName="ExecutionsTimedOut",
+                statistics=["Sum"],
+                dimensions={"StateMachineArn": sfn_name},
                 refId="D",
             ),
         ]
 
         generated_graph = generate_sfn_graph(
-            name=sfn_name, data_source=data_source, notifications=notifications
+            name=sfn_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
         )
         generated_graph.alert.should.be.a(Alert)
         generated_graph.alert.frequency.should.eql("2m")
@@ -131,15 +146,17 @@ class TestStepFunctionDashboards:
         generated_graph.alert.alertConditions[3].operator.should.equal(OP_OR)
 
     def test_should_generate_proper_dashboard(self):
-        name = "sfn-1"
-        data_source = "prod"
+        name = "arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-1"
+        cloudwatch_data_source = "prod"
+        influxdb_data_source = "prod"
         environment = "prod"
         notifications = ["foo-1", "foo-2"]
         lambdas = []
 
         generated_dashboard = generate_sfn_dashboard(
             name=name,
-            data_source=data_source,
+            cloudwatch_data_source=cloudwatch_data_source,
+            influxdb_data_source=influxdb_data_source,
             notifications=notifications,
             environment=environment,
             lambdas=lambdas,
@@ -152,38 +169,35 @@ class TestStepFunctionDashboards:
         generated_dashboard.tags.should.have.length_of(2)
         generated_dashboard.rows.should.have.length_of(1)
 
-    def test_should_generate_proper_dashboard_with_dashboards(self):
+    def test_should_throw_error_when_sfn_arn_not_specified(self):
         name = "sfn-1"
-        data_source = "prod"
+        cloudwatch_data_source = "prod"
+        influxdb_data_source = "prod"
         environment = "prod"
         notifications = ["foo-1", "foo-2"]
         lambdas = ["lambda-1", "lambda-2"]
 
-        generated_dashboard = generate_sfn_dashboard(
+        generate_sfn_dashboard.when.called_with(
             name=name,
-            data_source=data_source,
+            cloudwatch_data_source=cloudwatch_data_source,
+            influxdb_data_source=influxdb_data_source,
             notifications=notifications,
             environment=environment,
             lambdas=lambdas,
-        )
-
-        generated_dashboard.should.be.a(Dashboard)
-        generated_dashboard.title.should.match(r"Step Function: sfn-1")
-        generated_dashboard.annotations.should.be.a(Annotations)
-        generated_dashboard.templating.should.be.a(Templating)
-        generated_dashboard.tags.should.have.length_of(3)
-        generated_dashboard.rows.should.have.length_of(3)
+        ).should.throw(Exception, r"Statemachine ARN should be provided")
 
     def test_should_generate_proper_dashboard_with_arn(self):
-        name = "arn:aws:states:eu-west-1:606762362359:stateMachine:sfn-1"
-        data_source = "prod"
+        name = "arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-1"
+        cloudwatch_data_source = "prod"
+        influxdb_data_source = "prod"
         environment = "prod"
         notifications = ["foo-1", "foo-2"]
         lambdas = ["lambda-1", "lambda-2"]
 
         generated_dashboard = generate_sfn_dashboard(
             name=name,
-            data_source=data_source,
+            cloudwatch_data_source=cloudwatch_data_source,
+            influxdb_data_source=influxdb_data_source,
             notifications=notifications,
             environment=environment,
             lambdas=lambdas,

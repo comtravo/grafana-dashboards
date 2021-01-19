@@ -6,6 +6,9 @@ from lib import colors
 def get_release_annotations(data_source: str):
     """Generate release annotations"""
 
+    if data_source == None:
+        return Annotations(None)
+
     return Annotations(
         [
             {

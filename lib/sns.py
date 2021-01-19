@@ -16,7 +16,7 @@ from grafanalib.core import (
     YAxes,
     YAxis,
 )
-from grafanalib.influxdb import InfluxDBTarget
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.annotations import get_release_annotations
 from lib.commons import (
@@ -35,40 +35,44 @@ from typing import List
 
 import re
 
-SNS_MEASUREMENT = "cloudwatch_aws_sns"
+NAMESPACE = "AWS/SNS"
+PERIOD = "5m"
 
 SNS_PUBLISHED_NOTIFICATIONS = "Published"
 SNS_DELIVERED_NOTIFICATIONS = "Delivered"
 SNS_FAILED_NOTIFICATIONS = "Failed"
 
 
-def create_sns_graph(name: str, data_source: str, notifications: List[str]):
+def create_sns_graph(name: str, cloudwatch_data_source: str, notifications: List[str]):
     """Create SNS graph"""
 
     if re.match("^arn:aws:sns", name):
         name = name.split(":")[-1]
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=SNS_PUBLISHED_NOTIFICATIONS,
-            query='SELECT sum("number_of_messages_published_sum") FROM "{}"."{}" WHERE ("topic_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
-                RETENTION_POLICY, SNS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period=PERIOD,
+            statistics=["Sum"],
+            metricName="NumberOfMessagesPublished",
+            dimensions={"TopicName": name},
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=SNS_DELIVERED_NOTIFICATIONS,
-            query='SELECT sum("number_of_notifications_delivered_sum") FROM "{}"."{}" WHERE ("topic_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
-                RETENTION_POLICY, SNS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period=PERIOD,
+            statistics=["Sum"],
+            metricName="NumberOfNotificationsDelivered",
+            dimensions={"TopicName": name},
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=SNS_FAILED_NOTIFICATIONS,
-            query='SELECT sum("number_of_notifications_failed_sum") FROM "{}"."{}" WHERE ("topic_name" = \'{}\') AND $timeFilter GROUP BY time(5m) fill(0)'.format(
-                RETENTION_POLICY, SNS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            period=PERIOD,
+            statistics=["Sum"],
+            metricName="NumberOfMessagesFailed",
+            dimensions={"TopicName": name},
             refId=ALERT_REF_ID if notifications else None,
         ),
     ]
@@ -114,7 +118,7 @@ def create_sns_graph(name: str, data_source: str, notifications: List[str]):
 
     return Graph(
         title="SNS: {}".format(name),
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=yAxes,
         seriesOverrides=seriesOverrides,

@@ -12,14 +12,16 @@ class TestRDSMySqlDashboard:
     def test_should_generate_rds_mysql_dashboard(self):
         name = "api"
         environment = "prod"
-        data_source = "prod"
+        influxdb_data_source = "prod"
+        cloudwatch_data_source = "cw"
         engine = "mysql"
         notifications = ["lorem", "ipsum"]
 
         generated_dashboard = generate_rds_dashboard(
             name=name,
             environment=environment,
-            data_source=data_source,
+            influxdb_data_source=influxdb_data_source,
+            cloudwatch_data_source=cloudwatch_data_source,
             notifications=notifications,
             engine=engine,
         )
@@ -37,14 +39,16 @@ class TestRDSPostgresDashboard:
     def test_should_generate_rds_mysql_dashboard(self):
         name = "api"
         environment = "prod"
-        data_source = "prod"
+        influxdb_data_source = "prod"
+        cloudwatch_data_source = "cw"
         engine = "postgres"
         notifications = ["lorem", "ipsum"]
 
         generated_dashboard = generate_rds_dashboard(
             name=name,
             environment=environment,
-            data_source=data_source,
+            influxdb_data_source=influxdb_data_source,
+            cloudwatch_data_source=cloudwatch_data_source,
             notifications=notifications,
             engine=engine,
         )

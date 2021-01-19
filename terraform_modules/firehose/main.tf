@@ -1,9 +1,9 @@
 variable "grafana_configuration" {
   description = "Configuration for creating Grafana dashboards and alerts"
   type = object({
-    environment = string
-    data_source = string
-    folder      = string
+    environment          = string
+    influxdb_data_source = string
+    folder               = string
   })
 }
 
@@ -21,7 +21,7 @@ resource "null_resource" "generate_dashboard" {
   count = var.enable ? 1 : 0
 
   provisioner "local-exec" {
-    command = "python3 ${path.module}/../../bin.py --name firehose --environment ${var.grafana_configuration.environment} --data_source ${var.grafana_configuration.data_source} firehose | json_pp > ${local.dahboard_path}"
+    command = "python3 ${path.module}/../../bin.py --name firehose --environment ${var.grafana_configuration.environment} --influxdb_data_source ${var.grafana_configuration.influxdb_data_source} firehose | json_pp > ${local.dahboard_path}"
   }
 
   triggers = {
