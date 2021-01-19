@@ -10,7 +10,7 @@ terraform {
 variable "grafana_configuration" {
   description = "Configuration for creating Grafana dashboards and alerts"
   type = object({
-    name                   = string
+    arn                    = string
     environment            = string
     cloudwatch_data_source = string
     influxdb_data_source   = string
@@ -36,7 +36,7 @@ resource "null_resource" "generate_dashboard" {
   count = var.enable ? 1 : 0
 
   provisioner "local-exec" {
-    command = "python3 ${path.module}/../../bin.py --name ${var.grafana_configuration.name} --environment ${var.grafana_configuration.environment} ${local.notification_args} --influxdb_data_source ${var.grafana_configuration.influxdb_data_source} --cloudwatch_data_source ${var.grafana_configuration.cloudwatch_data_source} step-function ${local.lambda_args} | json_pp > ${local.dahboard_path}"
+    command = "python3 ${path.module}/../../bin.py --name ${var.grafana_configuration.arn} --environment ${var.grafana_configuration.environment} ${local.notification_args} --influxdb_data_source ${var.grafana_configuration.influxdb_data_source} --cloudwatch_data_source ${var.grafana_configuration.cloudwatch_data_source} step-function ${local.lambda_args} | json_pp > ${local.dahboard_path}"
   }
 
   triggers = {

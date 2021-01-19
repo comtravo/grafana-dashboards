@@ -32,7 +32,7 @@ FIREHOSE_DELIVERY_TO_S3_ALIAS = "Delivery to S3"
 FIREHOSE_DELIVERY_TO_S3_SUCCESS_ALIAS = "Delivery to S3 Success"
 
 
-def get_firehose_template(data_source: str):
+def get_firehose_template(data_source: str) -> Template:
     """Get template for firehose"""
 
     return Template(
@@ -49,7 +49,7 @@ def get_firehose_template(data_source: str):
     )
 
 
-def generate_firehose_graph(influxdb_data_source: str):
+def generate_firehose_graph(influxdb_data_source: str) -> Graph:
     """
     Generate Firehose graph
     """
@@ -111,7 +111,7 @@ def generate_firehose_graph(influxdb_data_source: str):
 
 def generate_firehose_dashboard(
     influxdb_data_source: str, environment: str, *args, **kwargs
-):
+) -> Dashboard:
     """Generate Firehose dashboard"""
     tags = ["firehose", environment]
 

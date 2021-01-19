@@ -12,7 +12,7 @@ import (
 func TestStepFunction_noDashboard(t *testing.T) {
 
 	// t.Parallel()
-	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
+	dashboardName := fmt.Sprintf("arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-%s", random.UniqueId())
 	exampleDir := "../../examples/step_function_dashboards/no_dashboard/"
 
 	terraformOptions := SetupExample(t, dashboardName, exampleDir)
@@ -41,7 +41,7 @@ func TestStepFunction_noDashboard(t *testing.T) {
 func TestStepFunction_alert(t *testing.T) {
 
 	// t.Parallel()
-	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
+	dashboardName := fmt.Sprintf("arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-%s", random.UniqueId())
 	exampleDir := "../../examples/step_function_dashboards/step_function_alert/"
 
 	terraformOptions := SetupExample(t, dashboardName, exampleDir)
@@ -54,7 +54,7 @@ func TestStepFunction_alert(t *testing.T) {
 func TestStepFunction_folder(t *testing.T) {
 
 	// t.Parallel()
-	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
+	dashboardName := fmt.Sprintf("arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-%s", random.UniqueId())
 	exampleDir := "../../examples/step_function_dashboards/step_function_folder/"
 
 	terraformOptions := SetupExample(t, dashboardName, exampleDir)
@@ -67,7 +67,7 @@ func TestStepFunction_folder(t *testing.T) {
 func TestStepFunction_withoutLambda(t *testing.T) {
 
 	// t.Parallel()
-	dashboardName := fmt.Sprintf("sfn-%s", random.UniqueId())
+	dashboardName := fmt.Sprintf("arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-%s", random.UniqueId())
 	exampleDir := "../../examples/step_function_dashboards/step_function_without_lambda/"
 
 	terraformOptions := SetupExample(t, dashboardName, exampleDir)

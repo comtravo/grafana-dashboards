@@ -22,7 +22,7 @@ from grafanalib.core import (
     YAxis,
 )
 from grafanalib.formatunits import BYTES, BYTES_SEC, SECONDS
-from grafanalib.influxdb import InfluxDBTarget
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib import colors
 from lib.annotations import get_release_annotations
@@ -39,10 +39,12 @@ from lib.commons import (
 )
 from lib.templating import get_release_templating
 
-RDS_MEASUREMENT = "cloudwatch_aws_rds"
+NAMESPACE = "AWS/RDS"
 
 
-def generate_rds_cpu_graph(name: str, data_source: str, notifications: List[str]):
+def generate_rds_cpu_graph(
+    name: str, cloudwatch_data_source: str, notifications: List[str]
+):
     """
     Generate rds graph
     """
@@ -53,27 +55,30 @@ def generate_rds_cpu_graph(name: str, data_source: str, notifications: List[str]
     mean_alias = "mean"
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=max_alias,
-            query='SELECT max("cpu_utilization_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
+            statistics=["Maximum"],
+            metricName="CPUUtilization",
             refId=ALERT_REF_ID,
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=mean_alias,
-            query='SELECT mean("cpu_utilization_average") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            statistics=["Average"],
+            metricName="CPUUtilization",
+            period="1m",
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=min_alias,
-            query='SELECT min("cpu_utilization_minimum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            statistics=["Minimum"],
+            metricName="CPUUtilization",
+            period="1m",
         ),
     ]
 
@@ -103,7 +108,7 @@ def generate_rds_cpu_graph(name: str, data_source: str, notifications: List[str]
 
     return Graph(
         title="CPU utilization",
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
         seriesOverrides=series_overrides,
@@ -115,7 +120,7 @@ def generate_rds_cpu_graph(name: str, data_source: str, notifications: List[str]
     ).auto_ref_ids()
 
 
-def generate_rds_database_connections_graph(name: str, data_source: str):
+def generate_rds_database_connections_graph(name: str, cloudwatch_data_source: str):
     """
     Generate rds graph
     """
@@ -126,27 +131,30 @@ def generate_rds_database_connections_graph(name: str, data_source: str):
     mean_alias = "mean"
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=max_alias,
-            query='SELECT max("database_connections_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            metricName="DatabaseConnections",
+            statistics=["Maximum"],
+            period="1m",
             refId=ALERT_REF_ID,
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=mean_alias,
-            query='SELECT mean("database_connections_average") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="DatabaseConnections",
+            statistics=["Average"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias=min_alias,
-            query='SELECT min("database_connections_minimum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="DatabaseConnections",
+            statistics=["Minimum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
         ),
     ]
 
@@ -154,7 +162,7 @@ def generate_rds_database_connections_graph(name: str, data_source: str):
 
     return Graph(
         title="Database connections",
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
         seriesOverrides=series_overrides,
@@ -166,7 +174,7 @@ def generate_rds_database_connections_graph(name: str, data_source: str):
 
 
 def generate_rds_burst_balance_graph(
-    name: str, data_source: str, notifications: List[str]
+    name: str, cloudwatch_data_source: str, notifications: List[str]
 ):
     """
     Generate rds graph
@@ -175,12 +183,13 @@ def generate_rds_burst_balance_graph(
     y_axes = single_y_axis(format=PERCENT_FORMAT)
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="Burst balance",
-            query='SELECT min("burst_balance_minimum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="BurstBalance",
+            statistics=["Minimum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
             refId=ALERT_REF_ID,
         ),
     ]
@@ -209,7 +218,7 @@ def generate_rds_burst_balance_graph(
 
     return Graph(
         title="Burst Balance",
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -221,7 +230,7 @@ def generate_rds_burst_balance_graph(
 
 
 def generate_rds_transaction_id_graph(
-    name: str, data_source: str, notifications: List[str]
+    name: str, cloudwatch_data_source: str, notifications: List[str]
 ):
     """
     Generate rds graph
@@ -230,12 +239,13 @@ def generate_rds_transaction_id_graph(
     y_axes = single_y_axis(format=SHORT_FORMAT)
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="Transaction ids used",
-            query='SELECT max("maximum_used_transaction_i_ds_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="MaximumUsedTransactionIDs",
+            statistics=["Maximum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
             refId=ALERT_REF_ID,
         ),
     ]
@@ -264,7 +274,7 @@ def generate_rds_transaction_id_graph(
 
     return Graph(
         title="Transaction ids used",
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -275,7 +285,7 @@ def generate_rds_transaction_id_graph(
     ).auto_ref_ids()
 
 
-def generate_rds_freeable_memory_graph(name: str, data_source: str):
+def generate_rds_freeable_memory_graph(name: str, cloudwatch_data_source: str):
     """
     Generate rds graph
     """
@@ -283,26 +293,28 @@ def generate_rds_freeable_memory_graph(name: str, data_source: str):
     y_axes = single_y_axis(format=BYTES)
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="Freeable memory",
-            query='SELECT min("freeable_memory_minimum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="FreeableMemory",
+            statistics=["Minimum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
             refId=ALERT_REF_ID,
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="Swap memory",
-            query='SELECT max("swap_usage_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="SwapUsage",
+            statistics=["Maximum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
         ),
     ]
 
     return Graph(
         title="Memory",
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -312,7 +324,7 @@ def generate_rds_freeable_memory_graph(name: str, data_source: str):
     ).auto_ref_ids()
 
 
-def generate_rds_free_storage_space_graph(name: str, data_source: str):
+def generate_rds_free_storage_space_graph(name: str, cloudwatch_data_source: str):
     """
     Generate rds graph
     """
@@ -320,19 +332,20 @@ def generate_rds_free_storage_space_graph(name: str, data_source: str):
     y_axes = single_y_axis(format=BYTES)
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="Free storage",
-            query='SELECT min("free_storage_space_minimum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="FreeStorageSpace",
+            statistics=["Minimum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
             refId=ALERT_REF_ID,
         ),
     ]
 
     return Graph(
         title="Free storage",
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -342,7 +355,7 @@ def generate_rds_free_storage_space_graph(name: str, data_source: str):
     ).auto_ref_ids()
 
 
-def generate_rds_disk_latency_graph(name: str, data_source: str):
+def generate_rds_disk_latency_graph(name: str, cloudwatch_data_source: str):
     """
     Generate rds graph
     """
@@ -350,25 +363,27 @@ def generate_rds_disk_latency_graph(name: str, data_source: str):
     y_axes = single_y_axis(format=SECONDS)
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="read latency",
-            query='SELECT max("read_latency_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="ReadLatency",
+            statistics=["Maximum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="write latency",
-            query='SELECT max("write_latency_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="WriteLatency",
+            statistics=["Maximum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
         ),
     ]
 
     return Graph(
         title="Disk latency",
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -378,7 +393,7 @@ def generate_rds_disk_latency_graph(name: str, data_source: str):
     ).auto_ref_ids()
 
 
-def generate_rds_disk_ops_graph(name: str, data_source: str):
+def generate_rds_disk_ops_graph(name: str, cloudwatch_data_source: str):
     """
     Generate rds graph
     """
@@ -386,32 +401,35 @@ def generate_rds_disk_ops_graph(name: str, data_source: str):
     y_axes = single_y_axis(format=SHORT_FORMAT, min=None)
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="write iops",
-            query='SELECT max("write_iops_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="WriteIOPS",
+            statistics=["Maximum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="read iops",
-            query='SELECT max("read_iops_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="ReadIOPS",
+            statistics=["Maximum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="disk queue depth",
-            query='SELECT max("disk_queue_depth_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="DiskQueueDepth",
+            statistics=["Maximum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
         ),
     ]
 
     return Graph(
         title="Disk iops",
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -421,7 +439,7 @@ def generate_rds_disk_ops_graph(name: str, data_source: str):
     ).auto_ref_ids()
 
 
-def generate_rds_network_throughput_graph(name: str, data_source: str):
+def generate_rds_network_throughput_graph(name: str, cloudwatch_data_source: str):
     """
     Generate rds graph
     """
@@ -429,19 +447,21 @@ def generate_rds_network_throughput_graph(name: str, data_source: str):
     y_axes = single_y_axis(format=BYTES_SEC, min=None)
 
     targets = [
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="RX",
-            query='SELECT max("network_receive_throughput_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="NetworkReceiveThroughput",
+            statistics=["Maximum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
         ),
-        InfluxDBTarget(
+        CloudwatchMetricsTarget(
             alias="TX",
-            query='SELECT max("network_transmit_throughput_maximum") FROM "{}"."{}" WHERE ("db_instance_identifier" =\'{}\') AND $timeFilter GROUP BY time(1m) fill(previous)'.format(
-                RETENTION_POLICY, RDS_MEASUREMENT, name
-            ),
-            rawQuery=RAW_QUERY,
+            metricName="NetworkTransmitThroughput",
+            statistics=["Maximum"],
+            namespace=NAMESPACE,
+            dimensions={"DBInstanceIdentifier": name},
+            period="1m",
         ),
     ]
 
@@ -457,7 +477,7 @@ def generate_rds_network_throughput_graph(name: str, data_source: str):
 
     return Graph(
         title="Network throughput",
-        dataSource=data_source,
+        dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
         transparent=TRANSPARENT,
@@ -471,7 +491,8 @@ def generate_rds_network_throughput_graph(name: str, data_source: str):
 def generate_rds_dashboard(
     name: str,
     environment: str,
-    data_source: str,
+    influxdb_data_source: str,
+    cloudwatch_data_source: str,
     engine: str,
     notifications: List[str],
     **kwargs
@@ -480,19 +501,23 @@ def generate_rds_dashboard(
     tags = [environment, engine, "rds", "database"]
 
     cpu_graph = generate_rds_cpu_graph(
-        name=name, data_source=data_source, notifications=notifications
+        name=name,
+        cloudwatch_data_source=cloudwatch_data_source,
+        notifications=notifications,
     )
     burst_graph = generate_rds_burst_balance_graph(
-        name=name, data_source=data_source, notifications=notifications
+        name=name,
+        cloudwatch_data_source=cloudwatch_data_source,
+        notifications=notifications,
     )
     connections_graph = generate_rds_database_connections_graph(
-        name=name, data_source=data_source
+        name=name, cloudwatch_data_source=cloudwatch_data_source
     )
     freeable_memory_graph = generate_rds_freeable_memory_graph(
-        name=name, data_source=data_source
+        name=name, cloudwatch_data_source=cloudwatch_data_source
     )
     free_storage_graph = generate_rds_free_storage_space_graph(
-        name=name, data_source=data_source
+        name=name, cloudwatch_data_source=cloudwatch_data_source
     )
 
     rows = [
@@ -500,10 +525,14 @@ def generate_rds_dashboard(
         Row(panels=[connections_graph, freeable_memory_graph, free_storage_graph]),
         Row(
             panels=[
-                generate_rds_disk_latency_graph(name=name, data_source=data_source),
-                generate_rds_disk_ops_graph(name=name, data_source=data_source),
+                generate_rds_disk_latency_graph(
+                    name=name, cloudwatch_data_source=cloudwatch_data_source
+                ),
+                generate_rds_disk_ops_graph(
+                    name=name, cloudwatch_data_source=cloudwatch_data_source
+                ),
                 generate_rds_network_throughput_graph(
-                    name=name, data_source=data_source
+                    name=name, cloudwatch_data_source=cloudwatch_data_source
                 ),
             ]
         ),
@@ -514,7 +543,9 @@ def generate_rds_dashboard(
             Row(
                 panels=[
                     generate_rds_transaction_id_graph(
-                        name=name, data_source=data_source, notifications=notifications
+                        name=name,
+                        cloudwatch_data_source=cloudwatch_data_source,
+                        notifications=notifications,
                     )
                 ]
             )
@@ -523,8 +554,8 @@ def generate_rds_dashboard(
     return Dashboard(
         title="RDS: {}".format(name),
         editable=EDITABLE,
-        annotations=get_release_annotations(data_source),
-        templating=get_release_templating(data_source),
+        annotations=get_release_annotations(influxdb_data_source),
+        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
