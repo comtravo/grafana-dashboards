@@ -140,7 +140,7 @@ class TestDispatcher:
         )
         generated_lambd_graph.should.have.property("alert").be.a(Alert)
         generated_lambd_graph.alert.executionErrorState.should.eql("alerting")
-        generated_lambd_graph.alert.noDataState.should.eql("keep_state")
+        generated_lambd_graph.alert.noDataState.should.eql("no_data")
         generated_lambd_graph.alert.alertConditions.should.have.length_of(1)
         generated_lambd_graph.alert.alertConditions[0].should.be.a(AlertCondition)
         generated_lambd_graph.alert.alertConditions[0].target.should.eql(
@@ -207,7 +207,7 @@ class TestDispatcher:
         generated_lambd_graph.targets[0].should.eql(expected_alert_query)
         generated_lambd_graph.should.have.property("alert").be.a(Alert)
         generated_lambd_graph.alert.executionErrorState.should.eql("alerting")
-        generated_lambd_graph.alert.noDataState.should.eql("keep_state")
+        generated_lambd_graph.alert.noDataState.should.eql("no_data")
 
     def test_should_create_lambda_sqs_graph(self):
         lambda_name = "lambda-1"

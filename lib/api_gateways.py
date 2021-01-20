@@ -104,7 +104,6 @@ def generate_api_gateway_requests_5xx_graph(
             name="{} API Gateway 5XX Errors".format(name),
             message="{} is having 5XX errors".format(name),
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),

@@ -91,7 +91,6 @@ def generate_rds_cpu_graph(
             name="{} CPU utilization Errors".format(name),
             message="{} is having CPU utilization errors".format(name),
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
@@ -201,7 +200,6 @@ def generate_rds_burst_balance_graph(
             name="{} Burst Balance Errors".format(name),
             message="{} is having Burst Balance errors".format(name),
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
@@ -257,7 +255,6 @@ def generate_rds_transaction_id_graph(
             name="{} transaction ids used Errors".format(name),
             message="{} is having transaction ids used errors".format(name),
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),

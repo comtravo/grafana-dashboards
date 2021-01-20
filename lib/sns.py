@@ -101,7 +101,6 @@ def create_sns_graph(name: str, cloudwatch_data_source: str, notifications: List
                 name
             ),
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),

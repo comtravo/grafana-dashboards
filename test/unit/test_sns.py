@@ -44,7 +44,7 @@ class TestCreateSNSGraph:
         ).which.should.be.equal("alerting")
         actual_sns_graph.alert.should.have.property(
             "noDataState"
-        ).which.should.be.equal("keep_state")
+        ).which.should.be.equal("no_data")
         actual_sns_graph.alert.should.have.property(
             "notifications"
         ).which.should.be.equal(expected_notifications)
