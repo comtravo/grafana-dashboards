@@ -285,7 +285,7 @@ def generate_sfn_dashboard(
     sfn_name = name.split(":")[-1]
 
     sfn_graph = generate_sfn_graph(
-        name=sfn_name,
+        name=name,
         cloudwatch_data_source=cloudwatch_data_source,
         notifications=notifications,
     )
