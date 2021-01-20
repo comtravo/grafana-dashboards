@@ -164,7 +164,6 @@ def lambda_generate_graph(
             name="{} Invocation Errors".format(name),
             message="{} is having invocation errors".format(name),
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
@@ -290,7 +289,6 @@ def create_lambda_sqs_dlq_graph(
             name="{} messages".format(name),
             message="{} is having messages".format(name),
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),

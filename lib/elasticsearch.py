@@ -121,7 +121,6 @@ def generate_elasticsearch_jvm_memory_pressure_graph(
             name="Elasticsearch JVM memory pressure alert",
             message="Elasticsearch JVM memory pressure alert",
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
@@ -261,7 +260,6 @@ def generate_elasticsearch_storage_graph(
             name="Elasticsearch storage alert",
             message="Elasticsearch might be low on storage",
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
@@ -427,7 +425,6 @@ def generate_elasticsearch_status_red_alert_graph(
             name="Elasticsearch is in status red",
             message="Elasticsearch is in status red",
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
@@ -493,7 +490,6 @@ def generate_elasticsearch_nodes_alert_graph(
             name="Elasticsearch nodes alert",
             message="Elasticsearch might have no nodes",
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
@@ -548,7 +544,6 @@ def generate_elasticsearch_writes_blocked_alert_graph(
             name="Elasticsearch writed blocked alert",
             message="Elasticsearch might be blocking writes",
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
@@ -603,7 +598,6 @@ def generate_elasticsearch_automated_snapshot_failure_alert_graph(
             name="Elasticsearch automated snapshot failure alert",
             message="Elasticsearch automated snapshot failure alert",
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),

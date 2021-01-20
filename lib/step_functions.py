@@ -216,7 +216,6 @@ def generate_sfn_graph(
             name="{} execution issues".format(name),
             message="{} might have failed, aborted, throttled or timedout".format(name),
             executionErrorState="alerting",
-            noDataState="keep_state",
             alertConditions=[
                 AlertCondition(
                     Target(refId=SFN_EXECUTIONS_ABORTED_REF_ID),
