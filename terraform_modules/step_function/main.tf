@@ -1,9 +1,17 @@
 terraform {
   required_version = ">= 0.12"
   required_providers {
-    grafana = "~> 1.7"
+    grafana = {
+      source  = "grafana/grafana"
+      version = "~> 1.7"
+    }
+    local = {
+      source = "hashicorp/local"
+    }
+    null = {
+      source = "hashicorp/null"
+    }
   }
-  experiments = [variable_validation]
 }
 
 
