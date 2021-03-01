@@ -220,7 +220,7 @@ def generate_api_gateways_dashboard(
         lambda_generate_graph(
             name=l,
             cloudwatch_data_source=cloudwatch_data_source,
-            notifications=notifications,
+            notifications=[]
         )
         for l in lambdas
     ]
