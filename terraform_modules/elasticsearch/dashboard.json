@@ -1,0 +1,1341 @@
+{
+   "rows" : [
+      {
+         "panels" : [
+            {
+               "id" : 1,
+               "minSpan" : null,
+               "height" : null,
+               "options" : {
+                  "alertThreshold" : true,
+                  "dataLinks" : []
+               },
+               "isNew" : true,
+               "legend" : {
+                  "rightSide" : false,
+                  "sort" : null,
+                  "values" : false,
+                  "sideWidth" : null,
+                  "sortDesc" : false,
+                  "current" : false,
+                  "show" : true,
+                  "avg" : false,
+                  "hideZero" : false,
+                  "total" : false,
+                  "max" : false,
+                  "alignAsTable" : false,
+                  "hideEmpty" : false,
+                  "min" : false
+               },
+               "links" : [],
+               "renderer" : "flot",
+               "targets" : [
+                  {
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "id" : "",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "region" : "default",
+                     "expression" : "",
+                     "dimensions" : {
+                        "DomainName" : "es",
+                        "ClientId" : "1234567890"
+                     },
+                     "metricName" : "CPUUtilization",
+                     "namespace" : "AWS/ES",
+                     "refId" : "A",
+                     "alias" : "CPU utilization"
+                  }
+               ],
+               "lines" : false,
+               "editable" : false,
+               "nullPointMode" : "connected",
+               "fill" : 1,
+               "error" : false,
+               "description" : null,
+               "points" : false,
+               "bars" : true,
+               "aliasColors" : {},
+               "tooltip" : {
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "msResolution" : true,
+                  "shared" : true
+               },
+               "title" : "CPU utilization",
+               "timeFrom" : null,
+               "repeat" : null,
+               "transparent" : true,
+               "yaxes" : [
+                  {
+                     "decimals" : null,
+                     "max" : null,
+                     "min" : 0,
+                     "show" : true,
+                     "label" : null,
+                     "format" : "percent",
+                     "logBase" : 1
+                  },
+                  {
+                     "max" : null,
+                     "decimals" : null,
+                     "format" : "short",
+                     "logBase" : 1,
+                     "show" : true,
+                     "label" : null,
+                     "min" : 0
+                  }
+               ],
+               "span" : 6,
+               "type" : "graph",
+               "hideTimeOverride" : false,
+               "steppedLine" : false,
+               "seriesOverrides" : [
+                  {
+                     "alias" : "CPU utilization",
+                     "bars" : false,
+                     "color" : "#7EB26D",
+                     "lines" : true
+                  }
+               ],
+               "stack" : false,
+               "datasource" : "cloudwatch",
+               "timeShift" : null,
+               "interval" : null,
+               "cacheTimeout" : null,
+               "linewidth" : 2,
+               "pointradius" : 5,
+               "grid" : {
+                  "threshold1" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null
+               },
+               "xaxis" : {
+                  "show" : true
+               },
+               "maxDataPoints" : 100,
+               "percentage" : false
+            },
+            {
+               "span" : 6,
+               "yaxes" : [
+                  {
+                     "decimals" : null,
+                     "max" : null,
+                     "min" : 0,
+                     "show" : true,
+                     "label" : null,
+                     "logBase" : 1,
+                     "format" : "percent"
+                  },
+                  {
+                     "show" : true,
+                     "min" : 0,
+                     "label" : null,
+                     "format" : "short",
+                     "logBase" : 1,
+                     "decimals" : null,
+                     "max" : null
+                  }
+               ],
+               "transparent" : true,
+               "repeat" : null,
+               "timeFrom" : null,
+               "title" : "JVM memory pressure",
+               "tooltip" : {
+                  "value_type" : "cumulative",
+                  "msResolution" : true,
+                  "shared" : true,
+                  "sort" : 0
+               },
+               "percentage" : false,
+               "maxDataPoints" : 100,
+               "xaxis" : {
+                  "show" : true
+               },
+               "grid" : {
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1" : null,
+                  "threshold2" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)"
+               },
+               "pointradius" : 5,
+               "cacheTimeout" : null,
+               "linewidth" : 2,
+               "datasource" : "cloudwatch",
+               "timeShift" : null,
+               "interval" : null,
+               "seriesOverrides" : [
+                  {
+                     "bars" : false,
+                     "lines" : true,
+                     "color" : "#7EB26D",
+                     "alias" : "JVM memory pressure"
+                  }
+               ],
+               "stack" : false,
+               "steppedLine" : false,
+               "type" : "graph",
+               "hideTimeOverride" : false,
+               "lines" : false,
+               "renderer" : "flot",
+               "targets" : [
+                  {
+                     "expression" : "",
+                     "dimensions" : {
+                        "DomainName" : "es",
+                        "ClientId" : "1234567890"
+                     },
+                     "region" : "default",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "id" : "",
+                     "matchExact" : true,
+                     "period" : "1m",
+                     "alias" : "JVM memory pressure",
+                     "refId" : "A",
+                     "namespace" : "AWS/ES",
+                     "metricName" : "JVMMemoryPressure"
+                  }
+               ],
+               "links" : [],
+               "legend" : {
+                  "rightSide" : false,
+                  "sort" : null,
+                  "sortDesc" : false,
+                  "sideWidth" : null,
+                  "values" : false,
+                  "current" : false,
+                  "show" : true,
+                  "avg" : false,
+                  "hideZero" : false,
+                  "max" : false,
+                  "alignAsTable" : false,
+                  "total" : false,
+                  "hideEmpty" : false,
+                  "min" : false
+               },
+               "isNew" : true,
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "height" : null,
+               "minSpan" : null,
+               "id" : 2,
+               "aliasColors" : {},
+               "bars" : true,
+               "points" : false,
+               "description" : null,
+               "error" : false,
+               "fill" : 1,
+               "nullPointMode" : "connected",
+               "editable" : false
+            }
+         ],
+         "collapse" : false,
+         "title" : "New row",
+         "editable" : false,
+         "height" : "250px",
+         "repeat" : null,
+         "showTitle" : false
+      },
+      {
+         "repeat" : null,
+         "showTitle" : false,
+         "panels" : [
+            {
+               "datasource" : "cloudwatch",
+               "interval" : null,
+               "timeShift" : null,
+               "steppedLine" : false,
+               "stack" : false,
+               "seriesOverrides" : [
+                  {
+                     "lines" : true,
+                     "color" : "#7EB26D",
+                     "bars" : false,
+                     "alias" : "Searchable documents"
+                  },
+                  {
+                     "yaxis" : 2,
+                     "bars" : false,
+                     "color" : "#EF843C",
+                     "lines" : true,
+                     "alias" : "Deleted documents"
+                  }
+               ],
+               "type" : "graph",
+               "hideTimeOverride" : false,
+               "percentage" : false,
+               "grid" : {
+                  "threshold2" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold1" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "pointradius" : 5,
+               "maxDataPoints" : 100,
+               "xaxis" : {
+                  "show" : true
+               },
+               "linewidth" : 2,
+               "cacheTimeout" : null,
+               "title" : "Documents",
+               "tooltip" : {
+                  "sort" : 0,
+                  "shared" : true,
+                  "msResolution" : true,
+                  "value_type" : "cumulative"
+               },
+               "yaxes" : [
+                  {
+                     "logBase" : 1,
+                     "format" : "short",
+                     "min" : 0,
+                     "show" : true,
+                     "label" : null,
+                     "max" : null,
+                     "decimals" : null
+                  },
+                  {
+                     "show" : true,
+                     "label" : null,
+                     "min" : 0,
+                     "logBase" : 1,
+                     "format" : "short",
+                     "decimals" : null,
+                     "max" : null
+                  }
+               ],
+               "span" : 12,
+               "transparent" : true,
+               "timeFrom" : null,
+               "repeat" : null,
+               "nullPointMode" : "connected",
+               "fill" : 1,
+               "editable" : false,
+               "aliasColors" : {},
+               "bars" : true,
+               "points" : false,
+               "description" : null,
+               "error" : false,
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "height" : null,
+               "minSpan" : null,
+               "id" : 3,
+               "lines" : false,
+               "targets" : [
+                  {
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "region" : "default",
+                     "dimensions" : {
+                        "ClientId" : "1234567890",
+                        "DomainName" : "es"
+                     },
+                     "expression" : "",
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "id" : "",
+                     "refId" : "A",
+                     "alias" : "Searchable documents",
+                     "metricName" : "SearchableDocuments",
+                     "namespace" : "AWS/ES"
+                  },
+                  {
+                     "matchExact" : true,
+                     "id" : "",
+                     "period" : "1m",
+                     "region" : "default",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "expression" : "",
+                     "dimensions" : {
+                        "ClientId" : "1234567890",
+                        "DomainName" : "es"
+                     },
+                     "namespace" : "AWS/ES",
+                     "metricName" : "DeletedDocuments",
+                     "refId" : "B",
+                     "alias" : "Deleted documents"
+                  }
+               ],
+               "renderer" : "flot",
+               "legend" : {
+                  "current" : false,
+                  "avg" : false,
+                  "show" : true,
+                  "values" : false,
+                  "sortDesc" : false,
+                  "sideWidth" : null,
+                  "sort" : null,
+                  "rightSide" : false,
+                  "min" : false,
+                  "hideEmpty" : false,
+                  "hideZero" : false,
+                  "total" : false,
+                  "alignAsTable" : false,
+                  "max" : false
+               },
+               "links" : [],
+               "isNew" : true
+            }
+         ],
+         "title" : "New row",
+         "collapse" : false,
+         "editable" : false,
+         "height" : "250px"
+      },
+      {
+         "collapse" : false,
+         "title" : "New row",
+         "panels" : [
+            {
+               "points" : false,
+               "bars" : true,
+               "aliasColors" : {},
+               "error" : false,
+               "description" : null,
+               "fill" : 1,
+               "nullPointMode" : "connected",
+               "editable" : false,
+               "renderer" : "flot",
+               "targets" : [
+                  {
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "id" : "",
+                     "statistics" : [
+                        "Minimum"
+                     ],
+                     "region" : "default",
+                     "expression" : "",
+                     "dimensions" : {
+                        "DomainName" : "es",
+                        "ClientId" : "1234567890"
+                     },
+                     "metricName" : "FreeStorageSpace",
+                     "namespace" : "AWS/ES",
+                     "alias" : "Free storage",
+                     "refId" : "A"
+                  },
+                  {
+                     "dimensions" : {
+                        "DomainName" : "es",
+                        "ClientId" : "1234567890"
+                     },
+                     "expression" : "",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "region" : "default",
+                     "period" : "1m",
+                     "id" : "",
+                     "matchExact" : true,
+                     "refId" : "B",
+                     "alias" : "Used space",
+                     "metricName" : "ClusterUsedSpace",
+                     "namespace" : "AWS/ES"
+                  }
+               ],
+               "lines" : false,
+               "isNew" : true,
+               "links" : [],
+               "legend" : {
+                  "min" : false,
+                  "hideEmpty" : false,
+                  "total" : false,
+                  "alignAsTable" : false,
+                  "max" : false,
+                  "hideZero" : false,
+                  "show" : true,
+                  "avg" : false,
+                  "current" : false,
+                  "values" : false,
+                  "sideWidth" : null,
+                  "sortDesc" : false,
+                  "sort" : null,
+                  "rightSide" : false
+               },
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "minSpan" : null,
+               "id" : 4,
+               "height" : null,
+               "percentage" : false,
+               "cacheTimeout" : null,
+               "linewidth" : 2,
+               "xaxis" : {
+                  "show" : true
+               },
+               "maxDataPoints" : 100,
+               "grid" : {
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null
+               },
+               "pointradius" : 5,
+               "timeShift" : null,
+               "datasource" : "cloudwatch",
+               "interval" : null,
+               "type" : "graph",
+               "hideTimeOverride" : false,
+               "stack" : false,
+               "seriesOverrides" : [
+                  {
+                     "bars" : false,
+                     "lines" : true,
+                     "color" : "#7EB26D",
+                     "alias" : "Free storage"
+                  },
+                  {
+                     "alias" : "Used space",
+                     "bars" : false,
+                     "lines" : true,
+                     "color" : "#EF843C",
+                     "yaxis" : 2
+                  }
+               ],
+               "steppedLine" : false,
+               "yaxes" : [
+                  {
+                     "decimals" : null,
+                     "max" : null,
+                     "show" : true,
+                     "min" : 0,
+                     "label" : null,
+                     "logBase" : 1,
+                     "format" : "decmbytes"
+                  },
+                  {
+                     "label" : null,
+                     "show" : true,
+                     "min" : 0,
+                     "format" : "decmbytes",
+                     "logBase" : 1,
+                     "decimals" : null,
+                     "max" : null
+                  }
+               ],
+               "span" : 12,
+               "repeat" : null,
+               "timeFrom" : null,
+               "transparent" : true,
+               "title" : "Storage",
+               "tooltip" : {
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "msResolution" : true,
+                  "shared" : true
+               }
+            }
+         ],
+         "height" : "250px",
+         "editable" : false,
+         "showTitle" : false,
+         "repeat" : null
+      },
+      {
+         "showTitle" : false,
+         "repeat" : null,
+         "height" : "250px",
+         "editable" : false,
+         "collapse" : false,
+         "title" : "New row",
+         "panels" : [
+            {
+               "fill" : 1,
+               "nullPointMode" : "connected",
+               "editable" : false,
+               "bars" : true,
+               "aliasColors" : {},
+               "points" : false,
+               "description" : null,
+               "error" : false,
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "height" : null,
+               "minSpan" : null,
+               "id" : 5,
+               "lines" : false,
+               "renderer" : "flot",
+               "targets" : [
+                  {
+                     "metricName" : "2xx",
+                     "namespace" : "AWS/ES",
+                     "alias" : "2xx",
+                     "refId" : "A",
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "id" : "",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "region" : "default",
+                     "dimensions" : {
+                        "DomainName" : "es",
+                        "ClientId" : "1234567890"
+                     },
+                     "expression" : ""
+                  },
+                  {
+                     "metricName" : "3xx",
+                     "namespace" : "AWS/ES",
+                     "refId" : "B",
+                     "alias" : "3xx",
+                     "period" : "1m",
+                     "id" : "",
+                     "matchExact" : true,
+                     "expression" : "",
+                     "dimensions" : {
+                        "ClientId" : "1234567890",
+                        "DomainName" : "es"
+                     },
+                     "region" : "default",
+                     "statistics" : [
+                        "Sum"
+                     ]
+                  },
+                  {
+                     "metricName" : "4xx",
+                     "namespace" : "AWS/ES",
+                     "alias" : "4xx",
+                     "refId" : "C",
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "id" : "",
+                     "region" : "default",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "dimensions" : {
+                        "DomainName" : "es",
+                        "ClientId" : "1234567890"
+                     },
+                     "expression" : ""
+                  },
+                  {
+                     "metricName" : "5xx",
+                     "namespace" : "AWS/ES",
+                     "alias" : "5xx",
+                     "refId" : "D",
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "id" : "",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "region" : "default",
+                     "dimensions" : {
+                        "ClientId" : "1234567890",
+                        "DomainName" : "es"
+                     },
+                     "expression" : ""
+                  }
+               ],
+               "links" : [],
+               "legend" : {
+                  "sideWidth" : null,
+                  "sortDesc" : false,
+                  "values" : false,
+                  "show" : true,
+                  "avg" : false,
+                  "current" : false,
+                  "rightSide" : false,
+                  "sort" : null,
+                  "hideEmpty" : false,
+                  "min" : false,
+                  "max" : false,
+                  "alignAsTable" : false,
+                  "total" : false,
+                  "hideZero" : false
+               },
+               "isNew" : true,
+               "timeShift" : null,
+               "datasource" : "cloudwatch",
+               "interval" : null,
+               "seriesOverrides" : [
+                  {
+                     "bars" : false,
+                     "lines" : true,
+                     "color" : "#7EB26D",
+                     "alias" : "2xx"
+                  },
+                  {
+                     "alias" : "3xx",
+                     "bars" : false,
+                     "lines" : true,
+                     "color" : "#EAB839"
+                  },
+                  {
+                     "color" : "#EF843C",
+                     "lines" : true,
+                     "bars" : false,
+                     "alias" : "4xx"
+                  },
+                  {
+                     "alias" : "5xx",
+                     "bars" : false,
+                     "lines" : true,
+                     "color" : "#EF843C"
+                  }
+               ],
+               "stack" : false,
+               "steppedLine" : false,
+               "hideTimeOverride" : false,
+               "type" : "graph",
+               "percentage" : false,
+               "xaxis" : {
+                  "show" : true
+               },
+               "maxDataPoints" : 100,
+               "pointradius" : 5,
+               "grid" : {
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1" : null
+               },
+               "linewidth" : 2,
+               "cacheTimeout" : null,
+               "title" : "Requests",
+               "tooltip" : {
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "shared" : true,
+                  "msResolution" : true
+               },
+               "span" : 12,
+               "yaxes" : [
+                  {
+                     "format" : "short",
+                     "logBase" : 1,
+                     "min" : 0,
+                     "show" : true,
+                     "label" : null,
+                     "max" : null,
+                     "decimals" : null
+                  },
+                  {
+                     "decimals" : null,
+                     "max" : null,
+                     "show" : true,
+                     "min" : 0,
+                     "label" : null,
+                     "logBase" : 1,
+                     "format" : "short"
+                  }
+               ],
+               "transparent" : true,
+               "repeat" : null,
+               "timeFrom" : null
+            }
+         ]
+      },
+      {
+         "height" : "250px",
+         "editable" : false,
+         "collapse" : false,
+         "title" : "New row",
+         "panels" : [
+            {
+               "type" : "graph",
+               "hideTimeOverride" : false,
+               "stack" : false,
+               "seriesOverrides" : [],
+               "steppedLine" : false,
+               "datasource" : "cloudwatch",
+               "interval" : null,
+               "timeShift" : null,
+               "cacheTimeout" : null,
+               "linewidth" : 2,
+               "xaxis" : {
+                  "show" : true
+               },
+               "maxDataPoints" : 100,
+               "pointradius" : 5,
+               "grid" : {
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null,
+                  "threshold1" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "percentage" : false,
+               "tooltip" : {
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "shared" : true,
+                  "msResolution" : true
+               },
+               "title" : "Status RED alerts",
+               "repeat" : null,
+               "timeFrom" : null,
+               "transparent" : true,
+               "yaxes" : [
+                  {
+                     "format" : "short",
+                     "logBase" : 1,
+                     "show" : true,
+                     "min" : 0,
+                     "label" : null,
+                     "max" : null,
+                     "decimals" : null
+                  },
+                  {
+                     "max" : null,
+                     "decimals" : null,
+                     "logBase" : 1,
+                     "format" : "short",
+                     "show" : true,
+                     "min" : 0,
+                     "label" : null
+                  }
+               ],
+               "span" : 3,
+               "editable" : false,
+               "fill" : 1,
+               "nullPointMode" : "connected",
+               "error" : false,
+               "description" : null,
+               "points" : false,
+               "aliasColors" : {},
+               "bars" : true,
+               "id" : 6,
+               "minSpan" : null,
+               "height" : null,
+               "options" : {
+                  "alertThreshold" : true,
+                  "dataLinks" : []
+               },
+               "isNew" : true,
+               "links" : [],
+               "legend" : {
+                  "sortDesc" : false,
+                  "sideWidth" : null,
+                  "values" : false,
+                  "show" : true,
+                  "avg" : false,
+                  "current" : false,
+                  "rightSide" : false,
+                  "sort" : null,
+                  "hideEmpty" : false,
+                  "min" : false,
+                  "alignAsTable" : false,
+                  "max" : false,
+                  "total" : false,
+                  "hideZero" : false
+               },
+               "targets" : [
+                  {
+                     "metricName" : "ClusterStatus.red",
+                     "namespace" : "AWS/ES",
+                     "alias" : "Red status",
+                     "refId" : "A",
+                     "period" : "1m",
+                     "id" : "",
+                     "matchExact" : true,
+                     "expression" : "",
+                     "dimensions" : {
+                        "ClientId" : "1234567890",
+                        "DomainName" : "es"
+                     },
+                     "region" : "default",
+                     "statistics" : [
+                        "Maximum"
+                     ]
+                  }
+               ],
+               "renderer" : "flot",
+               "lines" : false
+            },
+            {
+               "title" : "Elasticsearch node alerts",
+               "tooltip" : {
+                  "msResolution" : true,
+                  "shared" : true,
+                  "sort" : 0,
+                  "value_type" : "cumulative"
+               },
+               "yaxes" : [
+                  {
+                     "max" : null,
+                     "decimals" : null,
+                     "format" : "short",
+                     "logBase" : 1,
+                     "label" : null,
+                     "show" : true,
+                     "min" : 0
+                  },
+                  {
+                     "decimals" : null,
+                     "max" : null,
+                     "show" : true,
+                     "label" : null,
+                     "min" : 0,
+                     "logBase" : 1,
+                     "format" : "short"
+                  }
+               ],
+               "span" : 3,
+               "timeFrom" : null,
+               "repeat" : null,
+               "transparent" : true,
+               "datasource" : "cloudwatch",
+               "interval" : null,
+               "timeShift" : null,
+               "type" : "graph",
+               "hideTimeOverride" : false,
+               "steppedLine" : false,
+               "stack" : false,
+               "seriesOverrides" : [],
+               "percentage" : false,
+               "cacheTimeout" : null,
+               "linewidth" : 2,
+               "pointradius" : 5,
+               "grid" : {
+                  "threshold2" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold1" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "xaxis" : {
+                  "show" : true
+               },
+               "maxDataPoints" : 100,
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "id" : 7,
+               "minSpan" : null,
+               "height" : null,
+               "targets" : [
+                  {
+                     "id" : "",
+                     "matchExact" : true,
+                     "period" : "1m",
+                     "dimensions" : {
+                        "ClientId" : "1234567890",
+                        "DomainName" : "es"
+                     },
+                     "expression" : "",
+                     "region" : "default",
+                     "statistics" : [
+                        "Minimum"
+                     ],
+                     "namespace" : "AWS/ES",
+                     "metricName" : "Nodes",
+                     "alias" : "Minimum number of nodes",
+                     "refId" : "A"
+                  },
+                  {
+                     "refId" : "B",
+                     "alias" : "Maximum number of nodes",
+                     "namespace" : "AWS/ES",
+                     "metricName" : "Nodes",
+                     "expression" : "",
+                     "dimensions" : {
+                        "DomainName" : "es",
+                        "ClientId" : "1234567890"
+                     },
+                     "region" : "default",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "id" : "",
+                     "matchExact" : true,
+                     "period" : "1m"
+                  }
+               ],
+               "renderer" : "flot",
+               "lines" : true,
+               "isNew" : true,
+               "legend" : {
+                  "total" : false,
+                  "alignAsTable" : false,
+                  "max" : false,
+                  "hideZero" : false,
+                  "hideEmpty" : false,
+                  "min" : false,
+                  "rightSide" : false,
+                  "sort" : null,
+                  "values" : false,
+                  "sideWidth" : null,
+                  "sortDesc" : false,
+                  "show" : true,
+                  "avg" : false,
+                  "current" : false
+               },
+               "links" : [],
+               "nullPointMode" : "connected",
+               "fill" : 1,
+               "editable" : false,
+               "points" : false,
+               "bars" : false,
+               "aliasColors" : {},
+               "error" : false,
+               "description" : null
+            },
+            {
+               "editable" : false,
+               "fill" : 1,
+               "nullPointMode" : "connected",
+               "description" : null,
+               "error" : false,
+               "aliasColors" : {},
+               "bars" : false,
+               "points" : false,
+               "height" : null,
+               "minSpan" : null,
+               "id" : 8,
+               "options" : {
+                  "alertThreshold" : true,
+                  "dataLinks" : []
+               },
+               "links" : [],
+               "legend" : {
+                  "values" : false,
+                  "sideWidth" : null,
+                  "sortDesc" : false,
+                  "current" : false,
+                  "show" : true,
+                  "avg" : false,
+                  "rightSide" : false,
+                  "sort" : null,
+                  "hideEmpty" : false,
+                  "min" : false,
+                  "hideZero" : false,
+                  "total" : false,
+                  "alignAsTable" : false,
+                  "max" : false
+               },
+               "isNew" : true,
+               "lines" : true,
+               "renderer" : "flot",
+               "targets" : [
+                  {
+                     "region" : "default",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "expression" : "",
+                     "dimensions" : {
+                        "ClientId" : "1234567890",
+                        "DomainName" : "es"
+                     },
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "id" : "",
+                     "alias" : "Writes blocked",
+                     "refId" : "A",
+                     "metricName" : "ClusterIndexWritesBlocked",
+                     "namespace" : "AWS/ES"
+                  }
+               ],
+               "seriesOverrides" : [],
+               "stack" : false,
+               "steppedLine" : false,
+               "hideTimeOverride" : false,
+               "type" : "graph",
+               "interval" : null,
+               "timeShift" : null,
+               "datasource" : "cloudwatch",
+               "xaxis" : {
+                  "show" : true
+               },
+               "maxDataPoints" : 100,
+               "grid" : {
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1" : null
+               },
+               "pointradius" : 5,
+               "linewidth" : 2,
+               "cacheTimeout" : null,
+               "percentage" : false,
+               "tooltip" : {
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "msResolution" : true,
+                  "shared" : true
+               },
+               "title" : "Elasticsearch write blocked alerts",
+               "transparent" : true,
+               "repeat" : null,
+               "timeFrom" : null,
+               "span" : 3,
+               "yaxes" : [
+                  {
+                     "min" : 0,
+                     "show" : true,
+                     "label" : null,
+                     "logBase" : 1,
+                     "format" : "short",
+                     "decimals" : null,
+                     "max" : null
+                  },
+                  {
+                     "min" : 0,
+                     "show" : true,
+                     "label" : null,
+                     "logBase" : 1,
+                     "format" : "short",
+                     "decimals" : null,
+                     "max" : null
+                  }
+               ]
+            },
+            {
+               "nullPointMode" : "connected",
+               "fill" : 1,
+               "editable" : false,
+               "aliasColors" : {},
+               "bars" : false,
+               "points" : false,
+               "description" : null,
+               "error" : false,
+               "options" : {
+                  "alertThreshold" : true,
+                  "dataLinks" : []
+               },
+               "height" : null,
+               "minSpan" : null,
+               "id" : 9,
+               "lines" : true,
+               "targets" : [
+                  {
+                     "namespace" : "AWS/ES",
+                     "metricName" : "AutomatedSnapshotFailure",
+                     "alias" : "Automated snapshot failure",
+                     "refId" : "A",
+                     "id" : "",
+                     "matchExact" : true,
+                     "period" : "1m",
+                     "expression" : "",
+                     "dimensions" : {
+                        "ClientId" : "1234567890",
+                        "DomainName" : "es"
+                     },
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "region" : "default"
+                  }
+               ],
+               "renderer" : "flot",
+               "legend" : {
+                  "rightSide" : false,
+                  "sort" : null,
+                  "sortDesc" : false,
+                  "sideWidth" : null,
+                  "values" : false,
+                  "current" : false,
+                  "avg" : false,
+                  "show" : true,
+                  "hideZero" : false,
+                  "alignAsTable" : false,
+                  "max" : false,
+                  "total" : false,
+                  "hideEmpty" : false,
+                  "min" : false
+               },
+               "links" : [],
+               "isNew" : true,
+               "timeShift" : null,
+               "interval" : null,
+               "datasource" : "cloudwatch",
+               "steppedLine" : false,
+               "stack" : false,
+               "seriesOverrides" : [],
+               "type" : "graph",
+               "hideTimeOverride" : false,
+               "percentage" : false,
+               "pointradius" : 5,
+               "grid" : {
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null,
+                  "threshold1" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "xaxis" : {
+                  "show" : true
+               },
+               "maxDataPoints" : 100,
+               "linewidth" : 2,
+               "cacheTimeout" : null,
+               "title" : "Elasticsearch automated snapshot failure alerts",
+               "tooltip" : {
+                  "sort" : 0,
+                  "msResolution" : true,
+                  "shared" : true,
+                  "value_type" : "cumulative"
+               },
+               "span" : 3,
+               "yaxes" : [
+                  {
+                     "max" : null,
+                     "decimals" : null,
+                     "logBase" : 1,
+                     "format" : "short",
+                     "show" : true,
+                     "label" : null,
+                     "min" : 0
+                  },
+                  {
+                     "format" : "short",
+                     "logBase" : 1,
+                     "label" : null,
+                     "show" : true,
+                     "min" : 0,
+                     "max" : null,
+                     "decimals" : null
+                  }
+               ],
+               "transparent" : true,
+               "timeFrom" : null,
+               "repeat" : null
+            }
+         ],
+         "showTitle" : false,
+         "repeat" : null
+      }
+   ],
+   "time" : {
+      "from" : "now-1h",
+      "to" : "now"
+   },
+   "refresh" : "10s",
+   "__inputs" : [],
+   "annotations" : {
+      "list" : [
+         {
+            "type" : "tags",
+            "iconColor" : "#7EB26D",
+            "datasource" : "influxdb",
+            "limit" : 100,
+            "hide" : false,
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='0') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "name" : "Show Deployments in Graphs (green dashed line)",
+            "tags" : [],
+            "enable" : true,
+            "showIn" : 0
+         },
+         {
+            "type" : "tags Deployments in Graphs",
+            "hide" : false,
+            "limit" : 100,
+            "datasource" : "influxdb",
+            "iconColor" : "#E24D42",
+            "tags" : [],
+            "enable" : false,
+            "name" : "Show Failed Deployments in Graphs (red dashed line)",
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='2') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "showIn" : 0
+         },
+         {
+            "hide" : false,
+            "limit" : 100,
+            "iconColor" : "#EF843C",
+            "datasource" : "influxdb",
+            "type" : "tags",
+            "showIn" : 0,
+            "enable" : false,
+            "tags" : [],
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='1') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "name" : "Show Aborted Deployments in Graphs (orange dashed line)"
+         }
+      ]
+   },
+   "editable" : false,
+   "schemaVersion" : 12,
+   "description" : "",
+   "version" : 0,
+   "hideControls" : false,
+   "templating" : {
+      "list" : [
+         {
+            "options" : [],
+            "tagValuesQuery" : null,
+            "allValue" : "",
+            "hide" : 2,
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE $timeFilter",
+            "name" : "release",
+            "regex" : null,
+            "useTags" : false,
+            "type" : "query",
+            "refresh" : 2,
+            "multi" : true,
+            "datasource" : "influxdb",
+            "includeAll" : true,
+            "sort" : 1,
+            "tagsQuery" : null,
+            "current" : {
+               "tags" : [],
+               "text" : null,
+               "value" : null
+            },
+            "label" : "Filter by Branch/Release"
+         }
+      ]
+   },
+   "title" : "Elasticsearch: es",
+   "uid" : null,
+   "sharedCrosshair" : true,
+   "id" : null,
+   "timepicker" : {
+      "time_options" : [
+         "5m",
+         "15m",
+         "1h",
+         "6h",
+         "12h",
+         "24h",
+         "2d",
+         "7d",
+         "30d"
+      ],
+      "refresh_intervals" : [
+         "5s",
+         "10s",
+         "30s",
+         "1m",
+         "5m",
+         "15m",
+         "30m",
+         "1h",
+         "2h",
+         "1d"
+      ],
+      "hidden" : false
+   },
+   "tags" : [
+      "elasticsearch",
+      "prod"
+   ],
+   "style" : "dark",
+   "links" : [
+      {
+         "url" : "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains-cloudwatchmetrics.html",
+         "targetBlank" : true,
+         "title" : "Documentation"
+      }
+   ],
+   "timezone" : "",
+   "gnetId" : null
+}

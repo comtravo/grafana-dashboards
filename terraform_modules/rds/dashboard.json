@@ -1,0 +1,1229 @@
+{
+   "tags" : [
+      "prod",
+      "mysql",
+      "rds",
+      "database"
+   ],
+   "links" : [
+      {
+         "title" : "Link to Documentation",
+         "targetBlank" : true,
+         "url" : "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MonitoringOverview.html"
+      }
+   ],
+   "gnetId" : null,
+   "timepicker" : {
+      "hidden" : false,
+      "refresh_intervals" : [
+         "5s",
+         "10s",
+         "30s",
+         "1m",
+         "5m",
+         "15m",
+         "30m",
+         "1h",
+         "2h",
+         "1d"
+      ],
+      "time_options" : [
+         "5m",
+         "15m",
+         "1h",
+         "6h",
+         "12h",
+         "24h",
+         "2d",
+         "7d",
+         "30d"
+      ]
+   },
+   "style" : "dark",
+   "rows" : [
+      {
+         "panels" : [
+            {
+               "type" : "graph",
+               "minSpan" : null,
+               "isNew" : true,
+               "timeShift" : null,
+               "grid" : {
+                  "threshold1" : null,
+                  "threshold2" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "height" : null,
+               "datasource" : "cloudwatch",
+               "tooltip" : {
+                  "value_type" : "cumulative",
+                  "shared" : true,
+                  "msResolution" : true,
+                  "sort" : 0
+               },
+               "title" : "CPU utilization",
+               "editable" : false,
+               "stack" : false,
+               "seriesOverrides" : [
+                  {
+                     "color" : "#C8F2C2",
+                     "lines" : false,
+                     "alias" : "min"
+                  },
+                  {
+                     "fill" : 0,
+                     "alias" : "mean",
+                     "color" : "#FADE2A"
+                  },
+                  {
+                     "alias" : "max",
+                     "lines" : false,
+                     "fillBelowTo" : "min",
+                     "color" : "rgb(77, 159, 179)"
+                  }
+               ],
+               "hideTimeOverride" : false,
+               "bars" : false,
+               "cacheTimeout" : null,
+               "legend" : {
+                  "sortDesc" : false,
+                  "current" : false,
+                  "hideEmpty" : false,
+                  "sort" : null,
+                  "sideWidth" : null,
+                  "max" : false,
+                  "rightSide" : false,
+                  "total" : false,
+                  "hideZero" : false,
+                  "min" : false,
+                  "alignAsTable" : false,
+                  "avg" : false,
+                  "values" : false,
+                  "show" : true
+               },
+               "error" : false,
+               "maxDataPoints" : 100,
+               "pointradius" : 5,
+               "transparent" : true,
+               "timeFrom" : null,
+               "span" : 6,
+               "description" : null,
+               "targets" : [
+                  {
+                     "metricName" : "CPUUtilization",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "id" : "",
+                     "refId" : "A",
+                     "region" : "default",
+                     "matchExact" : true,
+                     "alias" : "max",
+                     "period" : "1m",
+                     "expression" : "",
+                     "namespace" : "AWS/RDS",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     }
+                  },
+                  {
+                     "period" : "1m",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "namespace" : "AWS/RDS",
+                     "expression" : "",
+                     "metricName" : "CPUUtilization",
+                     "statistics" : [
+                        "Average"
+                     ],
+                     "refId" : "B",
+                     "id" : "",
+                     "region" : "default",
+                     "matchExact" : true,
+                     "alias" : "mean"
+                  },
+                  {
+                     "namespace" : "AWS/RDS",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "expression" : "",
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "region" : "default",
+                     "alias" : "min",
+                     "metricName" : "CPUUtilization",
+                     "statistics" : [
+                        "Minimum"
+                     ],
+                     "id" : "",
+                     "refId" : "C"
+                  }
+               ],
+               "repeat" : null,
+               "nullPointMode" : "connected",
+               "interval" : null,
+               "id" : 1,
+               "renderer" : "flot",
+               "options" : {
+                  "alertThreshold" : true,
+                  "dataLinks" : []
+               },
+               "steppedLine" : false,
+               "aliasColors" : {},
+               "xaxis" : {
+                  "show" : true
+               },
+               "yaxes" : [
+                  {
+                     "max" : null,
+                     "label" : null,
+                     "show" : true,
+                     "min" : 0,
+                     "decimals" : null,
+                     "logBase" : 1,
+                     "format" : "percent"
+                  },
+                  {
+                     "format" : "short",
+                     "logBase" : 1,
+                     "decimals" : null,
+                     "min" : 0,
+                     "show" : true,
+                     "label" : null,
+                     "max" : null
+                  }
+               ],
+               "fill" : 1,
+               "links" : [],
+               "percentage" : false,
+               "points" : false,
+               "lines" : true,
+               "linewidth" : 2
+            },
+            {
+               "xaxis" : {
+                  "show" : true
+               },
+               "links" : [],
+               "yaxes" : [
+                  {
+                     "max" : null,
+                     "label" : null,
+                     "show" : true,
+                     "min" : 0,
+                     "decimals" : null,
+                     "logBase" : 1,
+                     "format" : "percent"
+                  },
+                  {
+                     "show" : true,
+                     "label" : null,
+                     "max" : null,
+                     "format" : "short",
+                     "decimals" : null,
+                     "logBase" : 1,
+                     "min" : 0
+                  }
+               ],
+               "fill" : 1,
+               "percentage" : false,
+               "points" : false,
+               "lines" : true,
+               "linewidth" : 2,
+               "transparent" : true,
+               "pointradius" : 5,
+               "maxDataPoints" : 100,
+               "timeFrom" : null,
+               "span" : 6,
+               "description" : null,
+               "targets" : [
+                  {
+                     "period" : "1m",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "namespace" : "AWS/RDS",
+                     "expression" : "",
+                     "refId" : "A",
+                     "id" : "",
+                     "metricName" : "BurstBalance",
+                     "statistics" : [
+                        "Minimum"
+                     ],
+                     "matchExact" : true,
+                     "region" : "default",
+                     "alias" : "Burst balance"
+                  }
+               ],
+               "repeat" : null,
+               "nullPointMode" : "connected",
+               "interval" : null,
+               "renderer" : "flot",
+               "id" : 2,
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "steppedLine" : false,
+               "aliasColors" : {},
+               "seriesOverrides" : [],
+               "hideTimeOverride" : false,
+               "bars" : false,
+               "cacheTimeout" : null,
+               "legend" : {
+                  "min" : false,
+                  "alignAsTable" : false,
+                  "total" : false,
+                  "hideZero" : false,
+                  "avg" : false,
+                  "show" : true,
+                  "values" : false,
+                  "hideEmpty" : false,
+                  "sort" : null,
+                  "sortDesc" : false,
+                  "current" : false,
+                  "max" : false,
+                  "rightSide" : false,
+                  "sideWidth" : null
+               },
+               "error" : false,
+               "type" : "graph",
+               "minSpan" : null,
+               "isNew" : true,
+               "timeShift" : null,
+               "grid" : {
+                  "threshold1" : null,
+                  "threshold2" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "height" : null,
+               "datasource" : "cloudwatch",
+               "title" : "Burst Balance",
+               "tooltip" : {
+                  "sort" : 0,
+                  "msResolution" : true,
+                  "shared" : true,
+                  "value_type" : "cumulative"
+               },
+               "editable" : false,
+               "stack" : false
+            }
+         ],
+         "collapse" : false,
+         "title" : "New row",
+         "editable" : true,
+         "height" : "250px",
+         "showTitle" : false,
+         "repeat" : null
+      },
+      {
+         "title" : "New row",
+         "editable" : true,
+         "height" : "250px",
+         "showTitle" : false,
+         "repeat" : null,
+         "panels" : [
+            {
+               "timeFrom" : null,
+               "pointradius" : 5,
+               "transparent" : true,
+               "maxDataPoints" : 100,
+               "description" : null,
+               "span" : 4,
+               "targets" : [
+                  {
+                     "expression" : "",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "namespace" : "AWS/RDS",
+                     "period" : "1m",
+                     "region" : "default",
+                     "matchExact" : true,
+                     "alias" : "max",
+                     "id" : "",
+                     "refId" : "A",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "metricName" : "DatabaseConnections"
+                  },
+                  {
+                     "expression" : "",
+                     "namespace" : "AWS/RDS",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "period" : "1m",
+                     "region" : "default",
+                     "matchExact" : true,
+                     "alias" : "mean",
+                     "refId" : "B",
+                     "id" : "",
+                     "metricName" : "DatabaseConnections",
+                     "statistics" : [
+                        "Average"
+                     ]
+                  },
+                  {
+                     "period" : "1m",
+                     "namespace" : "AWS/RDS",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "expression" : "",
+                     "id" : "",
+                     "refId" : "C",
+                     "metricName" : "DatabaseConnections",
+                     "statistics" : [
+                        "Minimum"
+                     ],
+                     "matchExact" : true,
+                     "region" : "default",
+                     "alias" : "min"
+                  }
+               ],
+               "repeat" : null,
+               "nullPointMode" : "connected",
+               "renderer" : "flot",
+               "id" : 3,
+               "interval" : null,
+               "options" : {
+                  "alertThreshold" : true,
+                  "dataLinks" : []
+               },
+               "aliasColors" : {},
+               "steppedLine" : false,
+               "xaxis" : {
+                  "show" : true
+               },
+               "yaxes" : [
+                  {
+                     "min" : 0,
+                     "logBase" : 1,
+                     "decimals" : null,
+                     "format" : "short",
+                     "max" : null,
+                     "label" : null,
+                     "show" : true
+                  },
+                  {
+                     "decimals" : null,
+                     "logBase" : 1,
+                     "min" : 0,
+                     "format" : "short",
+                     "label" : null,
+                     "max" : null,
+                     "show" : true
+                  }
+               ],
+               "fill" : 1,
+               "links" : [],
+               "percentage" : false,
+               "points" : false,
+               "linewidth" : 2,
+               "lines" : true,
+               "isNew" : true,
+               "minSpan" : null,
+               "type" : "graph",
+               "height" : null,
+               "grid" : {
+                  "threshold1" : null,
+                  "threshold2" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "timeShift" : null,
+               "datasource" : "cloudwatch",
+               "editable" : false,
+               "tooltip" : {
+                  "msResolution" : true,
+                  "sort" : 0,
+                  "value_type" : "cumulative",
+                  "shared" : true
+               },
+               "title" : "Database connections",
+               "stack" : false,
+               "seriesOverrides" : [
+                  {
+                     "color" : "#C8F2C2",
+                     "alias" : "min",
+                     "lines" : false
+                  },
+                  {
+                     "color" : "#FADE2A",
+                     "alias" : "mean",
+                     "fill" : 0
+                  },
+                  {
+                     "fillBelowTo" : "min",
+                     "lines" : false,
+                     "alias" : "max",
+                     "color" : "rgb(77, 159, 179)"
+                  }
+               ],
+               "hideTimeOverride" : false,
+               "bars" : false,
+               "cacheTimeout" : null,
+               "legend" : {
+                  "sideWidth" : null,
+                  "max" : false,
+                  "rightSide" : false,
+                  "sortDesc" : false,
+                  "current" : false,
+                  "hideEmpty" : false,
+                  "sort" : null,
+                  "avg" : false,
+                  "show" : true,
+                  "values" : false,
+                  "total" : false,
+                  "hideZero" : false,
+                  "min" : false,
+                  "alignAsTable" : false
+               },
+               "error" : false
+            },
+            {
+               "hideTimeOverride" : false,
+               "seriesOverrides" : [],
+               "bars" : false,
+               "cacheTimeout" : null,
+               "error" : false,
+               "legend" : {
+                  "hideZero" : false,
+                  "total" : false,
+                  "alignAsTable" : false,
+                  "min" : false,
+                  "values" : false,
+                  "show" : true,
+                  "avg" : false,
+                  "current" : false,
+                  "sortDesc" : false,
+                  "hideEmpty" : false,
+                  "sort" : null,
+                  "sideWidth" : null,
+                  "rightSide" : false,
+                  "max" : false
+               },
+               "type" : "graph",
+               "minSpan" : null,
+               "isNew" : true,
+               "datasource" : "cloudwatch",
+               "timeShift" : null,
+               "height" : null,
+               "grid" : {
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null,
+                  "threshold1" : null
+               },
+               "stack" : false,
+               "title" : "Memory",
+               "tooltip" : {
+                  "msResolution" : true,
+                  "sort" : 0,
+                  "value_type" : "cumulative",
+                  "shared" : true
+               },
+               "editable" : false,
+               "xaxis" : {
+                  "show" : true
+               },
+               "percentage" : false,
+               "yaxes" : [
+                  {
+                     "format" : "decbytes",
+                     "logBase" : 1,
+                     "decimals" : null,
+                     "min" : 0,
+                     "show" : true,
+                     "label" : null,
+                     "max" : null
+                  },
+                  {
+                     "format" : "short",
+                     "min" : 0,
+                     "decimals" : null,
+                     "logBase" : 1,
+                     "show" : true,
+                     "max" : null,
+                     "label" : null
+                  }
+               ],
+               "links" : [],
+               "fill" : 1,
+               "points" : false,
+               "lines" : true,
+               "linewidth" : 2,
+               "span" : 4,
+               "description" : null,
+               "transparent" : true,
+               "pointradius" : 5,
+               "maxDataPoints" : 100,
+               "timeFrom" : null,
+               "repeat" : null,
+               "targets" : [
+                  {
+                     "alias" : "Freeable memory",
+                     "region" : "default",
+                     "matchExact" : true,
+                     "statistics" : [
+                        "Minimum"
+                     ],
+                     "metricName" : "FreeableMemory",
+                     "refId" : "A",
+                     "id" : "",
+                     "namespace" : "AWS/RDS",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "expression" : "",
+                     "period" : "1m"
+                  },
+                  {
+                     "expression" : "",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "namespace" : "AWS/RDS",
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "region" : "default",
+                     "alias" : "Swap memory",
+                     "metricName" : "SwapUsage",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "refId" : "B",
+                     "id" : ""
+                  }
+               ],
+               "interval" : null,
+               "id" : 4,
+               "renderer" : "flot",
+               "nullPointMode" : "connected",
+               "steppedLine" : false,
+               "aliasColors" : {},
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               }
+            },
+            {
+               "height" : null,
+               "grid" : {
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1" : null,
+                  "threshold2" : null
+               },
+               "timeShift" : null,
+               "datasource" : "cloudwatch",
+               "isNew" : true,
+               "minSpan" : null,
+               "type" : "graph",
+               "editable" : false,
+               "title" : "Free storage",
+               "tooltip" : {
+                  "shared" : true,
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "msResolution" : true
+               },
+               "stack" : false,
+               "bars" : false,
+               "seriesOverrides" : [],
+               "hideTimeOverride" : false,
+               "legend" : {
+                  "total" : false,
+                  "hideZero" : false,
+                  "min" : false,
+                  "alignAsTable" : false,
+                  "avg" : false,
+                  "values" : false,
+                  "show" : true,
+                  "sortDesc" : false,
+                  "current" : false,
+                  "hideEmpty" : false,
+                  "sort" : null,
+                  "sideWidth" : null,
+                  "max" : false,
+                  "rightSide" : false
+               },
+               "error" : false,
+               "cacheTimeout" : null,
+               "targets" : [
+                  {
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "namespace" : "AWS/RDS",
+                     "expression" : "",
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "region" : "default",
+                     "alias" : "Free storage",
+                     "statistics" : [
+                        "Minimum"
+                     ],
+                     "metricName" : "FreeStorageSpace",
+                     "refId" : "A",
+                     "id" : ""
+                  }
+               ],
+               "repeat" : null,
+               "timeFrom" : null,
+               "transparent" : true,
+               "pointradius" : 5,
+               "maxDataPoints" : 100,
+               "description" : null,
+               "span" : 4,
+               "options" : {
+                  "alertThreshold" : true,
+                  "dataLinks" : []
+               },
+               "aliasColors" : {},
+               "steppedLine" : false,
+               "nullPointMode" : "connected",
+               "id" : 5,
+               "renderer" : "flot",
+               "interval" : null,
+               "yaxes" : [
+                  {
+                     "show" : true,
+                     "label" : null,
+                     "max" : null,
+                     "format" : "decbytes",
+                     "logBase" : 1,
+                     "decimals" : null,
+                     "min" : 0
+                  },
+                  {
+                     "label" : null,
+                     "max" : null,
+                     "show" : true,
+                     "logBase" : 1,
+                     "decimals" : null,
+                     "min" : 0,
+                     "format" : "short"
+                  }
+               ],
+               "fill" : 1,
+               "links" : [],
+               "percentage" : false,
+               "xaxis" : {
+                  "show" : true
+               },
+               "linewidth" : 2,
+               "lines" : true,
+               "points" : false
+            }
+         ],
+         "collapse" : false
+      },
+      {
+         "repeat" : null,
+         "showTitle" : false,
+         "height" : "250px",
+         "editable" : true,
+         "title" : "New row",
+         "collapse" : false,
+         "panels" : [
+            {
+               "bars" : false,
+               "hideTimeOverride" : false,
+               "seriesOverrides" : [],
+               "error" : false,
+               "legend" : {
+                  "avg" : false,
+                  "show" : true,
+                  "values" : false,
+                  "total" : false,
+                  "hideZero" : false,
+                  "min" : false,
+                  "alignAsTable" : false,
+                  "sideWidth" : null,
+                  "max" : false,
+                  "rightSide" : false,
+                  "sortDesc" : false,
+                  "current" : false,
+                  "sort" : null,
+                  "hideEmpty" : false
+               },
+               "cacheTimeout" : null,
+               "datasource" : "cloudwatch",
+               "grid" : {
+                  "threshold1" : null,
+                  "threshold2" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "height" : null,
+               "timeShift" : null,
+               "isNew" : true,
+               "minSpan" : null,
+               "type" : "graph",
+               "stack" : false,
+               "editable" : false,
+               "title" : "Disk latency",
+               "tooltip" : {
+                  "shared" : true,
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "msResolution" : true
+               },
+               "percentage" : false,
+               "fill" : 1,
+               "yaxes" : [
+                  {
+                     "format" : "s",
+                     "logBase" : 1,
+                     "decimals" : null,
+                     "min" : 0,
+                     "show" : true,
+                     "label" : null,
+                     "max" : null
+                  },
+                  {
+                     "min" : 0,
+                     "logBase" : 1,
+                     "decimals" : null,
+                     "format" : "short",
+                     "max" : null,
+                     "label" : null,
+                     "show" : true
+                  }
+               ],
+               "links" : [],
+               "xaxis" : {
+                  "show" : true
+               },
+               "linewidth" : 2,
+               "lines" : true,
+               "points" : false,
+               "repeat" : null,
+               "targets" : [
+                  {
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "metricName" : "ReadLatency",
+                     "id" : "",
+                     "refId" : "A",
+                     "matchExact" : true,
+                     "region" : "default",
+                     "alias" : "read latency",
+                     "period" : "1m",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "expression" : "",
+                     "namespace" : "AWS/RDS"
+                  },
+                  {
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "metricName" : "WriteLatency",
+                     "refId" : "B",
+                     "id" : "",
+                     "matchExact" : true,
+                     "region" : "default",
+                     "alias" : "write latency",
+                     "period" : "1m",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "expression" : "",
+                     "namespace" : "AWS/RDS"
+                  }
+               ],
+               "description" : null,
+               "span" : 4,
+               "timeFrom" : null,
+               "transparent" : true,
+               "pointradius" : 5,
+               "maxDataPoints" : 100,
+               "aliasColors" : {},
+               "steppedLine" : false,
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : true
+               },
+               "renderer" : "flot",
+               "id" : 6,
+               "interval" : null,
+               "nullPointMode" : "connected"
+            },
+            {
+               "repeat" : null,
+               "targets" : [
+                  {
+                     "period" : "1m",
+                     "namespace" : "AWS/RDS",
+                     "expression" : "",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "metricName" : "WriteIOPS",
+                     "refId" : "A",
+                     "id" : "",
+                     "matchExact" : true,
+                     "region" : "default",
+                     "alias" : "write iops"
+                  },
+                  {
+                     "expression" : "",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "namespace" : "AWS/RDS",
+                     "period" : "1m",
+                     "alias" : "read iops",
+                     "region" : "default",
+                     "matchExact" : true,
+                     "id" : "",
+                     "refId" : "B",
+                     "metricName" : "ReadIOPS",
+                     "statistics" : [
+                        "Maximum"
+                     ]
+                  },
+                  {
+                     "expression" : "",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "namespace" : "AWS/RDS",
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "region" : "default",
+                     "alias" : "disk queue depth",
+                     "id" : "",
+                     "refId" : "C",
+                     "metricName" : "DiskQueueDepth",
+                     "statistics" : [
+                        "Maximum"
+                     ]
+                  }
+               ],
+               "span" : 4,
+               "description" : null,
+               "maxDataPoints" : 100,
+               "pointradius" : 5,
+               "transparent" : true,
+               "timeFrom" : null,
+               "steppedLine" : false,
+               "aliasColors" : {},
+               "options" : {
+                  "alertThreshold" : true,
+                  "dataLinks" : []
+               },
+               "interval" : null,
+               "id" : 7,
+               "renderer" : "flot",
+               "nullPointMode" : "connected",
+               "percentage" : false,
+               "links" : [],
+               "yaxes" : [
+                  {
+                     "max" : null,
+                     "label" : null,
+                     "show" : true,
+                     "min" : null,
+                     "logBase" : 1,
+                     "decimals" : null,
+                     "format" : "short"
+                  },
+                  {
+                     "min" : 0,
+                     "decimals" : null,
+                     "logBase" : 1,
+                     "format" : "short",
+                     "max" : null,
+                     "label" : null,
+                     "show" : true
+                  }
+               ],
+               "fill" : 1,
+               "xaxis" : {
+                  "show" : true
+               },
+               "lines" : true,
+               "linewidth" : 2,
+               "points" : false,
+               "datasource" : "cloudwatch",
+               "timeShift" : null,
+               "grid" : {
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null,
+                  "threshold1" : null
+               },
+               "height" : null,
+               "type" : "graph",
+               "minSpan" : null,
+               "isNew" : true,
+               "stack" : false,
+               "title" : "Disk iops",
+               "tooltip" : {
+                  "value_type" : "cumulative",
+                  "shared" : true,
+                  "msResolution" : true,
+                  "sort" : 0
+               },
+               "editable" : false,
+               "bars" : false,
+               "hideTimeOverride" : false,
+               "seriesOverrides" : [],
+               "error" : false,
+               "legend" : {
+                  "sideWidth" : null,
+                  "max" : false,
+                  "rightSide" : false,
+                  "sortDesc" : false,
+                  "current" : false,
+                  "sort" : null,
+                  "hideEmpty" : false,
+                  "avg" : false,
+                  "show" : true,
+                  "values" : false,
+                  "total" : false,
+                  "hideZero" : false,
+                  "min" : false,
+                  "alignAsTable" : false
+               },
+               "cacheTimeout" : null
+            },
+            {
+               "lines" : true,
+               "linewidth" : 2,
+               "points" : false,
+               "fill" : 1,
+               "yaxes" : [
+                  {
+                     "show" : true,
+                     "max" : null,
+                     "label" : null,
+                     "format" : "Bps",
+                     "min" : null,
+                     "logBase" : 1,
+                     "decimals" : null
+                  },
+                  {
+                     "format" : "short",
+                     "min" : 0,
+                     "decimals" : null,
+                     "logBase" : 1,
+                     "show" : true,
+                     "max" : null,
+                     "label" : null
+                  }
+               ],
+               "links" : [],
+               "percentage" : false,
+               "xaxis" : {
+                  "show" : true
+               },
+               "options" : {
+                  "alertThreshold" : true,
+                  "dataLinks" : []
+               },
+               "steppedLine" : false,
+               "aliasColors" : {},
+               "nullPointMode" : "connected",
+               "interval" : null,
+               "id" : 8,
+               "renderer" : "flot",
+               "targets" : [
+                  {
+                     "id" : "",
+                     "refId" : "A",
+                     "metricName" : "NetworkReceiveThroughput",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "region" : "default",
+                     "matchExact" : true,
+                     "alias" : "RX",
+                     "period" : "1m",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "expression" : "",
+                     "namespace" : "AWS/RDS"
+                  },
+                  {
+                     "matchExact" : true,
+                     "region" : "default",
+                     "alias" : "TX",
+                     "id" : "",
+                     "refId" : "B",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "metricName" : "NetworkTransmitThroughput",
+                     "dimensions" : {
+                        "DBInstanceIdentifier" : "rds-eekM5A"
+                     },
+                     "expression" : "",
+                     "namespace" : "AWS/RDS",
+                     "period" : "1m"
+                  }
+               ],
+               "repeat" : null,
+               "transparent" : true,
+               "pointradius" : 5,
+               "maxDataPoints" : 100,
+               "timeFrom" : null,
+               "span" : 4,
+               "description" : null,
+               "legend" : {
+                  "sideWidth" : null,
+                  "rightSide" : false,
+                  "max" : false,
+                  "current" : false,
+                  "sortDesc" : false,
+                  "hideEmpty" : false,
+                  "sort" : null,
+                  "values" : false,
+                  "show" : true,
+                  "avg" : false,
+                  "hideZero" : false,
+                  "total" : false,
+                  "alignAsTable" : false,
+                  "min" : false
+               },
+               "error" : false,
+               "cacheTimeout" : null,
+               "bars" : false,
+               "seriesOverrides" : [
+                  {
+                     "color" : "#7EB26D",
+                     "transform" : "negative-Y",
+                     "fillGradient" : 10,
+                     "alias" : "TX"
+                  },
+                  {
+                     "fillGradient" : 10,
+                     "alias" : "RX",
+                     "color" : "#EAB839"
+                  }
+               ],
+               "hideTimeOverride" : false,
+               "title" : "Network throughput",
+               "tooltip" : {
+                  "msResolution" : true,
+                  "sort" : 0,
+                  "value_type" : "cumulative",
+                  "shared" : true
+               },
+               "editable" : false,
+               "stack" : false,
+               "timeShift" : null,
+               "height" : null,
+               "grid" : {
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1" : null,
+                  "threshold2" : null
+               },
+               "datasource" : "cloudwatch",
+               "minSpan" : null,
+               "type" : "graph",
+               "isNew" : true
+            }
+         ]
+      }
+   ],
+   "uid" : null,
+   "description" : "",
+   "annotations" : {
+      "list" : [
+         {
+            "enable" : true,
+            "limit" : 100,
+            "showIn" : 0,
+            "name" : "Show Deployments in Graphs (green dashed line)",
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='0') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "tags" : [],
+            "datasource" : "influxdb",
+            "iconColor" : "#7EB26D",
+            "type" : "tags",
+            "hide" : false
+         },
+         {
+            "iconColor" : "#E24D42",
+            "type" : "tags Deployments in Graphs",
+            "hide" : false,
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='2') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "tags" : [],
+            "datasource" : "influxdb",
+            "showIn" : 0,
+            "name" : "Show Failed Deployments in Graphs (red dashed line)",
+            "enable" : false,
+            "limit" : 100
+         },
+         {
+            "tags" : [],
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='1') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "datasource" : "influxdb",
+            "iconColor" : "#EF843C",
+            "type" : "tags",
+            "hide" : false,
+            "enable" : false,
+            "limit" : 100,
+            "showIn" : 0,
+            "name" : "Show Aborted Deployments in Graphs (orange dashed line)"
+         }
+      ]
+   },
+   "__inputs" : [],
+   "time" : {
+      "from" : "now-1h",
+      "to" : "now"
+   },
+   "sharedCrosshair" : true,
+   "refresh" : "10s",
+   "schemaVersion" : 12,
+   "hideControls" : false,
+   "timezone" : "",
+   "id" : null,
+   "version" : 0,
+   "templating" : {
+      "list" : [
+         {
+            "includeAll" : true,
+            "allValue" : "",
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE $timeFilter",
+            "regex" : null,
+            "tagsQuery" : null,
+            "options" : [],
+            "name" : "release",
+            "label" : "Filter by Branch/Release",
+            "current" : {
+               "value" : null,
+               "tags" : [],
+               "text" : null
+            },
+            "multi" : true,
+            "refresh" : 2,
+            "datasource" : "influxdb",
+            "tagValuesQuery" : null,
+            "useTags" : false,
+            "hide" : 2,
+            "sort" : 1,
+            "type" : "query"
+         }
+      ]
+   },
+   "editable" : false,
+   "title" : "RDS: rds-eekM5A"
+}

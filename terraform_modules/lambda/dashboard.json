@@ -1,0 +1,1314 @@
+{
+   "timezone" : "",
+   "title" : "Lambda: lambda-VZak0y",
+   "templating" : {
+      "list" : [
+         {
+            "tagsQuery" : null,
+            "name" : "release",
+            "multi" : true,
+            "options" : [],
+            "useTags" : false,
+            "allValue" : "",
+            "refresh" : 2,
+            "label" : "Filter by Branch/Release",
+            "sort" : 1,
+            "type" : "query",
+            "includeAll" : true,
+            "datasource" : "influxdb",
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE $timeFilter",
+            "regex" : null,
+            "current" : {
+               "value" : null,
+               "tags" : [],
+               "text" : null
+            },
+            "tagValuesQuery" : null,
+            "hide" : 2
+         }
+      ]
+   },
+   "id" : null,
+   "annotations" : {
+      "list" : [
+         {
+            "type" : "tags",
+            "hide" : false,
+            "limit" : 100,
+            "enable" : true,
+            "tags" : [],
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='0') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "datasource" : "influxdb",
+            "showIn" : 0,
+            "name" : "Show Deployments in Graphs (green dashed line)",
+            "iconColor" : "#7EB26D"
+         },
+         {
+            "tags" : [],
+            "type" : "tags Deployments in Graphs",
+            "limit" : 100,
+            "hide" : false,
+            "enable" : false,
+            "name" : "Show Failed Deployments in Graphs (red dashed line)",
+            "iconColor" : "#E24D42",
+            "datasource" : "influxdb",
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='2') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "showIn" : 0
+         },
+         {
+            "tags" : [],
+            "type" : "tags",
+            "enable" : false,
+            "limit" : 100,
+            "hide" : false,
+            "name" : "Show Aborted Deployments in Graphs (orange dashed line)",
+            "iconColor" : "#EF843C",
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='1') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "datasource" : "influxdb",
+            "showIn" : 0
+         }
+      ]
+   },
+   "description" : "",
+   "gnetId" : null,
+   "refresh" : "10s",
+   "time" : {
+      "from" : "now-1h",
+      "to" : "now"
+   },
+   "rows" : [
+      {
+         "collapse" : false,
+         "repeat" : null,
+         "panels" : [
+            {
+               "transparent" : true,
+               "targets" : [
+                  {
+                     "region" : "default",
+                     "namespace" : "AWS/SNS",
+                     "id" : "",
+                     "dimensions" : {
+                        "TopicName" : "topic-1"
+                     },
+                     "matchExact" : true,
+                     "refId" : "B",
+                     "period" : "5m",
+                     "expression" : "",
+                     "alias" : "Published",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "metricName" : "NumberOfMessagesPublished"
+                  },
+                  {
+                     "metricName" : "NumberOfNotificationsDelivered",
+                     "alias" : "Delivered",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "expression" : "",
+                     "period" : "5m",
+                     "refId" : "C",
+                     "matchExact" : true,
+                     "dimensions" : {
+                        "TopicName" : "topic-1"
+                     },
+                     "id" : "",
+                     "namespace" : "AWS/SNS",
+                     "region" : "default"
+                  },
+                  {
+                     "alias" : "Failed",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "metricName" : "NumberOfMessagesFailed",
+                     "expression" : "",
+                     "period" : "5m",
+                     "matchExact" : true,
+                     "refId" : "A",
+                     "dimensions" : {
+                        "TopicName" : "topic-1"
+                     },
+                     "id" : "",
+                     "namespace" : "AWS/SNS",
+                     "region" : "default"
+                  }
+               ],
+               "grid" : {
+                  "threshold1" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null
+               },
+               "cacheTimeout" : null,
+               "pointradius" : 5,
+               "fill" : 1,
+               "interval" : null,
+               "stack" : false,
+               "nullPointMode" : "connected",
+               "editable" : false,
+               "minSpan" : null,
+               "yaxes" : [
+                  {
+                     "min" : 0,
+                     "format" : "short",
+                     "logBase" : 1,
+                     "label" : null,
+                     "show" : true,
+                     "max" : null,
+                     "decimals" : null
+                  },
+                  {
+                     "min" : 0,
+                     "format" : "short",
+                     "logBase" : 1,
+                     "label" : null,
+                     "max" : null,
+                     "show" : true,
+                     "decimals" : null
+                  }
+               ],
+               "type" : "graph",
+               "links" : [],
+               "tooltip" : {
+                  "shared" : true,
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "msResolution" : true
+               },
+               "title" : "SNS: topic-1",
+               "points" : false,
+               "id" : 1,
+               "repeat" : null,
+               "linewidth" : 2,
+               "alert" : {
+                  "frequency" : "2m",
+                  "handler" : 1,
+                  "notifications" : [
+                     {
+                        "uid" : "slack"
+                     }
+                  ],
+                  "conditions" : [
+                     {
+                        "reducer" : {
+                           "type" : "max",
+                           "params" : []
+                        },
+                        "evaluator" : {
+                           "params" : [
+                              0
+                           ],
+                           "type" : "gt"
+                        },
+                        "type" : "query",
+                        "query" : {
+                           "params" : [
+                              "A",
+                              "15m",
+                              "now"
+                           ],
+                           "model" : {
+                              "hide" : false,
+                              "step" : 10,
+                              "legendFormat" : "",
+                              "metric" : "",
+                              "interval" : "",
+                              "refId" : "A",
+                              "intervalFactor" : 2,
+                              "target" : "",
+                              "expr" : "",
+                              "instant" : false,
+                              "datasource" : "",
+                              "format" : "time_series"
+                           }
+                        },
+                        "operator" : {
+                           "type" : "or"
+                        }
+                     }
+                  ],
+                  "executionErrorState" : "alerting",
+                  "noDataState" : "no_data",
+                  "name" : "topic-1 alerts",
+                  "for" : "2m",
+                  "message" : "topic-1 seems to have no subscriptions or failed deliveries"
+               },
+               "maxDataPoints" : 100,
+               "renderer" : "flot",
+               "timeFrom" : null,
+               "legend" : {
+                  "sort" : null,
+                  "rightSide" : false,
+                  "max" : false,
+                  "current" : false,
+                  "show" : true,
+                  "sortDesc" : false,
+                  "values" : false,
+                  "sideWidth" : null,
+                  "alignAsTable" : false,
+                  "total" : false,
+                  "avg" : false,
+                  "hideZero" : false,
+                  "hideEmpty" : false,
+                  "min" : false
+               },
+               "datasource" : "cloudwatch",
+               "hideTimeOverride" : false,
+               "percentage" : false,
+               "xaxis" : {
+                  "show" : true
+               },
+               "timeShift" : null,
+               "steppedLine" : false,
+               "aliasColors" : {},
+               "error" : false,
+               "lines" : false,
+               "isNew" : true,
+               "seriesOverrides" : [
+                  {
+                     "color" : "#E24D42",
+                     "yaxis" : 2,
+                     "alias" : "Failed"
+                  },
+                  {
+                     "zindex" : 1,
+                     "alias" : "Published"
+                  }
+               ],
+               "options" : {
+                  "alertThreshold" : false,
+                  "dataLinks" : []
+               },
+               "description" : null,
+               "bars" : true,
+               "span" : 4,
+               "height" : null
+            },
+            {
+               "editable" : false,
+               "stack" : false,
+               "nullPointMode" : "connected",
+               "fill" : 1,
+               "pointradius" : 5,
+               "interval" : null,
+               "transparent" : true,
+               "targets" : [
+                  {
+                     "dimensions" : {
+                        "TopicName" : "topic-2"
+                     },
+                     "region" : "default",
+                     "namespace" : "AWS/SNS",
+                     "id" : "",
+                     "matchExact" : true,
+                     "refId" : "B",
+                     "expression" : "",
+                     "period" : "5m",
+                     "alias" : "Published",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "metricName" : "NumberOfMessagesPublished"
+                  },
+                  {
+                     "expression" : "",
+                     "period" : "5m",
+                     "alias" : "Delivered",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "metricName" : "NumberOfNotificationsDelivered",
+                     "dimensions" : {
+                        "TopicName" : "topic-2"
+                     },
+                     "region" : "default",
+                     "namespace" : "AWS/SNS",
+                     "id" : "",
+                     "matchExact" : true,
+                     "refId" : "C"
+                  },
+                  {
+                     "period" : "5m",
+                     "expression" : "",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "alias" : "Failed",
+                     "metricName" : "NumberOfMessagesFailed",
+                     "region" : "default",
+                     "namespace" : "AWS/SNS",
+                     "id" : "",
+                     "dimensions" : {
+                        "TopicName" : "topic-2"
+                     },
+                     "matchExact" : true,
+                     "refId" : "A"
+                  }
+               ],
+               "cacheTimeout" : null,
+               "grid" : {
+                  "threshold2" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1" : null
+               },
+               "id" : 2,
+               "title" : "SNS: topic-2",
+               "points" : false,
+               "links" : [],
+               "tooltip" : {
+                  "value_type" : "cumulative",
+                  "shared" : true,
+                  "sort" : 0,
+                  "msResolution" : true
+               },
+               "type" : "graph",
+               "yaxes" : [
+                  {
+                     "min" : 0,
+                     "format" : "short",
+                     "max" : null,
+                     "show" : true,
+                     "decimals" : null,
+                     "logBase" : 1,
+                     "label" : null
+                  },
+                  {
+                     "min" : 0,
+                     "format" : "short",
+                     "logBase" : 1,
+                     "label" : null,
+                     "max" : null,
+                     "show" : true,
+                     "decimals" : null
+                  }
+               ],
+               "minSpan" : null,
+               "percentage" : false,
+               "datasource" : "cloudwatch",
+               "hideTimeOverride" : false,
+               "legend" : {
+                  "rightSide" : false,
+                  "sort" : null,
+                  "current" : false,
+                  "max" : false,
+                  "show" : true,
+                  "sideWidth" : null,
+                  "alignAsTable" : false,
+                  "sortDesc" : false,
+                  "values" : false,
+                  "avg" : false,
+                  "hideZero" : false,
+                  "hideEmpty" : false,
+                  "min" : false,
+                  "total" : false
+               },
+               "timeFrom" : null,
+               "renderer" : "flot",
+               "maxDataPoints" : 100,
+               "alert" : {
+                  "frequency" : "2m",
+                  "handler" : 1,
+                  "notifications" : [
+                     {
+                        "uid" : "slack"
+                     }
+                  ],
+                  "executionErrorState" : "alerting",
+                  "conditions" : [
+                     {
+                        "evaluator" : {
+                           "params" : [
+                              0
+                           ],
+                           "type" : "gt"
+                        },
+                        "operator" : {
+                           "type" : "or"
+                        },
+                        "query" : {
+                           "model" : {
+                              "datasource" : "",
+                              "instant" : false,
+                              "format" : "time_series",
+                              "legendFormat" : "",
+                              "step" : 10,
+                              "hide" : false,
+                              "expr" : "",
+                              "intervalFactor" : 2,
+                              "target" : "",
+                              "refId" : "A",
+                              "interval" : "",
+                              "metric" : ""
+                           },
+                           "params" : [
+                              "A",
+                              "15m",
+                              "now"
+                           ]
+                        },
+                        "type" : "query",
+                        "reducer" : {
+                           "type" : "max",
+                           "params" : []
+                        }
+                     }
+                  ],
+                  "for" : "2m",
+                  "message" : "topic-2 seems to have no subscriptions or failed deliveries",
+                  "noDataState" : "no_data",
+                  "name" : "topic-2 alerts"
+               },
+               "linewidth" : 2,
+               "repeat" : null,
+               "span" : 4,
+               "height" : null,
+               "description" : null,
+               "bars" : true,
+               "seriesOverrides" : [
+                  {
+                     "alias" : "Failed",
+                     "color" : "#E24D42",
+                     "yaxis" : 2
+                  },
+                  {
+                     "alias" : "Published",
+                     "zindex" : 1
+                  }
+               ],
+               "options" : {
+                  "alertThreshold" : false,
+                  "dataLinks" : []
+               },
+               "lines" : false,
+               "isNew" : true,
+               "error" : false,
+               "aliasColors" : {},
+               "timeShift" : null,
+               "steppedLine" : false,
+               "xaxis" : {
+                  "show" : true
+               }
+            },
+            {
+               "repeat" : null,
+               "linewidth" : 2,
+               "alert" : {
+                  "noDataState" : "no_data",
+                  "name" : "topic-3 alerts",
+                  "for" : "2m",
+                  "message" : "topic-3 seems to have no subscriptions or failed deliveries",
+                  "frequency" : "2m",
+                  "handler" : 1,
+                  "notifications" : [
+                     {
+                        "uid" : "slack"
+                     }
+                  ],
+                  "conditions" : [
+                     {
+                        "reducer" : {
+                           "params" : [],
+                           "type" : "max"
+                        },
+                        "evaluator" : {
+                           "type" : "gt",
+                           "params" : [
+                              0
+                           ]
+                        },
+                        "type" : "query",
+                        "query" : {
+                           "model" : {
+                              "format" : "time_series",
+                              "instant" : false,
+                              "datasource" : "",
+                              "metric" : "",
+                              "interval" : "",
+                              "refId" : "A",
+                              "intervalFactor" : 2,
+                              "target" : "",
+                              "expr" : "",
+                              "hide" : false,
+                              "step" : 10,
+                              "legendFormat" : ""
+                           },
+                           "params" : [
+                              "A",
+                              "15m",
+                              "now"
+                           ]
+                        },
+                        "operator" : {
+                           "type" : "or"
+                        }
+                     }
+                  ],
+                  "executionErrorState" : "alerting"
+               },
+               "legend" : {
+                  "sort" : null,
+                  "rightSide" : false,
+                  "max" : false,
+                  "current" : false,
+                  "show" : true,
+                  "sortDesc" : false,
+                  "values" : false,
+                  "sideWidth" : null,
+                  "alignAsTable" : false,
+                  "total" : false,
+                  "hideZero" : false,
+                  "avg" : false,
+                  "hideEmpty" : false,
+                  "min" : false
+               },
+               "timeFrom" : null,
+               "maxDataPoints" : 100,
+               "renderer" : "flot",
+               "percentage" : false,
+               "datasource" : "cloudwatch",
+               "hideTimeOverride" : false,
+               "xaxis" : {
+                  "show" : true
+               },
+               "error" : false,
+               "aliasColors" : {},
+               "timeShift" : null,
+               "steppedLine" : false,
+               "seriesOverrides" : [
+                  {
+                     "alias" : "Failed",
+                     "yaxis" : 2,
+                     "color" : "#E24D42"
+                  },
+                  {
+                     "alias" : "Published",
+                     "zindex" : 1
+                  }
+               ],
+               "options" : {
+                  "alertThreshold" : false,
+                  "dataLinks" : []
+               },
+               "lines" : false,
+               "isNew" : true,
+               "span" : 4,
+               "height" : null,
+               "description" : null,
+               "bars" : true,
+               "pointradius" : 5,
+               "fill" : 1,
+               "interval" : null,
+               "targets" : [
+                  {
+                     "metricName" : "NumberOfMessagesPublished",
+                     "alias" : "Published",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "expression" : "",
+                     "period" : "5m",
+                     "refId" : "B",
+                     "matchExact" : true,
+                     "dimensions" : {
+                        "TopicName" : "topic-3"
+                     },
+                     "namespace" : "AWS/SNS",
+                     "id" : "",
+                     "region" : "default"
+                  },
+                  {
+                     "refId" : "C",
+                     "matchExact" : true,
+                     "region" : "default",
+                     "namespace" : "AWS/SNS",
+                     "id" : "",
+                     "dimensions" : {
+                        "TopicName" : "topic-3"
+                     },
+                     "metricName" : "NumberOfNotificationsDelivered",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "alias" : "Delivered",
+                     "period" : "5m",
+                     "expression" : ""
+                  },
+                  {
+                     "region" : "default",
+                     "id" : "",
+                     "namespace" : "AWS/SNS",
+                     "dimensions" : {
+                        "TopicName" : "topic-3"
+                     },
+                     "matchExact" : true,
+                     "refId" : "A",
+                     "period" : "5m",
+                     "expression" : "",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "alias" : "Failed",
+                     "metricName" : "NumberOfMessagesFailed"
+                  }
+               ],
+               "transparent" : true,
+               "grid" : {
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null,
+                  "threshold1" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "cacheTimeout" : null,
+               "stack" : false,
+               "nullPointMode" : "connected",
+               "editable" : false,
+               "minSpan" : null,
+               "links" : [],
+               "tooltip" : {
+                  "shared" : true,
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "msResolution" : true
+               },
+               "yaxes" : [
+                  {
+                     "logBase" : 1,
+                     "label" : null,
+                     "show" : true,
+                     "max" : null,
+                     "decimals" : null,
+                     "min" : 0,
+                     "format" : "short"
+                  },
+                  {
+                     "label" : null,
+                     "logBase" : 1,
+                     "decimals" : null,
+                     "show" : true,
+                     "max" : null,
+                     "format" : "short",
+                     "min" : 0
+                  }
+               ],
+               "type" : "graph",
+               "title" : "SNS: topic-3",
+               "points" : false,
+               "id" : 3
+            }
+         ],
+         "height" : "250px",
+         "editable" : true,
+         "title" : "New row",
+         "showTitle" : false
+      },
+      {
+         "title" : "New row",
+         "showTitle" : false,
+         "height" : "250px",
+         "editable" : true,
+         "repeat" : null,
+         "panels" : [
+            {
+               "points" : false,
+               "title" : "Lambda: lambda-VZak0y",
+               "id" : 4,
+               "minSpan" : null,
+               "type" : "graph",
+               "yaxes" : [
+                  {
+                     "label" : null,
+                     "logBase" : 1,
+                     "decimals" : 2,
+                     "show" : true,
+                     "max" : null,
+                     "format" : "ms",
+                     "min" : 0
+                  },
+                  {
+                     "label" : null,
+                     "logBase" : 1,
+                     "decimals" : 2,
+                     "max" : null,
+                     "show" : true,
+                     "format" : "short",
+                     "min" : 0
+                  }
+               ],
+               "links" : [],
+               "tooltip" : {
+                  "shared" : true,
+                  "value_type" : "cumulative",
+                  "sort" : 0,
+                  "msResolution" : true
+               },
+               "editable" : false,
+               "targets" : [
+                  {
+                     "expression" : "",
+                     "period" : "5m",
+                     "alias" : "Duration - Minimum",
+                     "statistics" : [
+                        "Minimum"
+                     ],
+                     "metricName" : "Duration",
+                     "dimensions" : {
+                        "FunctionName" : "lambda-VZak0y"
+                     },
+                     "region" : "default",
+                     "id" : "",
+                     "namespace" : "AWS/Lambda",
+                     "matchExact" : true,
+                     "refId" : "B"
+                  },
+                  {
+                     "namespace" : "AWS/Lambda",
+                     "id" : "",
+                     "region" : "default",
+                     "dimensions" : {
+                        "FunctionName" : "lambda-VZak0y"
+                     },
+                     "refId" : "C",
+                     "matchExact" : true,
+                     "period" : "5m",
+                     "expression" : "",
+                     "metricName" : "Duration",
+                     "alias" : "Duration - Average",
+                     "statistics" : [
+                        "Average"
+                     ]
+                  },
+                  {
+                     "region" : "default",
+                     "id" : "",
+                     "namespace" : "AWS/Lambda",
+                     "dimensions" : {
+                        "FunctionName" : "lambda-VZak0y"
+                     },
+                     "matchExact" : true,
+                     "refId" : "D",
+                     "period" : "5m",
+                     "expression" : "",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "alias" : "Duration - Maximum",
+                     "metricName" : "Duration"
+                  },
+                  {
+                     "dimensions" : {
+                        "FunctionName" : "lambda-VZak0y"
+                     },
+                     "region" : "default",
+                     "namespace" : "AWS/Lambda",
+                     "id" : "",
+                     "refId" : "E",
+                     "matchExact" : true,
+                     "expression" : "",
+                     "period" : "1m",
+                     "metricName" : "Invocations",
+                     "alias" : "Invocations - Sum",
+                     "statistics" : [
+                        "Sum"
+                     ]
+                  },
+                  {
+                     "namespace" : "AWS/Lambda",
+                     "id" : "",
+                     "region" : "default",
+                     "dimensions" : {
+                        "FunctionName" : "lambda-VZak0y"
+                     },
+                     "refId" : "A",
+                     "matchExact" : true,
+                     "period" : "1m",
+                     "expression" : "",
+                     "metricName" : "Errors",
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "alias" : "Errors - Sum"
+                  }
+               ],
+               "transparent" : true,
+               "cacheTimeout" : null,
+               "grid" : {
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null,
+                  "threshold1" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "pointradius" : 5,
+               "fill" : 1,
+               "interval" : null,
+               "stack" : false,
+               "nullPointMode" : "connected",
+               "lines" : true,
+               "isNew" : true,
+               "seriesOverrides" : [
+                  {
+                     "yaxis" : 2,
+                     "bars" : true,
+                     "color" : "#7EB26D",
+                     "points" : false,
+                     "lines" : false,
+                     "alias" : "Invocations - Sum"
+                  },
+                  {
+                     "alias" : "Errors - Sum",
+                     "lines" : false,
+                     "points" : false,
+                     "color" : "#E24D42",
+                     "bars" : true,
+                     "yaxis" : 2
+                  },
+                  {
+                     "color" : "#C8F2C2",
+                     "alias" : "Duration - Minimum",
+                     "lines" : false
+                  },
+                  {
+                     "color" : "#FADE2A",
+                     "alias" : "Duration - Average",
+                     "fill" : 0
+                  },
+                  {
+                     "fillBelowTo" : "Duration - Minimum",
+                     "color" : "rgb(77, 159, 179)",
+                     "lines" : false,
+                     "alias" : "Duration - Maximum"
+                  }
+               ],
+               "options" : {
+                  "alertThreshold" : false,
+                  "dataLinks" : []
+               },
+               "description" : null,
+               "bars" : false,
+               "span" : 12,
+               "height" : null,
+               "xaxis" : {
+                  "show" : true
+               },
+               "timeShift" : null,
+               "steppedLine" : false,
+               "aliasColors" : {},
+               "error" : false,
+               "maxDataPoints" : 100,
+               "renderer" : "flot",
+               "timeFrom" : null,
+               "legend" : {
+                  "sortDesc" : false,
+                  "values" : false,
+                  "sideWidth" : null,
+                  "alignAsTable" : false,
+                  "total" : false,
+                  "hideZero" : false,
+                  "avg" : false,
+                  "hideEmpty" : false,
+                  "min" : false,
+                  "sort" : null,
+                  "rightSide" : false,
+                  "max" : false,
+                  "current" : false,
+                  "show" : true
+               },
+               "datasource" : "cloudwatch",
+               "hideTimeOverride" : false,
+               "percentage" : false,
+               "repeat" : null,
+               "alert" : {
+                  "message" : "lambda-VZak0y is having invocation errors",
+                  "for" : "1m",
+                  "name" : "lambda-VZak0y Invocation Errors",
+                  "noDataState" : "no_data",
+                  "handler" : 1,
+                  "frequency" : "60s",
+                  "conditions" : [
+                     {
+                        "type" : "query",
+                        "query" : {
+                           "params" : [
+                              "A",
+                              "5m",
+                              "now"
+                           ],
+                           "model" : {
+                              "interval" : "",
+                              "refId" : "A",
+                              "metric" : "",
+                              "expr" : "",
+                              "intervalFactor" : 2,
+                              "target" : "",
+                              "hide" : false,
+                              "legendFormat" : "",
+                              "step" : 10,
+                              "format" : "time_series",
+                              "instant" : false,
+                              "datasource" : ""
+                           }
+                        },
+                        "operator" : {
+                           "type" : "and"
+                        },
+                        "evaluator" : {
+                           "params" : [
+                              0
+                           ],
+                           "type" : "gt"
+                        },
+                        "reducer" : {
+                           "params" : [],
+                           "type" : "max"
+                        }
+                     }
+                  ],
+                  "executionErrorState" : "alerting",
+                  "notifications" : [
+                     {
+                        "uid" : "slack"
+                     }
+                  ]
+               },
+               "linewidth" : 2
+            }
+         ],
+         "collapse" : false
+      },
+      {
+         "editable" : true,
+         "height" : "250px",
+         "showTitle" : false,
+         "title" : "New row",
+         "collapse" : false,
+         "repeat" : null,
+         "panels" : [
+            {
+               "renderer" : "flot",
+               "maxDataPoints" : 100,
+               "legend" : {
+                  "sortDesc" : false,
+                  "values" : false,
+                  "sideWidth" : null,
+                  "alignAsTable" : false,
+                  "total" : false,
+                  "avg" : false,
+                  "hideZero" : false,
+                  "hideEmpty" : false,
+                  "min" : false,
+                  "sort" : null,
+                  "rightSide" : false,
+                  "max" : false,
+                  "current" : false,
+                  "show" : true
+               },
+               "timeFrom" : null,
+               "datasource" : "cloudwatch",
+               "hideTimeOverride" : false,
+               "percentage" : false,
+               "repeat" : null,
+               "linewidth" : 2,
+               "lines" : true,
+               "isNew" : true,
+               "seriesOverrides" : [],
+               "options" : {
+                  "alertThreshold" : true,
+                  "dataLinks" : []
+               },
+               "bars" : false,
+               "description" : null,
+               "span" : 12,
+               "height" : null,
+               "xaxis" : {
+                  "show" : true
+               },
+               "timeShift" : null,
+               "steppedLine" : false,
+               "error" : false,
+               "aliasColors" : {},
+               "editable" : false,
+               "transparent" : true,
+               "targets" : [
+                  {
+                     "statistics" : [
+                        "Sum"
+                     ],
+                     "alias" : "Number of messages sent to the queue",
+                     "metricName" : "NumberOfMessagesSent",
+                     "expression" : "",
+                     "period" : "1m",
+                     "matchExact" : true,
+                     "refId" : "A",
+                     "dimensions" : {
+                        "QueueName" : "lambda-VZak0y"
+                     },
+                     "region" : "default",
+                     "namespace" : "AWS/SQS",
+                     "id" : ""
+                  }
+               ],
+               "cacheTimeout" : null,
+               "grid" : {
+                  "threshold2" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold1" : null
+               },
+               "pointradius" : 5,
+               "fill" : 1,
+               "interval" : null,
+               "stack" : false,
+               "nullPointMode" : "connected",
+               "points" : false,
+               "title" : "SQS: lambda-VZak0y",
+               "id" : 5,
+               "minSpan" : null,
+               "yaxes" : [
+                  {
+                     "format" : "short",
+                     "min" : 0,
+                     "decimals" : null,
+                     "show" : true,
+                     "max" : null,
+                     "label" : null,
+                     "logBase" : 1
+                  },
+                  {
+                     "show" : true,
+                     "max" : null,
+                     "decimals" : null,
+                     "logBase" : 1,
+                     "label" : null,
+                     "min" : 0,
+                     "format" : "short"
+                  }
+               ],
+               "type" : "graph",
+               "links" : [],
+               "tooltip" : {
+                  "sort" : 0,
+                  "msResolution" : true,
+                  "value_type" : "cumulative",
+                  "shared" : true
+               }
+            }
+         ]
+      },
+      {
+         "panels" : [
+            {
+               "minSpan" : null,
+               "yaxes" : [
+                  {
+                     "format" : "short",
+                     "min" : 0,
+                     "decimals" : null,
+                     "show" : true,
+                     "max" : null,
+                     "label" : null,
+                     "logBase" : 1
+                  },
+                  {
+                     "min" : 0,
+                     "format" : "short",
+                     "logBase" : 1,
+                     "label" : null,
+                     "show" : true,
+                     "max" : null,
+                     "decimals" : null
+                  }
+               ],
+               "type" : "graph",
+               "links" : [],
+               "tooltip" : {
+                  "sort" : 0,
+                  "msResolution" : true,
+                  "shared" : true,
+                  "value_type" : "cumulative"
+               },
+               "title" : "SQS Dead Letter Queue: lambda-VZak0y-dlq",
+               "points" : false,
+               "id" : 6,
+               "targets" : [
+                  {
+                     "metricName" : "ApproximateNumberOfMessagesVisible",
+                     "alias" : "Approximate number of messages available",
+                     "statistics" : [
+                        "Maximum"
+                     ],
+                     "period" : "1m",
+                     "expression" : "",
+                     "refId" : "A",
+                     "matchExact" : true,
+                     "id" : "",
+                     "namespace" : "AWS/SQS",
+                     "region" : "default",
+                     "dimensions" : {
+                        "QueueName" : "lambda-VZak0y-dlq"
+                     }
+                  }
+               ],
+               "transparent" : true,
+               "grid" : {
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2" : null,
+                  "threshold1" : null,
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)"
+               },
+               "cacheTimeout" : null,
+               "fill" : 1,
+               "pointradius" : 5,
+               "interval" : null,
+               "stack" : false,
+               "nullPointMode" : "connected",
+               "editable" : false,
+               "xaxis" : {
+                  "show" : true
+               },
+               "timeShift" : null,
+               "steppedLine" : false,
+               "error" : false,
+               "aliasColors" : {},
+               "lines" : true,
+               "isNew" : true,
+               "seriesOverrides" : [],
+               "options" : {
+                  "dataLinks" : [],
+                  "alertThreshold" : false
+               },
+               "description" : null,
+               "bars" : false,
+               "span" : 12,
+               "height" : null,
+               "repeat" : null,
+               "linewidth" : 2,
+               "alert" : {
+                  "executionErrorState" : "alerting",
+                  "conditions" : [
+                     {
+                        "reducer" : {
+                           "params" : [],
+                           "type" : "max"
+                        },
+                        "operator" : {
+                           "type" : "and"
+                        },
+                        "type" : "query",
+                        "query" : {
+                           "params" : [
+                              "A",
+                              "5m",
+                              "now"
+                           ],
+                           "model" : {
+                              "expr" : "",
+                              "intervalFactor" : 2,
+                              "target" : "",
+                              "refId" : "A",
+                              "interval" : "",
+                              "metric" : "",
+                              "legendFormat" : "",
+                              "step" : 10,
+                              "hide" : false,
+                              "format" : "time_series",
+                              "datasource" : "",
+                              "instant" : false
+                           }
+                        },
+                        "evaluator" : {
+                           "params" : [
+                              0
+                           ],
+                           "type" : "gt"
+                        }
+                     }
+                  ],
+                  "notifications" : [
+                     {
+                        "uid" : "slack"
+                     }
+                  ],
+                  "handler" : 1,
+                  "frequency" : "60s",
+                  "name" : "lambda-VZak0y-dlq messages",
+                  "noDataState" : "no_data",
+                  "message" : "lambda-VZak0y-dlq is having messages",
+                  "for" : "5m"
+               },
+               "maxDataPoints" : 100,
+               "renderer" : "flot",
+               "timeFrom" : null,
+               "legend" : {
+                  "show" : true,
+                  "max" : false,
+                  "current" : false,
+                  "sort" : null,
+                  "rightSide" : false,
+                  "total" : false,
+                  "hideEmpty" : false,
+                  "hideZero" : false,
+                  "min" : false,
+                  "avg" : false,
+                  "values" : false,
+                  "sortDesc" : false,
+                  "alignAsTable" : false,
+                  "sideWidth" : null
+               },
+               "hideTimeOverride" : false,
+               "datasource" : "cloudwatch",
+               "percentage" : false
+            }
+         ],
+         "repeat" : null,
+         "collapse" : false,
+         "title" : "New row",
+         "showTitle" : false,
+         "height" : "250px",
+         "editable" : true
+      }
+   ],
+   "sharedCrosshair" : true,
+   "tags" : [
+      "lambda",
+      "sqs",
+      "prod",
+      "sns"
+   ],
+   "hideControls" : false,
+   "timepicker" : {
+      "hidden" : false,
+      "time_options" : [
+         "5m",
+         "15m",
+         "1h",
+         "6h",
+         "12h",
+         "24h",
+         "2d",
+         "7d",
+         "30d"
+      ],
+      "refresh_intervals" : [
+         "5s",
+         "10s",
+         "30s",
+         "1m",
+         "5m",
+         "15m",
+         "30m",
+         "1h",
+         "2h",
+         "1d"
+      ]
+   },
+   "__inputs" : [],
+   "links" : [],
+   "uid" : null,
+   "version" : 0,
+   "editable" : false,
+   "schemaVersion" : 12,
+   "style" : "dark"
+}

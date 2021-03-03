@@ -1,0 +1,283 @@
+{
+   "tags" : [
+      "firehose",
+      "prod"
+   ],
+   "style" : "dark",
+   "description" : "",
+   "schemaVersion" : 12,
+   "id" : null,
+   "sharedCrosshair" : true,
+   "rows" : [
+      {
+         "editable" : false,
+         "repeat" : "firehose",
+         "showTitle" : true,
+         "panels" : [
+            {
+               "legend" : {
+                  "avg" : false,
+                  "current" : false,
+                  "values" : false,
+                  "show" : true,
+                  "hideEmpty" : false,
+                  "alignAsTable" : false,
+                  "sideWidth" : null,
+                  "total" : false,
+                  "max" : false,
+                  "hideZero" : false,
+                  "sortDesc" : false,
+                  "sort" : null,
+                  "rightSide" : false,
+                  "min" : false
+               },
+               "cacheTimeout" : null,
+               "pointradius" : 5,
+               "renderer" : "flot",
+               "maxDataPoints" : 100,
+               "interval" : null,
+               "points" : false,
+               "error" : false,
+               "options" : {
+                  "alertThreshold" : true,
+                  "dataLinks" : []
+               },
+               "tooltip" : {
+                  "sort" : 0,
+                  "msResolution" : true,
+                  "shared" : true,
+                  "value_type" : "cumulative"
+               },
+               "targets" : [
+                  {
+                     "resultFormat" : "time_series",
+                     "alias" : "Incoming records",
+                     "rawQuery" : true,
+                     "measurement" : "",
+                     "refId" : "A",
+                     "query" : "SELECT sum(\"incoming_records_sum\") FROM \"autogen\".\"cloudwatch_aws_firehose\" WHERE (\"delivery_stream_name\" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), \"delivery_stream_name\" fill(0)"
+                  },
+                  {
+                     "query" : "SELECT sum(\"delivery_to_s3._success_sum\") FROM \"autogen\".\"cloudwatch_aws_firehose\" WHERE (\"delivery_stream_name\" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), \"delivery_stream_name\" fill(0)",
+                     "resultFormat" : "time_series",
+                     "alias" : "Delivery to S3 Success",
+                     "rawQuery" : true,
+                     "measurement" : "",
+                     "refId" : "B"
+                  },
+                  {
+                     "resultFormat" : "time_series",
+                     "alias" : "Delivery to S3",
+                     "refId" : "C",
+                     "measurement" : "",
+                     "rawQuery" : true,
+                     "query" : "SELECT sum(\"delivery_to_s3._records_sum\") FROM \"autogen\".\"cloudwatch_aws_firehose\" WHERE (\"delivery_stream_name\" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), \"delivery_stream_name\" fill(0)"
+                  }
+               ],
+               "nullPointMode" : "connected",
+               "datasource" : "prod",
+               "timeShift" : null,
+               "title" : "Firehose: $firehose",
+               "yaxes" : [
+                  {
+                     "format" : "short",
+                     "decimals" : null,
+                     "label" : null,
+                     "logBase" : 1,
+                     "min" : 0,
+                     "show" : true,
+                     "max" : null
+                  },
+                  {
+                     "label" : null,
+                     "decimals" : null,
+                     "format" : "short",
+                     "min" : 0,
+                     "logBase" : 1,
+                     "show" : true,
+                     "max" : null
+                  }
+               ],
+               "timeFrom" : null,
+               "height" : null,
+               "minSpan" : null,
+               "isNew" : true,
+               "editable" : false,
+               "repeat" : null,
+               "linewidth" : 2,
+               "fill" : 1,
+               "transparent" : true,
+               "type" : "graph",
+               "bars" : true,
+               "lines" : false,
+               "span" : 12,
+               "id" : 1,
+               "description" : null,
+               "hideTimeOverride" : false,
+               "grid" : {
+                  "threshold1" : null,
+                  "threshold1Color" : "rgba(216, 200, 27, 0.27)",
+                  "threshold2Color" : "rgba(234, 112, 112, 0.22)",
+                  "threshold2" : null
+               },
+               "steppedLine" : false,
+               "links" : [],
+               "xaxis" : {
+                  "show" : true
+               },
+               "percentage" : false,
+               "aliasColors" : {},
+               "stack" : false,
+               "seriesOverrides" : [
+                  {
+                     "color" : "#EF843C",
+                     "alias" : "Incoming records"
+                  },
+                  {
+                     "alias" : "Delivery to S3",
+                     "color" : "#EAB839"
+                  },
+                  {
+                     "zindex" : 1,
+                     "alias" : "Delivery to S3 Success",
+                     "color" : "#7EB26D"
+                  }
+               ]
+            }
+         ],
+         "title" : "$firehose",
+         "height" : "250px",
+         "collapse" : false
+      }
+   ],
+   "time" : {
+      "to" : "now",
+      "from" : "now-1h"
+   },
+   "timezone" : "",
+   "refresh" : "10s",
+   "annotations" : {
+      "list" : [
+         {
+            "name" : "Show Deployments in Graphs (green dashed line)",
+            "iconColor" : "#7EB26D",
+            "tags" : [],
+            "hide" : false,
+            "type" : "tags",
+            "enable" : true,
+            "datasource" : "prod",
+            "showIn" : 0,
+            "limit" : 100,
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='0') AND (\"release\" =~ /^$release/) AND $timeFilter"
+         },
+         {
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='2') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "type" : "tags Deployments in Graphs",
+            "enable" : false,
+            "showIn" : 0,
+            "datasource" : "prod",
+            "limit" : 100,
+            "hide" : false,
+            "tags" : [],
+            "iconColor" : "#E24D42",
+            "name" : "Show Failed Deployments in Graphs (red dashed line)"
+         },
+         {
+            "hide" : false,
+            "tags" : [],
+            "iconColor" : "#EF843C",
+            "name" : "Show Aborted Deployments in Graphs (orange dashed line)",
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE (\"operation\"='deploy') AND (\"result\"='1') AND (\"release\" =~ /^$release/) AND $timeFilter",
+            "type" : "tags",
+            "enable" : false,
+            "showIn" : 0,
+            "datasource" : "prod",
+            "limit" : 100
+         }
+      ]
+   },
+   "__inputs" : [],
+   "version" : 0,
+   "editable" : false,
+   "gnetId" : null,
+   "hideControls" : false,
+   "templating" : {
+      "list" : [
+         {
+            "label" : "Firehose",
+            "options" : [],
+            "tagValuesQuery" : null,
+            "sort" : 5,
+            "hide" : 0,
+            "includeAll" : true,
+            "allValue" : "",
+            "type" : "query",
+            "multi" : true,
+            "useTags" : false,
+            "regex" : null,
+            "name" : "firehose",
+            "current" : {
+               "tags" : [],
+               "text" : null,
+               "value" : null
+            },
+            "refresh" : 2,
+            "tagsQuery" : null,
+            "datasource" : "prod",
+            "query" : "SHOW TAG VALUES WITH KEY = \"delivery_stream_name\" WHERE $timeFilter"
+         },
+         {
+            "refresh" : 2,
+            "name" : "release",
+            "regex" : null,
+            "current" : {
+               "text" : null,
+               "tags" : [],
+               "value" : null
+            },
+            "query" : "SELECT \"release\" FROM \"deployment_status\" WHERE $timeFilter",
+            "tagsQuery" : null,
+            "datasource" : "prod",
+            "sort" : 1,
+            "tagValuesQuery" : null,
+            "hide" : 2,
+            "options" : [],
+            "label" : "Filter by Branch/Release",
+            "useTags" : false,
+            "includeAll" : true,
+            "multi" : true,
+            "type" : "query",
+            "allValue" : ""
+         }
+      ]
+   },
+   "links" : [],
+   "uid" : null,
+   "timepicker" : {
+      "hidden" : false,
+      "refresh_intervals" : [
+         "5s",
+         "10s",
+         "30s",
+         "1m",
+         "5m",
+         "15m",
+         "30m",
+         "1h",
+         "2h",
+         "1d"
+      ],
+      "time_options" : [
+         "5m",
+         "15m",
+         "1h",
+         "6h",
+         "12h",
+         "24h",
+         "2d",
+         "7d",
+         "30d"
+      ]
+   },
+   "title" : "Firehose"
+}
