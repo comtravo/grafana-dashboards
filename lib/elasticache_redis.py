@@ -40,7 +40,7 @@ from lib.commons import (
     TRANSPARENT,
 )
 
-ES_MEASUREMENT = "cloudwatch_aws_es"
+ELASTICACHE_MEASUREMENT = "cloudwatch_aws_es"
 NAMESPACE = "AWS/ES"
 
 DOCUMENTATION_LINK = {
@@ -50,11 +50,11 @@ DOCUMENTATION_LINK = {
 }
 
 
-def generate_elasticache_cpu_graph(
+def generate_elasticache_redis_cpu_graph(
     name: str, client_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
-    Generate ElastiCache graph
+    Generate ElastiCache Redis graph
     """
 
     y_axes = single_y_axis(format=PERCENT_FORMAT)
@@ -93,11 +93,11 @@ def generate_elasticache_cpu_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_jvm_memory_pressure_graph(
+def generate_elasticache_redis_jvm_memory_pressure_graph(
     name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
 ) -> Graph:
     """
-    Generate ElastiCache graph
+    Generate ElastiCache Redis graph
     """
 
     y_axes = single_y_axis(format=PERCENT_FORMAT)
@@ -118,8 +118,8 @@ def generate_elasticache_jvm_memory_pressure_graph(
     alert = None
     if notifications:
         alert = Alert(
-            name="ElastiCache JVM memory pressure alert",
-            message="ElastiCache JVM memory pressure alert",
+            name="ElastiCache Redis JVM memory pressure alert",
+            message="ElastiCache Redis JVM memory pressure alert",
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -158,11 +158,11 @@ def generate_elasticache_jvm_memory_pressure_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_documents_graph(
+def generate_elasticache_redis_documents_graph(
     name: str, client_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
-    Generate ElastiCache graph
+    Generate ElastiCache Redis graph
     """
 
     y_axes = YAxes(
@@ -220,11 +220,11 @@ def generate_elasticache_documents_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_storage_graph(
+def generate_elasticache_redis_storage_graph(
     name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
 ) -> Graph:
     """
-    Generate ElastiCache graph
+    Generate ElastiCache Redis graph
     """
 
     y_axes = YAxes(
@@ -257,8 +257,8 @@ def generate_elasticache_storage_graph(
     alert = None
     if notifications:
         alert = Alert(
-            name="ElastiCache storage alert",
-            message="ElastiCache might be low on storage",
+            name="ElastiCache Redis storage alert",
+            message="ElastiCache Redis might be low on storage",
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -304,11 +304,11 @@ def generate_elasticache_storage_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_requests_graph(
+def generate_elasticache_redis_requests_graph(
     name: str, client_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
-    Generate ElastiCache graph
+    Generate ElastiCache Redis graph
     """
 
     y_axes = YAxes(
@@ -395,11 +395,11 @@ def generate_elasticache_requests_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_status_red_alert_graph(
+def generate_elasticache_redis_status_red_alert_graph(
     name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
 ) -> Graph:
     """
-    Generate ElastiCache graph
+    Generate ElastiCache Redis graph
     """
 
     y_axes = YAxes(
@@ -422,8 +422,8 @@ def generate_elasticache_status_red_alert_graph(
 
     if notifications:
         alert = Alert(
-            name="ElastiCache is in status red",
-            message="ElastiCache is in status red",
+            name="ElastiCache Redis is in status red",
+            message="ElastiCache Redis is in status red",
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -452,11 +452,11 @@ def generate_elasticache_status_red_alert_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_nodes_alert_graph(
+def generate_elasticache_redis_nodes_alert_graph(
     name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
 ):
     """
-    Generate ElastiCache graph
+    Generate ElastiCache Redis graph
     """
 
     y_axes = YAxes(
@@ -487,8 +487,8 @@ def generate_elasticache_nodes_alert_graph(
     alert = None
     if notifications:
         alert = Alert(
-            name="ElastiCache nodes alert",
-            message="ElastiCache might have no nodes",
+            name="ElastiCache Redis nodes alert",
+            message="ElastiCache Redis might have no nodes",
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -505,7 +505,7 @@ def generate_elasticache_nodes_alert_graph(
         )
 
     return Graph(
-        title="ElastiCache node alerts",
+        title="ElastiCache Redis node alerts",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
@@ -517,11 +517,11 @@ def generate_elasticache_nodes_alert_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_writes_blocked_alert_graph(
+def generate_elasticache_redis_writes_blocked_alert_graph(
     name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
 ) -> Graph:
     """
-    Generate ElastiCache graph
+    Generate ElastiCache Redis graph
     """
 
     y_axes = single_y_axis(format=SHORT_FORMAT)
@@ -541,8 +541,8 @@ def generate_elasticache_writes_blocked_alert_graph(
     alert = None
     if notifications:
         alert = Alert(
-            name="ElastiCache writed blocked alert",
-            message="ElastiCache might be blocking writes",
+            name="ElastiCache Redis writed blocked alert",
+            message="ElastiCache Redis might be blocking writes",
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -559,7 +559,7 @@ def generate_elasticache_writes_blocked_alert_graph(
         )
 
     return Graph(
-        title="ElastiCache write blocked alerts",
+        title="ElastiCache Redis write blocked alerts",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
@@ -571,11 +571,11 @@ def generate_elasticache_writes_blocked_alert_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_automated_snapshot_failure_alert_graph(
+def generate_elasticache_redis_automated_snapshot_failure_alert_graph(
     name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
 ):
     """
-    Generate ElastiCache graph
+    Generate ElastiCache Redis graph
     """
 
     y_axes = single_y_axis(format=SHORT_FORMAT)
@@ -595,8 +595,8 @@ def generate_elasticache_automated_snapshot_failure_alert_graph(
     alert = None
     if notifications:
         alert = Alert(
-            name="ElastiCache automated snapshot failure alert",
-            message="ElastiCache automated snapshot failure alert",
+            name="ElastiCache Redis automated snapshot failure alert",
+            message="ElastiCache Redis automated snapshot failure alert",
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -613,7 +613,7 @@ def generate_elasticache_automated_snapshot_failure_alert_graph(
         )
 
     return Graph(
-        title="ElastiCache automated snapshot failure alerts",
+        title="ElastiCache Redis automated snapshot failure alerts",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
@@ -625,7 +625,7 @@ def generate_elasticache_automated_snapshot_failure_alert_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_dashboard(
+def generate_elasticache_redis_dashboard(
     name: str,
     client_id: str,
     influxdb_data_source: str,
@@ -635,18 +635,18 @@ def generate_elasticache_dashboard(
     *args,
     **kwargs
 ):
-    """Generate ElastiCache dashboard"""
+    """Generate ElastiCache Redis dashboard"""
     tags = ["elasticache", environment]
 
     rows = [
         Row(
             panels=[
-                generate_elasticache_cpu_graph(
+                generate_elasticache_redis_cpu_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
-                generate_elasticache_jvm_memory_pressure_graph(
+                generate_elasticache_redis_jvm_memory_pressure_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
@@ -657,7 +657,7 @@ def generate_elasticache_dashboard(
         ),
         Row(
             panels=[
-                generate_elasticache_documents_graph(
+                generate_elasticache_redis_documents_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
@@ -667,7 +667,7 @@ def generate_elasticache_dashboard(
         ),
         Row(
             panels=[
-                generate_elasticache_storage_graph(
+                generate_elasticache_redis_storage_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
@@ -678,7 +678,7 @@ def generate_elasticache_dashboard(
         ),
         Row(
             panels=[
-                generate_elasticache_requests_graph(
+                generate_elasticache_redis_requests_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
@@ -688,25 +688,25 @@ def generate_elasticache_dashboard(
         ),
         Row(
             panels=[
-                generate_elasticache_status_red_alert_graph(
+                generate_elasticache_redis_status_red_alert_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                     notifications=notifications,
                 ),
-                generate_elasticache_nodes_alert_graph(
+                generate_elasticache_redis_nodes_alert_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                     notifications=notifications,
                 ),
-                generate_elasticache_writes_blocked_alert_graph(
+                generate_elasticache_redis_writes_blocked_alert_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                     notifications=notifications,
                 ),
-                generate_elasticache_automated_snapshot_failure_alert_graph(
+                generate_elasticache_redis_automated_snapshot_failure_alert_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
