@@ -52,7 +52,7 @@ DOCUMENTATION_LINK = {
 
 
 def generate_elasticache_redis_memory_usage_graph(
-    name: str, client_id: str, cloudwatch_data_source: str
+    cache_cluster_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
@@ -75,7 +75,7 @@ def generate_elasticache_redis_memory_usage_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="BytesUsedForCache",
         ),
         CloudwatchMetricsTarget(
@@ -83,7 +83,7 @@ def generate_elasticache_redis_memory_usage_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="DatabaseMemoryUsagePercentage",
         ),
         CloudwatchMetricsTarget(
@@ -91,7 +91,7 @@ def generate_elasticache_redis_memory_usage_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="SwapUsage",
         ),
         CloudwatchMetricsTarget(
@@ -99,7 +99,7 @@ def generate_elasticache_redis_memory_usage_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="Evictions",
         ),
     ]
@@ -140,7 +140,7 @@ def generate_elasticache_redis_memory_usage_graph(
 
 
 def generate_elasticache_redis_cpu_usage_graph(
-    name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
+    cache_cluster_id: str, cloudwatch_data_source: str, notifications: List[str]
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
@@ -162,7 +162,7 @@ def generate_elasticache_redis_cpu_usage_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Minimum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="CPUCreditBalance",
             refId=ALERT_REF_ID,
         ),
@@ -171,7 +171,7 @@ def generate_elasticache_redis_cpu_usage_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="CPUCreditUsage",
         ),
         CloudwatchMetricsTarget(
@@ -179,7 +179,7 @@ def generate_elasticache_redis_cpu_usage_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="EngineCPUUtilization",
         ),
     ]
@@ -240,7 +240,7 @@ def generate_elasticache_redis_cpu_usage_graph(
 
 
 def generate_elasticache_redis_network_in_graph(
-    name: str, client_id: str, cloudwatch_data_source: str
+    cache_cluster_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
@@ -257,7 +257,7 @@ def generate_elasticache_redis_network_in_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="NetworkBytesIn",
             refId=ALERT_REF_ID,
         ),
@@ -286,7 +286,7 @@ def generate_elasticache_redis_network_in_graph(
 
 
 def generate_elasticache_redis_network_out_graph(
-    name: str, client_id: str, cloudwatch_data_source: str
+    cache_cluster_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
@@ -303,7 +303,7 @@ def generate_elasticache_redis_network_out_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="NetworkBytesOut",
         ),
     ]
@@ -331,7 +331,7 @@ def generate_elasticache_redis_network_out_graph(
 
 
 def generate_elasticache_redis_connections_graph(
-    name: str, client_id: str, cloudwatch_data_source: str
+    cache_cluster_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
@@ -348,7 +348,7 @@ def generate_elasticache_redis_connections_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="CurrConnections",
             refId=ALERT_REF_ID,
         ),
@@ -377,7 +377,7 @@ def generate_elasticache_redis_connections_graph(
 
 
 def generate_elasticache_redis_replication_graph(
-    name: str, client_id: str, cloudwatch_data_source: str
+    cache_cluster_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
@@ -399,7 +399,7 @@ def generate_elasticache_redis_replication_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="ReplicationBytes",
         ),
         CloudwatchMetricsTarget(
@@ -407,7 +407,7 @@ def generate_elasticache_redis_replication_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="ReplicationLag",
         ),
     ]
@@ -441,7 +441,7 @@ def generate_elasticache_redis_replication_graph(
 
 
 def generate_elasticache_redis_latency_graph(
-    name: str, client_id: str, cloudwatch_data_source: str
+    cache_cluster_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
@@ -461,7 +461,7 @@ def generate_elasticache_redis_latency_graph(
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
+            dimensions={"CacheClusterId": cache_cluster_id},
             metricName="StringBasedCmdsLatency",
         ),
     ]
@@ -489,8 +489,7 @@ def generate_elasticache_redis_latency_graph(
 
 
 def generate_elasticache_redis_dashboard(
-    name: str,
-    client_id: str,
+    cache_cluster_id: str,
     influxdb_data_source: str,
     cloudwatch_data_source: str,
     environment: str,
@@ -505,14 +504,12 @@ def generate_elasticache_redis_dashboard(
         Row(
             panels=[
                 generate_elasticache_redis_cpu_usage_graph(
-                    name=name,
-                    client_id=client_id,
+                    cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                     notifications=notifications,
                 ),
                 generate_elasticache_redis_memory_usage_graph(
-                    name=name,
-                    client_id=client_id,
+                    cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
             ],
@@ -521,13 +518,11 @@ def generate_elasticache_redis_dashboard(
         Row(
             panels=[
                 generate_elasticache_redis_network_in_graph(
-                    name=name,
-                    client_id=client_id,
+                    cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
                 generate_elasticache_redis_network_out_graph(
-                    name=name,
-                    client_id=client_id,
+                    cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
             ],
@@ -536,18 +531,15 @@ def generate_elasticache_redis_dashboard(
         Row(
             panels=[
                 generate_elasticache_redis_replication_graph(
-                    name=name,
-                    client_id=client_id,
+                    cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
                 generate_elasticache_redis_connections_graph(
-                    name=name,
-                    client_id=client_id,
+                    cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
                 generate_elasticache_redis_latency_graph(
-                    name=name,
-                    client_id=client_id,
+                    cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
             ],
