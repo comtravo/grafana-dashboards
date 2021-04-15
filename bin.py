@@ -53,6 +53,10 @@ def parse_options():  # pragma: no cover
     )
 
     subparsers.add_parser("firehose", help="Create dashboard for AWS Firehose")
+
+    elasticache = subparsers.add_parser("elasticache", help="Create dashboard for AWS ElastiCache")
+    elasticache.add_argument("--cache_cluster_id", type=str, help="Cache Cluster Id", required=True)
+
     es = subparsers.add_parser("elasticsearch", help="Create dashboard for AWS ES")
     es.add_argument("--client_id", type=str, help="Client id", required=True)
 
@@ -112,6 +116,7 @@ def dispatcher():
         "api-gateway": apig_dispatcher,
         "step-function": sfn_dispatcher,
         "firehose": firehose_dispatcher,
+        "elasticache-redis": elasticache_dispatcher,
         "elasticsearch": elasticsearch_dispatcher,
         "rds": rds_dispatcher,
     }
