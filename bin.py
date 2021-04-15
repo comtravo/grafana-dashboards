@@ -5,7 +5,9 @@ from lib.lambdas import dispatcher as lambda_dispatcher
 from lib.api_gateways import generate_api_gateways_dashboard as apig_dispatcher
 from lib.step_functions import generate_sfn_dashboard as sfn_dispatcher
 from lib.firehose import generate_firehose_dashboard as firehose_dispatcher
-from lib.elasticache_redis import generate_elasticache_redis_dashboard as elasticache_dispatcher
+from lib.elasticache_redis import (
+    generate_elasticache_redis_dashboard as elasticache_dispatcher,
+)
 from lib.elasticsearch import (
     generate_elasticsearch_dashboard as elasticsearch_dispatcher,
 )
