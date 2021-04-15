@@ -10,6 +10,7 @@ from grafanalib.core import (
     LowerThan,
     Graph,
     GreaterThan,
+    MILLISECONDS_FORMAT,
     OP_OR,
     PERCENT_FORMAT,
     Repeat,
@@ -55,16 +56,6 @@ def generate_elasticache_redis_memory_usage_graph(
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
-    """
-
-    """
-    "CurrConnections",
-    "NetworkBytesIn",
-    "NetworkBytesOut",
-    "ReplicationBytes",
-    "ReplicationLag",
-    "SaveInProgress",
-    "StringBasedCmdsLatency",
     """
 
     y_axes = YAxes(
@@ -249,7 +240,7 @@ def generate_elasticache_redis_cpu_usage_graph(
 
 
 def generate_elasticache_redis_network_in_graph(
-    name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
+    name: str, client_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
@@ -295,7 +286,7 @@ def generate_elasticache_redis_network_in_graph(
 
 
 def generate_elasticache_redis_network_out_graph(
-    name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
+    name: str, client_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
@@ -307,7 +298,6 @@ def generate_elasticache_redis_network_out_graph(
     }
 
     targets = [
-        ),
         CloudwatchMetricsTarget(
             alias=aliases["out"],
             namespace=NAMESPACE,
@@ -329,6 +319,164 @@ def generate_elasticache_redis_network_out_graph(
 
     return Graph(
         title="Network out",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        yAxes=y_axes,
+        seriesOverrides=series_overrides,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=True,
+        lines=False,
+    ).auto_ref_ids()
+
+
+def generate_elasticache_redis_connections_graph(
+    name: str, client_id: str, cloudwatch_data_source: str
+) -> Graph:
+    """
+    Generate ElastiCache Redis graph
+    """
+
+    y_axes = YAxis(format=SHORT_FORMAT)
+    aliases = {
+        "current": "Current connections",
+    }
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=aliases["current"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Maximum"],
+            dimensions={"DomainName": name, "ClientId": client_id},
+            metricName="CurrConnections",
+            refId=ALERT_REF_ID,
+        ),
+    ]
+
+    series_overrides = [
+        {
+            "alias": aliases["current"],
+            "color": colors.GREEN,
+            "lines": False,
+            "bars": True,
+        },
+    ]
+
+    return Graph(
+        title="Current connections",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        yAxes=y_axes,
+        seriesOverrides=series_overrides,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=True,
+        lines=False,
+    ).auto_ref_ids()
+
+
+def generate_elasticache_redis_replication_graph(
+    name: str, client_id: str, cloudwatch_data_source: str
+) -> Graph:
+    """
+    Generate ElastiCache Redis graph
+    """
+
+    y_axes = YAxes(
+        YAxis(format=MEGA_BYTES),
+        YAxis(format=MILLISECONDS_FORMAT),
+    )
+
+    aliases = {
+        "bytes": "Replication bytes",
+        "lag": "Replication lag",
+    }
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=aliases["bytes"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Maximum"],
+            dimensions={"DomainName": name, "ClientId": client_id},
+            metricName="ReplicationBytes",
+        ),
+        CloudwatchMetricsTarget(
+            alias=aliases["lag"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Maximum"],
+            dimensions={"DomainName": name, "ClientId": client_id},
+            metricName="ReplicationLag",
+        ),
+    ]
+
+    series_overrides = [
+        {
+            "alias": aliases["bytes"],
+            "color": colors.GREEN,
+            "lines": False,
+            "bars": True,
+        },
+        {
+            "alias": aliases["lag"],
+            "color": colors.RED,
+            "lines": True,
+            "bars": False,
+        },
+    ]
+
+    return Graph(
+        title="Replication",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        yAxes=y_axes,
+        seriesOverrides=series_overrides,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=True,
+        lines=False,
+    ).auto_ref_ids()
+
+
+def generate_elasticache_redis_latency_graph(
+    name: str, client_id: str, cloudwatch_data_source: str
+) -> Graph:
+    """
+    Generate ElastiCache Redis graph
+    """
+
+    y_axes = YAxes(
+        YAxis(format=MILLISECONDS_FORMAT),
+    )
+
+    aliases = {
+        "latency":     "String based CMDs latency",
+    }
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=aliases["bytes"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Maximum"],
+            dimensions={"DomainName": name, "ClientId": client_id},
+            metricName=    "StringBasedCmdsLatency",
+        ),
+    ]
+
+    series_overrides = [
+        {
+            "alias": aliases["latency"],
+            "color": colors.GREEN,
+            "lines": True,
+            "bars": False,
+        },
+    ]
+
+    return Graph(
+        title="Latency",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
