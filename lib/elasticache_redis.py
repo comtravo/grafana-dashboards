@@ -452,7 +452,7 @@ def generate_elasticache_redis_latency_graph(
     )
 
     aliases = {
-        "latency":     "String based CMDs latency",
+        "latency": "String based CMDs latency",
     }
 
     targets = [
@@ -462,7 +462,7 @@ def generate_elasticache_redis_latency_graph(
             period="1m",
             statistics=["Maximum"],
             dimensions={"DomainName": name, "ClientId": client_id},
-            metricName=    "StringBasedCmdsLatency",
+            metricName="StringBasedCmdsLatency",
         ),
     ]
 
@@ -504,76 +504,51 @@ def generate_elasticache_redis_dashboard(
     rows = [
         Row(
             panels=[
-                generate_elasticache_redis_cpu_graph(
-                    name=name,
-                    client_id=client_id,
-                    cloudwatch_data_source=cloudwatch_data_source,
-                ),
-                generate_elasticache_redis_jvm_memory_pressure_graph(
+                generate_elasticache_redis_cpu_usage_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                     notifications=notifications,
+                ),
+                generate_elasticache_redis_memory_usage_graph(
+                    name=name,
+                    client_id=client_id,
+                    cloudwatch_data_source=cloudwatch_data_source,
                 ),
             ],
             editable=EDITABLE,
         ),
         Row(
             panels=[
-                generate_elasticache_redis_documents_graph(
+                generate_elasticache_redis_network_in_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
-                )
+                ),
+                generate_elasticache_redis_network_out_graph(
+                    name=name,
+                    client_id=client_id,
+                    cloudwatch_data_source=cloudwatch_data_source,
+                ),
             ],
             editable=EDITABLE,
         ),
         Row(
             panels=[
-                generate_elasticache_redis_storage_graph(
+                generate_elasticache_redis_replication_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
-                    notifications=notifications,
-                )
-            ],
-            editable=EDITABLE,
-        ),
-        Row(
-            panels=[
-                generate_elasticache_redis_requests_graph(
-                    name=name,
-                    client_id=client_id,
-                    cloudwatch_data_source=cloudwatch_data_source,
-                )
-            ],
-            editable=EDITABLE,
-        ),
-        Row(
-            panels=[
-                generate_elasticache_redis_status_red_alert_graph(
-                    name=name,
-                    client_id=client_id,
-                    cloudwatch_data_source=cloudwatch_data_source,
-                    notifications=notifications,
                 ),
-                generate_elasticache_redis_nodes_alert_graph(
+                generate_elasticache_redis_connections_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
-                    notifications=notifications,
                 ),
-                generate_elasticache_redis_writes_blocked_alert_graph(
+                generate_elasticache_redis_latency_graph(
                     name=name,
                     client_id=client_id,
                     cloudwatch_data_source=cloudwatch_data_source,
-                    notifications=notifications,
-                ),
-                generate_elasticache_redis_automated_snapshot_failure_alert_graph(
-                    name=name,
-                    client_id=client_id,
-                    cloudwatch_data_source=cloudwatch_data_source,
-                    notifications=notifications,
                 ),
             ],
             editable=EDITABLE,
@@ -581,7 +556,7 @@ def generate_elasticache_redis_dashboard(
     ]
 
     return Dashboard(
-        title="ElastiCache: {}".format(name),
+        title="ElastiCache Redis: {}".format(name),
         editable=EDITABLE,
         annotations=get_release_annotations(influxdb_data_source),
         templating=get_release_templating(influxdb_data_source),
