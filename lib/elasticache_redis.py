@@ -50,38 +50,93 @@ DOCUMENTATION_LINK = {
 }
 
 
-def generate_elasticache_redis_cpu_graph(
+def generate_elasticache_redis_memory_usage_graph(
     name: str, client_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
     """
 
-    y_axes = single_y_axis(format=PERCENT_FORMAT)
-    alias = "CPU utilization"
+    """
+    "CurrConnections",
+    "NetworkBytesIn",
+    "NetworkBytesOut",
+    "ReplicationBytes",
+    "ReplicationLag",
+    "SaveInProgress",
+    "StringBasedCmdsLatency",
+    """
+
+    y_axes = YAxes(
+        YAxis(format=PERCENT_FORMAT),
+        YAxis(format=MEGA_BYTES),
+    )
+    aliases = {
+        "bytes": "Bytes used for cache",
+        "db usage": "Database memory usage percentage",
+        "swap": "SwapUsage",
+        "evictions": "Evictions",
+    }
 
     targets = [
         CloudwatchMetricsTarget(
-            alias=alias,
+            alias=aliases["bytes"],
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
             dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="CPUUtilization",
-        )
+            metricName="BytesUsedForCache",
+        ),
+        CloudwatchMetricsTarget(
+            alias=aliases["db usage"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Maximum"],
+            dimensions={"DomainName": name, "ClientId": client_id},
+            metricName="DatabaseMemoryUsagePercentage",
+        ),
+        CloudwatchMetricsTarget(
+            alias=aliases["swap"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Maximum"],
+            dimensions={"DomainName": name, "ClientId": client_id},
+            metricName="SwapUsage",
+        ),
+        CloudwatchMetricsTarget(
+            alias=aliases["evictions"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Maximum"],
+            dimensions={"DomainName": name, "ClientId": client_id},
+            metricName="Evictions",
+        ),
     ]
 
     series_overrides = [
         {
-            "alias": alias,
+            "alias": aliases["db usage"],
+            "color": colors.ORANGE,
+            "lines": True,
+            "bars": False,
+        },
+        {
+            "alias": aliases["swap"],
+            "color": colors.BLUE,
+            "lines": True,
+            "bars": False,
+        },
+        {
+            "alias": aliases["bytes"],
             "color": colors.GREEN,
             "lines": True,
             "bars": False,
-        }
+            "yaxis": 2,
+        },
     ]
 
     return Graph(
-        title=alias,
+        title="Memory usage",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
@@ -93,39 +148,62 @@ def generate_elasticache_redis_cpu_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_redis_jvm_memory_pressure_graph(
+def generate_elasticache_redis_cpu_usage_graph(
     name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
     """
 
-    y_axes = single_y_axis(format=PERCENT_FORMAT)
-    alias = "JVM memory pressure"
+    y_axes = YAxes(
+        YAxis(format=SHORT_FORMAT),
+        YAxis(format=PERCENT_FORMAT),
+    )
+    aliases = {
+        "credit balance": "CPU credit balance",
+        "credit usage": "CPU credit usage",
+        "engine utilization": "Engine CPU utilization",
+    }
 
     targets = [
         CloudwatchMetricsTarget(
-            alias=alias,
+            alias=aliases["credit balance"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Minimum"],
+            dimensions={"DomainName": name, "ClientId": client_id},
+            metricName="CPUCreditBalance",
+            refId=ALERT_REF_ID,
+        ),
+        CloudwatchMetricsTarget(
+            alias=aliases["credit usage"],
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
             dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="JVMMemoryPressure",
-            refId=ALERT_REF_ID,
-        )
+            metricName="CPUCreditUsage",
+        ),
+        CloudwatchMetricsTarget(
+            alias=aliases["engine utilization"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Maximum"],
+            dimensions={"DomainName": name, "ClientId": client_id},
+            metricName="EngineCPUUtilization",
+        ),
     ]
 
     alert = None
     if notifications:
         alert = Alert(
-            name="ElastiCache Redis JVM memory pressure alert",
-            message="ElastiCache Redis JVM memory pressure alert",
+            name="ElastiCache Redis CPU credit balance alert",
+            message="ElastiCache Redis CPU credit balance alert",
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
                     timeRange=TimeRange("5m", "now"),
-                    evaluator=GreaterThan(80),
+                    evaluator=LowerThan(250),
                     reducerType=RTYPE_MAX,
                     operator=OP_OR,
                 ),
@@ -137,69 +215,19 @@ def generate_elasticache_redis_jvm_memory_pressure_graph(
 
     series_overrides = [
         {
-            "alias": alias,
-            "color": colors.GREEN,
-            "lines": True,
-            "bars": False,
-        }
-    ]
-
-    return Graph(
-        title=alias,
-        dataSource=cloudwatch_data_source,
-        targets=targets,
-        yAxes=y_axes,
-        seriesOverrides=series_overrides,
-        transparent=TRANSPARENT,
-        editable=EDITABLE,
-        bars=True,
-        lines=False,
-        alert=alert,
-    ).auto_ref_ids()
-
-
-def generate_elasticache_redis_documents_graph(
-    name: str, client_id: str, cloudwatch_data_source: str
-) -> Graph:
-    """
-    Generate ElastiCache Redis graph
-    """
-
-    y_axes = YAxes(
-        YAxis(format=SHORT_FORMAT),
-        YAxis(format=SHORT_FORMAT),
-    )
-    searchable_documents_alias = "Searchable documents"
-    deleted_documents_alias = "Deleted documents"
-
-    targets = [
-        CloudwatchMetricsTarget(
-            alias=searchable_documents_alias,
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="SearchableDocuments",
-        ),
-        CloudwatchMetricsTarget(
-            alias=deleted_documents_alias,
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="DeletedDocuments",
-        ),
-    ]
-
-    series_overrides = [
-        {
-            "alias": searchable_documents_alias,
+            "alias": aliases["credit balance"],
             "color": colors.GREEN,
             "lines": True,
             "bars": False,
         },
         {
-            "alias": deleted_documents_alias,
+            "alias": aliases["cedit usage"],
+            "color": colors.YELLOW,
+            "lines": False,
+            "bars": True,
+        },
+        {
+            "alias": aliases["engine utilization"],
             "color": colors.ORANGE,
             "lines": True,
             "bars": False,
@@ -208,7 +236,7 @@ def generate_elasticache_redis_documents_graph(
     ]
 
     return Graph(
-        title="Documents",
+        title="CPU usage",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
@@ -636,7 +664,7 @@ def generate_elasticache_redis_dashboard(
     **kwargs
 ):
     """Generate ElastiCache Redis dashboard"""
-    tags = ["elasticache", environment]
+    tags = ["elasticache", "redis", environment]
 
     rows = [
         Row(
