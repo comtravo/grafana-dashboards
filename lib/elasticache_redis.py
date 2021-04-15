@@ -248,170 +248,41 @@ def generate_elasticache_redis_cpu_usage_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_redis_storage_graph(
+def generate_elasticache_redis_network_in_graph(
     name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
     """
 
-    y_axes = YAxes(
-        YAxis(format=MEGA_BYTES),
-        YAxis(format=MEGA_BYTES),
-    )
-    free_storage_alias = "Free storage"
-    cluster_used_space_alias = "Used space"
+    y_axes = YAxis(format=MEGA_BYTES)
+    aliases = {
+        "in": "Network bytes in",
+    }
 
     targets = [
         CloudwatchMetricsTarget(
-            alias=free_storage_alias,
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Minimum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="FreeStorageSpace",
-            refId=ALERT_REF_ID,
-        ),
-        CloudwatchMetricsTarget(
-            alias=cluster_used_space_alias,
+            alias=aliases["in"],
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
             dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="ClusterUsedSpace",
-        ),
-    ]
-
-    alert = None
-    if notifications:
-        alert = Alert(
-            name="ElastiCache Redis storage alert",
-            message="ElastiCache Redis might be low on storage",
-            executionErrorState="alerting",
-            alertConditions=[
-                AlertCondition(
-                    Target(refId=ALERT_REF_ID),
-                    timeRange=TimeRange("5m", "now"),
-                    evaluator=LowerThan(10240),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_OR,
-                ),
-            ],
-            frequency="2m",
-            gracePeriod="2m",
-            notifications=notifications,
-        )
-
-    series_overrides = [
-        {
-            "alias": free_storage_alias,
-            "color": colors.GREEN,
-            "lines": True,
-            "bars": False,
-        },
-        {
-            "alias": cluster_used_space_alias,
-            "color": colors.ORANGE,
-            "lines": True,
-            "bars": False,
-            "yaxis": 2,
-        },
-    ]
-
-    return Graph(
-        title="Storage",
-        dataSource=cloudwatch_data_source,
-        targets=targets,
-        yAxes=y_axes,
-        seriesOverrides=series_overrides,
-        transparent=TRANSPARENT,
-        editable=EDITABLE,
-        bars=True,
-        lines=False,
-        alert=alert,
-    ).auto_ref_ids()
-
-
-def generate_elasticache_redis_requests_graph(
-    name: str, client_id: str, cloudwatch_data_source: str
-) -> Graph:
-    """
-    Generate ElastiCache Redis graph
-    """
-
-    y_axes = YAxes(
-        YAxis(format=SHORT_FORMAT),
-        YAxis(format=SHORT_FORMAT),
-    )
-    xx2_alias = "2xx"
-    xx3_alias = "3xx"
-    xx4_alias = "4xx"
-    xx5_alias = "5xx"
-
-    targets = [
-        CloudwatchMetricsTarget(
-            alias=xx2_alias,
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Sum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="2xx",
-        ),
-        CloudwatchMetricsTarget(
-            alias=xx3_alias,
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Sum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="3xx",
-        ),
-        CloudwatchMetricsTarget(
-            alias=xx4_alias,
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Sum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="4xx",
-        ),
-        CloudwatchMetricsTarget(
-            alias=xx5_alias,
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Sum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="5xx",
+            metricName="NetworkBytesIn",
+            refId=ALERT_REF_ID,
         ),
     ]
 
     series_overrides = [
         {
-            "alias": xx2_alias,
+            "alias": aliases["in"],
             "color": colors.GREEN,
-            "lines": True,
-            "bars": False,
-        },
-        {
-            "alias": xx3_alias,
-            "color": colors.YELLOW,
-            "lines": True,
-            "bars": False,
-        },
-        {
-            "alias": xx4_alias,
-            "color": colors.ORANGE,
-            "lines": True,
-            "bars": False,
-        },
-        {
-            "alias": xx5_alias,
-            "color": colors.ORANGE,
-            "lines": True,
-            "bars": False,
+            "lines": False,
+            "bars": True,
         },
     ]
 
     return Graph(
-        title="Requests",
+        title="Network in",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
@@ -423,233 +294,49 @@ def generate_elasticache_redis_requests_graph(
     ).auto_ref_ids()
 
 
-def generate_elasticache_redis_status_red_alert_graph(
+def generate_elasticache_redis_network_out_graph(
     name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
 ) -> Graph:
     """
     Generate ElastiCache Redis graph
     """
 
-    y_axes = YAxes(
-        YAxis(format=SHORT_FORMAT),
-        YAxis(format=SHORT_FORMAT),
-    )
+    y_axes = YAxis(format=MEGA_BYTES)
+    aliases = {
+        "out": "Network bytes out",
+    }
 
     targets = [
+        ),
         CloudwatchMetricsTarget(
-            alias="Red status",
+            alias=aliases["out"],
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
             dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="ClusterStatus.red",
+            metricName="NetworkBytesOut",
         ),
     ]
 
-    alert = None
-
-    if notifications:
-        alert = Alert(
-            name="ElastiCache Redis is in status red",
-            message="ElastiCache Redis is in status red",
-            executionErrorState="alerting",
-            alertConditions=[
-                AlertCondition(
-                    Target(refId=ALERT_REF_ID),
-                    timeRange=TimeRange("5m", "now"),
-                    evaluator=GreaterThan(0),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_OR,
-                ),
-            ],
-            frequency="2m",
-            gracePeriod="2m",
-            notifications=notifications,
-        )
+    series_overrides = [
+        {
+            "alias": aliases["out"],
+            "color": colors.RED,
+            "lines": False,
+            "bars": True,
+        },
+    ]
 
     return Graph(
-        title="Status RED alerts",
+        title="Network out",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
+        seriesOverrides=series_overrides,
         transparent=TRANSPARENT,
         editable=EDITABLE,
         bars=True,
         lines=False,
-        alert=alert,
-    ).auto_ref_ids()
-
-
-def generate_elasticache_redis_nodes_alert_graph(
-    name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
-):
-    """
-    Generate ElastiCache Redis graph
-    """
-
-    y_axes = YAxes(
-        YAxis(format=SHORT_FORMAT),
-        YAxis(format=SHORT_FORMAT),
-    )
-
-    targets = [
-        CloudwatchMetricsTarget(
-            alias="Minimum number of nodes",
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Minimum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="Nodes",
-            refId=ALERT_REF_ID,
-        ),
-        CloudwatchMetricsTarget(
-            alias="Maximum number of nodes",
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="Nodes",
-        ),
-    ]
-
-    alert = None
-    if notifications:
-        alert = Alert(
-            name="ElastiCache Redis nodes alert",
-            message="ElastiCache Redis might have no nodes",
-            executionErrorState="alerting",
-            alertConditions=[
-                AlertCondition(
-                    Target(refId=ALERT_REF_ID),
-                    timeRange=TimeRange("5m", "now"),
-                    evaluator=LowerThan(1),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_OR,
-                ),
-            ],
-            frequency="2m",
-            gracePeriod="2m",
-            notifications=notifications,
-        )
-
-    return Graph(
-        title="ElastiCache Redis node alerts",
-        dataSource=cloudwatch_data_source,
-        targets=targets,
-        yAxes=y_axes,
-        transparent=TRANSPARENT,
-        editable=EDITABLE,
-        bars=False,
-        lines=True,
-        alert=alert,
-    ).auto_ref_ids()
-
-
-def generate_elasticache_redis_writes_blocked_alert_graph(
-    name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
-) -> Graph:
-    """
-    Generate ElastiCache Redis graph
-    """
-
-    y_axes = single_y_axis(format=SHORT_FORMAT)
-
-    targets = [
-        CloudwatchMetricsTarget(
-            alias="Writes blocked",
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="ClusterIndexWritesBlocked",
-            refId=ALERT_REF_ID,
-        ),
-    ]
-
-    alert = None
-    if notifications:
-        alert = Alert(
-            name="ElastiCache Redis writed blocked alert",
-            message="ElastiCache Redis might be blocking writes",
-            executionErrorState="alerting",
-            alertConditions=[
-                AlertCondition(
-                    Target(refId=ALERT_REF_ID),
-                    timeRange=TimeRange("5m", "now"),
-                    evaluator=GreaterThan(0),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_OR,
-                ),
-            ],
-            frequency="2m",
-            gracePeriod="2m",
-            notifications=notifications,
-        )
-
-    return Graph(
-        title="ElastiCache Redis write blocked alerts",
-        dataSource=cloudwatch_data_source,
-        targets=targets,
-        yAxes=y_axes,
-        transparent=TRANSPARENT,
-        editable=EDITABLE,
-        bars=False,
-        lines=True,
-        alert=alert,
-    ).auto_ref_ids()
-
-
-def generate_elasticache_redis_automated_snapshot_failure_alert_graph(
-    name: str, client_id: str, cloudwatch_data_source: str, notifications: List[str]
-):
-    """
-    Generate ElastiCache Redis graph
-    """
-
-    y_axes = single_y_axis(format=SHORT_FORMAT)
-
-    targets = [
-        CloudwatchMetricsTarget(
-            alias="Automated snapshot failure",
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Maximum"],
-            dimensions={"DomainName": name, "ClientId": client_id},
-            metricName="AutomatedSnapshotFailure",
-            refId=ALERT_REF_ID,
-        ),
-    ]
-
-    alert = None
-    if notifications:
-        alert = Alert(
-            name="ElastiCache Redis automated snapshot failure alert",
-            message="ElastiCache Redis automated snapshot failure alert",
-            executionErrorState="alerting",
-            alertConditions=[
-                AlertCondition(
-                    Target(refId=ALERT_REF_ID),
-                    timeRange=TimeRange("5m", "now"),
-                    evaluator=GreaterThan(0),
-                    reducerType=RTYPE_MAX,
-                    operator=OP_OR,
-                ),
-            ],
-            frequency="2m",
-            gracePeriod="2m",
-            notifications=notifications,
-        )
-
-    return Graph(
-        title="ElastiCache Redis automated snapshot failure alerts",
-        dataSource=cloudwatch_data_source,
-        targets=targets,
-        yAxes=y_axes,
-        transparent=TRANSPARENT,
-        editable=EDITABLE,
-        bars=False,
-        lines=True,
-        alert=alert,
     ).auto_ref_ids()
 
 
