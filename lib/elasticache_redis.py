@@ -236,6 +236,7 @@ def generate_elasticache_redis_cpu_usage_graph(
         editable=EDITABLE,
         bars=True,
         lines=False,
+        alert=alert,
     ).auto_ref_ids()
 
 
@@ -447,9 +448,7 @@ def generate_elasticache_redis_latency_graph(
     Generate ElastiCache Redis graph
     """
 
-    y_axes = YAxes(
-        YAxis(format=MILLISECONDS_FORMAT),
-    )
+    y_axes = single_y_axis(format=MILLISECONDS_FORMAT)
 
     aliases = {
         "latency": "String based CMDs latency",

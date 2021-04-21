@@ -38,7 +38,7 @@ class TestElasticCacheRedisDashboard:
             target.period.should.equal("1m")
             target.statistics.should.equal(["Maximum"])
             target.dimensions.should.equal(
-                {"ClientId": cache_cluster_id}
+                {"CacheClusterId": cache_cluster_id}
             )
 
         generated_graph.targets[0].metricName.should.equal("BytesUsedForCache")
@@ -56,6 +56,7 @@ class TestElasticCacheRedisDashboard:
         generated_graph = generate_elasticache_redis_cpu_usage_graph(
             cache_cluster_id=cache_cluster_id,
             cloudwatch_data_source=cloudwatch_data_source,
+            notifications=[]
         )
         generated_graph.title.should.match(r"CPU utilization")
         generated_graph.dataSource.should.match(cloudwatch_data_source)
@@ -63,10 +64,10 @@ class TestElasticCacheRedisDashboard:
 
         for target in generated_graph.targets:
             target.should.be.a(CloudwatchMetricsTarget)
-            target.namespace.should.equal("AWS/Elasticache")
+            target.namespace.should.equal("AWS/ElastiCache")
             target.period.should.equal("1m")
             target.dimensions.should.equal(
-                {"ClientId": cache_cluster_id}
+                {"CacheClusterId": cache_cluster_id}
             )
 
         generated_graph.targets[0].metricName.should.equal("CPUCreditBalance")
