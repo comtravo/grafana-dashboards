@@ -212,7 +212,7 @@ def generate_elasticache_redis_cpu_usage_graph(
             "bars": False,
         },
         {
-            "alias": aliases["cedit usage"],
+            "alias": aliases["credit usage"],
             "color": colors.YELLOW,
             "lines": False,
             "bars": True,
@@ -246,7 +246,7 @@ def generate_elasticache_redis_network_in_graph(
     Generate ElastiCache Redis graph
     """
 
-    y_axes = YAxis(format=MEGA_BYTES)
+    y_axes = single_y_axis(format=MEGA_BYTES)
     aliases = {
         "in": "Network bytes in",
     }
@@ -292,7 +292,7 @@ def generate_elasticache_redis_network_out_graph(
     Generate ElastiCache Redis graph
     """
 
-    y_axes = YAxis(format=MEGA_BYTES)
+    y_axes = single_y_axis(format=MEGA_BYTES)
     aliases = {
         "out": "Network bytes out",
     }
@@ -337,7 +337,7 @@ def generate_elasticache_redis_connections_graph(
     Generate ElastiCache Redis graph
     """
 
-    y_axes = YAxis(format=SHORT_FORMAT)
+    y_axes = single_y_axis(format=SHORT_FORMAT)
     aliases = {
         "current": "Current connections",
     }
@@ -457,7 +457,7 @@ def generate_elasticache_redis_latency_graph(
 
     targets = [
         CloudwatchMetricsTarget(
-            alias=aliases["bytes"],
+            alias=aliases["latency"],
             namespace=NAMESPACE,
             period="1m",
             statistics=["Maximum"],
