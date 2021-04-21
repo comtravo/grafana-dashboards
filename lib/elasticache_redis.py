@@ -25,7 +25,7 @@ from grafanalib.core import (
     YAxes,
     YAxis,
 )
-from grafanalib.formatunits import MEGA_BYTES, KILO_BYTES
+from grafanalib.formatunits import MEGA_BYTES, BYTES
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.annotations import get_release_annotations
@@ -121,7 +121,7 @@ def generate_elasticache_redis_swap_and_memory_usage_graph(
     Generate ElastiCache Redis graph
     """
 
-    y_axes = single_y_axis(format=KILO_BYTES)
+    y_axes = single_y_axis(format=BYTES)
     aliases = {
         "bytes": "Bytes used for cache",
         "swap": "Swap Usage",
@@ -282,7 +282,7 @@ def generate_elasticache_redis_network_in_graph(
     Generate ElastiCache Redis graph
     """
 
-    y_axes = single_y_axis(format=MEGA_BYTES)
+    y_axes = single_y_axis(format=BYTES)
     aliases = {
         "in": "Network bytes in",
     }
@@ -328,7 +328,7 @@ def generate_elasticache_redis_network_out_graph(
     Generate ElastiCache Redis graph
     """
 
-    y_axes = single_y_axis(format=MEGA_BYTES)
+    y_axes = single_y_axis(format=BYTES)
     aliases = {
         "out": "Network bytes out",
     }
