@@ -41,8 +41,8 @@ from lib.commons import (
     TRANSPARENT,
 )
 
-ELASTICACHE_MEASUREMENT = "cloudwatch_aws_es"
-NAMESPACE = "AWS/ES"
+ELASTICACHE_MEASUREMENT = "cloudwatch_aws_elasticache"
+NAMESPACE = "AWS/ElastiCache"
 
 DOCUMENTATION_LINK = {
     "targetBlank": True,
@@ -227,7 +227,7 @@ def generate_elasticache_redis_cpu_usage_graph(
     ]
 
     return Graph(
-        title="CPU usage",
+        title="CPU utilization",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
@@ -499,6 +499,7 @@ def generate_elasticache_redis_dashboard(
 ):
     """Generate ElastiCache Redis dashboard"""
     tags = ["elasticache", "redis", environment]
+    name = "ElastiCache Redis"
 
     rows = [
         Row(
@@ -548,7 +549,7 @@ def generate_elasticache_redis_dashboard(
     ]
 
     return Dashboard(
-        title="ElastiCache Redis: {}".format(name),
+        title=name,
         editable=EDITABLE,
         annotations=get_release_annotations(influxdb_data_source),
         templating=get_release_templating(influxdb_data_source),
