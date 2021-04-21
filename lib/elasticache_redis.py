@@ -25,7 +25,7 @@ from grafanalib.core import (
     YAxes,
     YAxis,
 )
-from grafanalib.formatunits import MEGA_BYTES
+from grafanalib.formatunits import MEGA_BYTES, KILO_BYTES
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.annotations import get_release_annotations
@@ -51,7 +51,7 @@ DOCUMENTATION_LINK = {
 }
 
 
-def generate_elasticache_redis_memory_usage_graph(
+def generate_elasticache_redis_db_memory_usage_and_evicitons_graph(
     cache_cluster_id: str, cloudwatch_data_source: str
 ) -> Graph:
     """
@@ -60,24 +60,14 @@ def generate_elasticache_redis_memory_usage_graph(
 
     y_axes = YAxes(
         YAxis(format=PERCENT_FORMAT),
-        YAxis(format=MEGA_BYTES),
+        YAxis(format=SHORT_FORMAT),
     )
     aliases = {
-        "bytes": "Bytes used for cache",
         "db usage": "Database memory usage percentage",
-        "swap": "SwapUsage",
         "evictions": "Evictions",
     }
 
     targets = [
-        CloudwatchMetricsTarget(
-            alias=aliases["bytes"],
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Maximum"],
-            dimensions={"CacheClusterId": cache_cluster_id},
-            metricName="BytesUsedForCache",
-        ),
         CloudwatchMetricsTarget(
             alias=aliases["db usage"],
             namespace=NAMESPACE,
@@ -85,14 +75,6 @@ def generate_elasticache_redis_memory_usage_graph(
             statistics=["Maximum"],
             dimensions={"CacheClusterId": cache_cluster_id},
             metricName="DatabaseMemoryUsagePercentage",
-        ),
-        CloudwatchMetricsTarget(
-            alias=aliases["swap"],
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Maximum"],
-            dimensions={"CacheClusterId": cache_cluster_id},
-            metricName="SwapUsage",
         ),
         CloudwatchMetricsTarget(
             alias=aliases["evictions"],
@@ -112,6 +94,60 @@ def generate_elasticache_redis_memory_usage_graph(
             "bars": False,
         },
         {
+            "alias": aliases["evictions"],
+            "color": colors.RED,
+            "lines": True,
+            "bars": False,
+            "yaxis": 2,
+        },
+    ]
+
+    return Graph(
+        title="DB memory usage and Evictions",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        yAxes=y_axes,
+        seriesOverrides=series_overrides,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=True,
+        lines=False,
+    ).auto_ref_ids()
+
+def generate_elasticache_redis_swap_and_memory_usage_graph(
+    cache_cluster_id: str, cloudwatch_data_source: str
+) -> Graph:
+    """
+    Generate ElastiCache Redis graph
+    """
+
+    y_axes = single_y_axis(format=KILO_BYTES)
+    aliases = {
+        "bytes": "Bytes used for cache",
+        "swap": "Swap Usage",
+    }
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=aliases["bytes"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Maximum"],
+            dimensions={"CacheClusterId": cache_cluster_id},
+            metricName="BytesUsedForCache",
+        ),
+        CloudwatchMetricsTarget(
+            alias=aliases["swap"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Maximum"],
+            dimensions={"CacheClusterId": cache_cluster_id},
+            metricName="SwapUsage",
+        ),
+    ]
+
+    series_overrides = [
+        {
             "alias": aliases["swap"],
             "color": colors.BLUE,
             "lines": True,
@@ -122,12 +158,11 @@ def generate_elasticache_redis_memory_usage_graph(
             "color": colors.GREEN,
             "lines": True,
             "bars": False,
-            "yaxis": 2,
         },
     ]
 
     return Graph(
-        title="Memory usage",
+        title="Memory and Swap usage",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
@@ -508,7 +543,11 @@ def generate_elasticache_redis_dashboard(
                     cloudwatch_data_source=cloudwatch_data_source,
                     notifications=notifications,
                 ),
-                generate_elasticache_redis_memory_usage_graph(
+                generate_elasticache_redis_swap_and_memory_usage_graph(
+                    cache_cluster_id=cache_cluster_id,
+                    cloudwatch_data_source=cloudwatch_data_source,
+                ),
+                generate_elasticache_redis_db_memory_usage_and_evicitons_graph(
                     cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
