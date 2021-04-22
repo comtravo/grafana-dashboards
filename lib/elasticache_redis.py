@@ -227,10 +227,7 @@ def generate_elasticache_redis_cpu_credit_usage_graph(
     Generate ElastiCache Redis graph
     """
 
-    y_axes = YAxes(
-        YAxis(format=SHORT_FORMAT),
-        YAxis(format=SHORT_FORMAT),
-    )
+    y_axes = single_y_axis(format=SHORT_FORMAT)
     aliases = {
         "credit balance": "CPU credit balance",
         "credit usage": "CPU credit usage",
@@ -288,7 +285,6 @@ def generate_elasticache_redis_cpu_credit_usage_graph(
             "color": colors.YELLOW,
             "lines": True,
             "bars": False,
-            "yaxis": 2,
         },
     ]
 
