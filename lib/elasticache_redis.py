@@ -175,6 +175,50 @@ def generate_elasticache_redis_swap_and_memory_usage_graph(
 
 
 def generate_elasticache_redis_cpu_usage_graph(
+    cache_cluster_id: str, cloudwatch_data_source: str
+) -> Graph:
+    """
+    Generate ElastiCache Redis graph
+    """
+
+    y_axes = single_y_axis(format=PERCENT_FORMAT),
+    aliases = {
+        "engine utilization": "Engine CPU utilization",
+    }
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=aliases["engine utilization"],
+            namespace=NAMESPACE,
+            period="1m",
+            statistics=["Maximum"],
+            dimensions={"CacheClusterId": cache_cluster_id},
+            metricName="EngineCPUUtilization",
+        ),
+    ]
+
+    series_overrides = [
+        {
+            "alias": aliases["engine utilization"],
+            "color": colors.GREEN,
+            "lines": True,
+            "bars": False,
+        },
+    ]
+
+    return Graph(
+        title="CPU utilization",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        yAxes=y_axes,
+        seriesOverrides=series_overrides,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        bars=True,
+        lines=False,
+    ).auto_ref_ids()
+
+def generate_elasticache_redis_cpu_credit_usage_graph(
     cache_cluster_id: str, cloudwatch_data_source: str, notifications: List[str]
 ) -> Graph:
     """
@@ -183,12 +227,11 @@ def generate_elasticache_redis_cpu_usage_graph(
 
     y_axes = YAxes(
         YAxis(format=SHORT_FORMAT),
-        YAxis(format=PERCENT_FORMAT),
+        YAxis(format=SHORT_FORMAT),
     )
     aliases = {
         "credit balance": "CPU credit balance",
         "credit usage": "CPU credit usage",
-        "engine utilization": "Engine CPU utilization",
     }
 
     targets = [
@@ -208,14 +251,6 @@ def generate_elasticache_redis_cpu_usage_graph(
             statistics=["Maximum"],
             dimensions={"CacheClusterId": cache_cluster_id},
             metricName="CPUCreditUsage",
-        ),
-        CloudwatchMetricsTarget(
-            alias=aliases["engine utilization"],
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Maximum"],
-            dimensions={"CacheClusterId": cache_cluster_id},
-            metricName="EngineCPUUtilization",
         ),
     ]
 
@@ -251,12 +286,6 @@ def generate_elasticache_redis_cpu_usage_graph(
             "color": colors.YELLOW,
             "lines": False,
             "bars": True,
-        },
-        {
-            "alias": aliases["engine utilization"],
-            "color": colors.ORANGE,
-            "lines": True,
-            "bars": False,
             "yaxis": 2,
         },
     ]
@@ -541,13 +570,13 @@ def generate_elasticache_redis_dashboard(
                 generate_elasticache_redis_cpu_usage_graph(
                     cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
+                ),
+                generate_elasticache_redis_cpu_credit_usage_graph(
+                    cache_cluster_id=cache_cluster_id,
+                    cloudwatch_data_source=cloudwatch_data_source,
                     notifications=notifications,
                 ),
                 generate_elasticache_redis_swap_and_memory_usage_graph(
-                    cache_cluster_id=cache_cluster_id,
-                    cloudwatch_data_source=cloudwatch_data_source,
-                ),
-                generate_elasticache_redis_db_memory_usage_and_evicitons_graph(
                     cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
@@ -560,7 +589,11 @@ def generate_elasticache_redis_dashboard(
                     cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
-                generate_elasticache_redis_network_out_graph(
+                generate_elasticache_redis_connections_graph(
+                    cache_cluster_id=cache_cluster_id,
+                    cloudwatch_data_source=cloudwatch_data_source,
+                ),
+                generate_elasticache_redis_db_memory_usage_and_evicitons_graph(
                     cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
@@ -569,11 +602,11 @@ def generate_elasticache_redis_dashboard(
         ),
         Row(
             panels=[
-                generate_elasticache_redis_replication_graph(
+                generate_elasticache_redis_network_out_graph(
                     cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
-                generate_elasticache_redis_connections_graph(
+                generate_elasticache_redis_replication_graph(
                     cache_cluster_id=cache_cluster_id,
                     cloudwatch_data_source=cloudwatch_data_source,
                 ),
