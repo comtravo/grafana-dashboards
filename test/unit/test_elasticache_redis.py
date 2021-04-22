@@ -3,6 +3,9 @@ from grafanalib.core import (
     Graph,
     Template,
     Templating,
+    LowerThan,
+    OP_OR,
+    RTYPE_MAX,
 )
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
@@ -117,7 +120,7 @@ class TestElasticCacheRedisDashboard:
         generated_graph.targets[1].metricName.should.equal("CPUCreditUsage")
         generated_graph.targets[1].statistics.should.equal(["Maximum"])
 
-    def test_should_generate_elasticache_cpu_usage_graph_with_notifications(
+    def test_should_generate_elasticache_cpu_credit_usage_graph_with_notifications(
         self,
     ):
 
@@ -134,6 +137,11 @@ class TestElasticCacheRedisDashboard:
         generated_graph.alert.frequency.should.equal("2m")
         generated_graph.alert.gracePeriod.should.equal("2m")
         generated_graph.alert.notifications.should.equal(notifications)
+        generated_graph.alert.alertConditions[0].evaluator.should.be.equal(
+            LowerThan(250)
+        )
+        generated_graph.alert.alertConditions[0].reducerType.should.be.equal(RTYPE_MAX)
+        generated_graph.alert.alertConditions[0].operator.should.be.equal(OP_OR)
 
     def test_should_generate_elasticache_redis_network_in_graph(self):
 
