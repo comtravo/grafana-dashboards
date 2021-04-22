@@ -286,8 +286,8 @@ def generate_elasticache_redis_cpu_credit_usage_graph(
         {
             "alias": aliases["credit usage"],
             "color": colors.YELLOW,
-            "lines": False,
-            "bars": True,
+            "lines": True,
+            "bars": False,
             "yaxis": 2,
         },
     ]
