@@ -423,8 +423,8 @@ def generate_elasticache_redis_connections_graph(
         {
             "alias": aliases["current"],
             "color": colors.GREEN,
-            "lines": False,
-            "bars": True,
+            "lines": True,
+            "bars": False,
         },
     ]
 
