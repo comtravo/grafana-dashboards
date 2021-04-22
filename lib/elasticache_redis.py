@@ -114,6 +114,7 @@ def generate_elasticache_redis_db_memory_usage_and_evicitons_graph(
         lines=False,
     ).auto_ref_ids()
 
+
 def generate_elasticache_redis_swap_and_memory_usage_graph(
     cache_cluster_id: str, cloudwatch_data_source: str
 ) -> Graph:
@@ -207,7 +208,7 @@ def generate_elasticache_redis_cpu_usage_graph(
     ]
 
     return Graph(
-        title="CPU utilization",
+        title="Engine CPU utilization",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
@@ -217,6 +218,7 @@ def generate_elasticache_redis_cpu_usage_graph(
         bars=True,
         lines=False,
     ).auto_ref_ids()
+
 
 def generate_elasticache_redis_cpu_credit_usage_graph(
     cache_cluster_id: str, cloudwatch_data_source: str, notifications: List[str]
@@ -291,7 +293,7 @@ def generate_elasticache_redis_cpu_credit_usage_graph(
     ]
 
     return Graph(
-        title="CPU utilization",
+        title="CPU credit utilization",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
