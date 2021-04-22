@@ -181,7 +181,7 @@ def generate_elasticache_redis_cpu_usage_graph(
     Generate ElastiCache Redis graph
     """
 
-    y_axes = single_y_axis(format=PERCENT_FORMAT),
+    y_axes = single_y_axis(format=PERCENT_FORMAT)
     aliases = {
         "engine utilization": "Engine CPU utilization",
     }
