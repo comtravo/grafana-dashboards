@@ -555,6 +555,7 @@ def generate_elasticache_redis_latency_graph(
 
 
 def generate_elasticache_redis_dashboard(
+    name: str,
     cache_cluster_id: str,
     influxdb_data_source: str,
     cloudwatch_data_source: str,
@@ -565,7 +566,6 @@ def generate_elasticache_redis_dashboard(
 ):
     """Generate ElastiCache Redis dashboard"""
     tags = ["elasticache", "redis", environment]
-    name = "ElastiCache Redis"
 
     rows = [
         Row(
@@ -623,7 +623,7 @@ def generate_elasticache_redis_dashboard(
     ]
 
     return Dashboard(
-        title=name,
+        title="ElastiCache Redis: {}".format(name),
         editable=EDITABLE,
         annotations=get_release_annotations(influxdb_data_source),
         templating=get_release_templating(influxdb_data_source),

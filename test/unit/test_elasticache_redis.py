@@ -243,7 +243,7 @@ class TestElasticCacheRedisDashboard:
 
     def test_should_generate_elasticsearch_dashboard(self):
 
-        name = "ElastiCache Redis"
+        name = "foo"
         cache_cluster_id = "1234567890"
         environment = "prod"
         influxdb_data_source = "influxdb"
@@ -251,6 +251,7 @@ class TestElasticCacheRedisDashboard:
         notifications = ["slack-1", "slack-2"]
 
         generated_dashboard = generate_elasticache_redis_dashboard(
+            name=name,
             cache_cluster_id=cache_cluster_id,
             environment=environment,
             influxdb_data_source=influxdb_data_source,
@@ -258,7 +259,7 @@ class TestElasticCacheRedisDashboard:
             notifications=notifications,
         )
 
-        generated_dashboard.title.should.equal(name)
+        generated_dashboard.title.should.equal("ElastiCache Redis: foo")
         generated_dashboard.templating.should.be.a(Templating)
         generated_dashboard.templating.list.should.have.length_of(1)
         generated_dashboard.templating.list[0].should.be.a(Template)
