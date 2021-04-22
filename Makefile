@@ -51,7 +51,6 @@ clean: clean-py clean-state
 generate-docs: fmt-go lint-go
 	@find terraform_modules -maxdepth 1 -type d -not -path 'terraform_modules' -exec sh -c 'cd {} && $(GENERATE_DOCS_COMMAND)' ';'
 
-
 test-unit:
 	@coverage run -m pytest test/unit/test_*.py && coverage report -m
 

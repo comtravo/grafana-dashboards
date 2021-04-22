@@ -51,6 +51,6 @@ The [examples](./examples) directory showcases various possibilies on using the 
 
 ## TODO
 
- - [ ] Create snapshots of dasboards in the [examples](./examples) directory
+ - [ ] Create snapshots of dashboards in the [examples](./examples) directory
  - [ ] Add ECS
  - [ ] Add MongoDB

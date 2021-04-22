@@ -5,6 +5,9 @@ from lib.lambdas import dispatcher as lambda_dispatcher
 from lib.api_gateways import generate_api_gateways_dashboard as apig_dispatcher
 from lib.step_functions import generate_sfn_dashboard as sfn_dispatcher
 from lib.firehose import generate_firehose_dashboard as firehose_dispatcher
+from lib.elasticache_redis import (
+    generate_elasticache_redis_dashboard as elasticache_redis_dispatcher,
+)
 from lib.elasticsearch import (
     generate_elasticsearch_dashboard as elasticsearch_dispatcher,
 )
@@ -53,6 +56,14 @@ def parse_options():  # pragma: no cover
     )
 
     subparsers.add_parser("firehose", help="Create dashboard for AWS Firehose")
+
+    elasticache_redis = subparsers.add_parser(
+        "elasticache-redis", help="Create dashboard for AWS ElastiCache"
+    )
+    elasticache_redis.add_argument(
+        "--cache_cluster_id", type=str, help="Cache Cluster Id", required=True
+    )
+
     es = subparsers.add_parser("elasticsearch", help="Create dashboard for AWS ES")
     es.add_argument("--client_id", type=str, help="Client id", required=True)
 
@@ -112,6 +123,7 @@ def dispatcher():
         "api-gateway": apig_dispatcher,
         "step-function": sfn_dispatcher,
         "firehose": firehose_dispatcher,
+        "elasticache-redis": elasticache_redis_dispatcher,
         "elasticsearch": elasticsearch_dispatcher,
         "rds": rds_dispatcher,
     }
