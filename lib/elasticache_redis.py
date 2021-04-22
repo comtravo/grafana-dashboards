@@ -449,7 +449,7 @@ def generate_elasticache_redis_replication_graph(
     """
 
     y_axes = YAxes(
-        YAxis(format=MEGA_BYTES),
+        YAxis(format=BYTES),
         YAxis(format=MILLISECONDS_FORMAT),
     )
 
@@ -489,6 +489,7 @@ def generate_elasticache_redis_replication_graph(
             "color": colors.RED,
             "lines": True,
             "bars": False,
+            "yaxis": 2,
         },
     ]
 
