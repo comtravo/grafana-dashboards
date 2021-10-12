@@ -102,8 +102,13 @@ def parse_options():  # pragma: no cover
     lambda_sns_triggers.add_argument(
         "--topics", nargs="+", help="List of SNS topics", required=True
     )
-    lambda_function_sub_parser.add_parser("sqs", help="Lambda is triggered by SQS")
-
+    lambda_sns_triggers.add_argument(
+        "--fifo", action='store_true', help="Are the SQS queues FIFO"
+    )
+    sqs = lambda_function_sub_parser.add_parser("sqs", help="Lambda is triggered by SQS")
+    sqs.add_argument(
+        "--fifo", action='store_true', help="Are the SQS queues FIFO"
+    )
     return parser.parse_args()
 
 

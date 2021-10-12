@@ -263,9 +263,12 @@ def create_lambda_only_dashboard(
 
 
 def create_lambda_sqs_dlq_graph(
-    name: str, cloudwatch_data_source: str, notifications: List[str]
+    name: str, cloudwatch_data_source: str, fifo: bool, notifications: List[str]
 ):
     """Create SQS Deadletter graph"""
+
+    if fifo:
+        name += '.fifo'
 
     targets = [
         CloudwatchMetricsTarget(
@@ -314,8 +317,11 @@ def create_lambda_sqs_dlq_graph(
     ).auto_ref_ids()
 
 
-def create_lambda_sqs_graph(name: str, cloudwatch_data_source: str):
+def create_lambda_sqs_graph(name: str, cloudwatch_data_source: str, fifo: bool):
     """Create SQS graph"""
+
+    if fifo:
+        name += '.fifo'
 
     targets = [
         CloudwatchMetricsTarget(
@@ -346,8 +352,7 @@ def lambda_sqs_dashboard(
     influxdb_data_source: str,
     notifications: List[str],
     environment: str,
-    *args,
-    **kwargs
+    fifo: bool
 ):
     """Create a dashboard with Lambda and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment]
@@ -356,11 +361,12 @@ def lambda_sqs_dashboard(
         name, cloudwatch_data_source, notifications=notifications
     )
     sqs_graph = create_lambda_sqs_graph(
-        name=name, cloudwatch_data_source=cloudwatch_data_source
+        name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
     )
     dead_letter_sqs_graph = create_lambda_sqs_dlq_graph(
         name=name + "-dlq",
         cloudwatch_data_source=cloudwatch_data_source,
+        fifo=fifo,
         notifications=notifications,
     )
 
@@ -387,8 +393,7 @@ def lambda_sns_sqs_dashboard(
     notifications: List[str],
     environment: str,
     topics: List[str],
-    *args,
-    **kwargs
+    fifo: bool
 ):
     """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment, "sns"]
@@ -397,11 +402,12 @@ def lambda_sns_sqs_dashboard(
         name, cloudwatch_data_source, notifications=notifications
     )
     sqs_graph = create_lambda_sqs_graph(
-        name=name, cloudwatch_data_source=cloudwatch_data_source
+        name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
     )
     dead_letter_sqs_graph = create_lambda_sqs_dlq_graph(
         name=name + "-dlq",
         cloudwatch_data_source=cloudwatch_data_source,
+        fifo=fifo,
         notifications=notifications,
     )
 
