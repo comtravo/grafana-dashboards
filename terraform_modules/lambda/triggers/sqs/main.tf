@@ -4,7 +4,7 @@ variable "grafana_configuration" {
     name                   = string
     environment            = string
     cloudwatch_data_source = string
-    fifo = bool
+    fifo                   = bool
     notifications          = list(string)
     topics                 = list(string)
     folder                 = string
@@ -20,8 +20,8 @@ locals {
   notification_args = length(var.grafana_configuration.notifications) > 0 ? "--notifications ${join(" ", var.grafana_configuration.notifications)}" : ""
   topics_args       = try(length(var.grafana_configuration.topics), 0) > 0 ? "--topics ${join(" ", var.grafana_configuration.topics)}" : ""
 
-  fifo_args = var.grafana_configuration.fifo == true ? "--fifo": ""
-  dahboard_path     = "${path.module}/dashboard.json"
+  fifo_args     = var.grafana_configuration.fifo == true ? "--fifo" : ""
+  dahboard_path = "${path.module}/dashboard.json"
 }
 
 resource "null_resource" "generate_dashboard" {
@@ -55,7 +55,7 @@ output "output" {
   value = {
     slug         = try(grafana_dashboard.this[0].slug, "")
     dashboard_id = try(grafana_dashboard.this[0].dashboard_id, "")
-    uid = try(grafana_dashboard.this[0].uid, "")
-    version = try(grafana_dashboard.this[0].version, "")
+    uid          = try(grafana_dashboard.this[0].uid, "")
+    version      = try(grafana_dashboard.this[0].version, "")
   }
 }

@@ -74,8 +74,7 @@ def dispatcher(service, trigger, *args, **kwargs):
 
 
 def lambda_generate_graph(
-    name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
-):
+    name: str, cloudwatch_data_source: str, notifications: List[str]):
     """
     Generate lambda graph
     """
@@ -357,8 +356,11 @@ def lambda_sqs_dashboard(
     """Create a dashboard with Lambda and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment]
 
+    if fifo:
+        tags += ["fifo"]
+
     lambda_graph = lambda_generate_graph(
-        name, cloudwatch_data_source, notifications=notifications
+        name, cloudwatch_data_source, notifications=[]
     )
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
@@ -398,8 +400,11 @@ def lambda_sns_sqs_dashboard(
     """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment, "sns"]
 
+    if fifo:
+        tags += ["fifo"]
+
     lambda_graph = lambda_generate_graph(
-        name, cloudwatch_data_source, notifications=notifications
+        name, cloudwatch_data_source, notifications=[]
     )
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
