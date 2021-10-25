@@ -69,5 +69,7 @@ output "output" {
   value = {
     slug         = try(grafana_dashboard.this[0].slug, "")
     dashboard_id = try(grafana_dashboard.this[0].dashboard_id, "")
+    uid          = try(grafana_dashboard.this[0].uid, "")
+    version      = try(grafana_dashboard.this[0].version, "")
   }
 }
