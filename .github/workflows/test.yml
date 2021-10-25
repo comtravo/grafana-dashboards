@@ -1,0 +1,14 @@
+name: test
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fkirc/skip-duplicate-actions@master
+      - uses: actions/checkout@v2
+      - run: make build
+      - run: make lint-docker
+      - run: make test-docker
