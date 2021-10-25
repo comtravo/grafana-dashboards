@@ -50,7 +50,7 @@ clean: clean-py clean-state
 
 generate-docs: fmt-go lint-go
 	@find terraform_modules -maxdepth 1 -type d -not -path 'terraform_modules' -exec sh -c 'cd {} && $(GENERATE_DOCS_COMMAND)' ';'
-	@find terraform_modules/lambda/triggers -maxdepth 1 -type d -not -path 'triggers' -exec sh -c 'cd {} && $(GENERATE_DOCS_COMMAND)' ';'
+	@find terraform_modules/lambda/triggers -maxdepth 1 -type d -not -path 'terraform_modules/lambda/triggers' -exec sh -c 'cd {} && $(GENERATE_DOCS_COMMAND)' ';'
 
 test-unit:
 	@coverage run -m pytest test/unit/test_*.py && coverage report -m
