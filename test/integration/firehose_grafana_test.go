@@ -27,10 +27,12 @@ func TestFirehose_noDashboard(t *testing.T) {
 
 	output := terraform.OutputMap(t, terraformOptions, "op")
 
-	expectedLen := 2
+	expectedLen := 4
 	expectedMap := map[string]string{
 		"dashboard_id": "",
 		"slug":         "",
+		"uid":          "",
+		"version":      "",
 	}
 
 	require.Len(t, output, expectedLen, "Output should contain %d items", expectedLen)

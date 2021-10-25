@@ -59,6 +59,6 @@ func TerraformApplyAndValidateElasticsearchOutputs(t *testing.T, terraformOption
 	require.Equal(t, resourceCount.Destroy, 0)
 
 	output := terraform.OutputMap(t, terraformOptions, "op")
-	expectedLen := 2
+	expectedLen := 4
 	require.Len(t, output, expectedLen, "Output should contain %d items", expectedLen)
 }

@@ -28,10 +28,12 @@ func TestLambda_noDashboard(t *testing.T) {
 
 	output := terraform.OutputMap(t, terraformOptions, "op")
 
-	expectedLen := 2
+	expectedLen := 4
 	expectedMap := map[string]string{
 		"dashboard_id": "",
 		"slug":         "",
+		"uid":          "",
+		"version":      "",
 	}
 
 	require.Len(t, output, expectedLen, "Output should contain %d items", expectedLen)
@@ -101,6 +103,19 @@ func SetupExample(t *testing.T, dashboardName string, exampleDir string) *terraf
 	return terraformOptions
 }
 
+func TestLambda_lambdaSqsFifoTrigger(t *testing.T) {
+
+	// t.Parallel()
+	dashboardName := fmt.Sprintf("lambda-%s", random.UniqueId())
+	exampleDir := "../../examples/lambda_dashboards/lambda_sqs_fifo_trigger/"
+
+	terraformOptions := SetupExample(t, dashboardName, exampleDir)
+	t.Logf("Terraform module inputs: %+v", *terraformOptions)
+	defer terraform.Destroy(t, terraformOptions)
+
+	TerraformApplyAndValidateOutputs(t, terraformOptions)
+}
+
 func TerraformApplyAndValidateOutputs(t *testing.T, terraformOptions *terraform.Options) {
 	terraformApplyOutput := terraform.InitAndApply(t, terraformOptions)
 	resourceCount := terraform.GetResourceCount(t, terraformApplyOutput)
@@ -111,10 +126,12 @@ func TerraformApplyAndValidateOutputs(t *testing.T, terraformOptions *terraform.
 
 	output := terraform.OutputMap(t, terraformOptions, "op")
 
-	expectedLen := 2
+	expectedLen := 4
 	notExpectedMap := map[string]string{
 		"dashboard_id": "",
 		"slug":         "",
+		"uid":          "",
+		"version":      "",
 	}
 
 	require.Len(t, output, expectedLen, "Output should contain %d items", expectedLen)
