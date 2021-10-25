@@ -114,17 +114,6 @@ func TestLambda_lambdaSqsFifoTrigger(t *testing.T) {
 	TerraformApplyAndValidateOutputs(t, terraformOptions)
 }
 
-func SetupExample(t *testing.T, dashboardName string, exampleDir string) *terraform.Options {
-
-	terraformOptions := &terraform.Options{
-		TerraformDir: exampleDir,
-		Vars: map[string]interface{}{
-			"name": dashboardName,
-		},
-	}
-	return terraformOptions
-}
-
 func TerraformApplyAndValidateOutputs(t *testing.T, terraformOptions *terraform.Options) {
 	terraformApplyOutput := terraform.InitAndApply(t, terraformOptions)
 	resourceCount := terraform.GetResourceCount(t, terraformApplyOutput)

@@ -48,7 +48,10 @@ clean-py:
 
 clean: clean-py clean-state
 
-generate-docs: fmt-go lint-go
+reset-dashboard:
+	@for i in `find . -type f -name 'dashboard.json'`; do echo '{}' > $i; done
+
+generate-docs: reset-dashboard fmt-go lint-go
 	@find terraform_modules -maxdepth 1 -type d -not -path 'terraform_modules' -exec sh -c 'cd {} && $(GENERATE_DOCS_COMMAND)' ';'
 
 test-unit:

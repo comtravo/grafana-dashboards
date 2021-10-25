@@ -3,13 +3,12 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_grafana"></a> [grafana](#requirement\_grafana) | ~> 1.7 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_grafana"></a> [grafana](#provider\_grafana) | ~> 1.7 |
+| <a name="provider_grafana"></a> [grafana](#provider\_grafana) | n/a |
 | <a name="provider_local"></a> [local](#provider\_local) | n/a |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 

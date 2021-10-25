@@ -18,7 +18,7 @@ module "dashboard" {
     cloudwatch_data_source = "cloudwatch"
     notifications          = ["slack"]
     folder                 = null
-    fifo = true
+    fifo                   = true
     topics                 = []
   }
 }

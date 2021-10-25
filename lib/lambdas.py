@@ -72,7 +72,8 @@ def dispatcher(service, trigger, *args, **kwargs):
 
 
 def lambda_generate_graph(
-    name: str, cloudwatch_data_source: str, notifications: List[str]):
+    name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
+):
     """
     Generate lambda graph
     """
@@ -265,7 +266,7 @@ def create_lambda_sqs_dlq_graph(
     """Create SQS Deadletter graph"""
 
     if fifo:
-        name += '.fifo'
+        name += ".fifo"
 
     targets = [
         CloudwatchMetricsTarget(
@@ -318,7 +319,7 @@ def create_lambda_sqs_graph(name: str, cloudwatch_data_source: str, fifo: bool):
     """Create SQS graph"""
 
     if fifo:
-        name += '.fifo'
+        name += ".fifo"
 
     targets = [
         CloudwatchMetricsTarget(
@@ -349,7 +350,9 @@ def lambda_sqs_dashboard(
     influxdb_data_source: str,
     notifications: List[str],
     environment: str,
-    fifo: bool
+    fifo: bool,
+    *args,
+    **kwargs
 ):
     """Create a dashboard with Lambda and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment]
@@ -357,9 +360,7 @@ def lambda_sqs_dashboard(
     if fifo:
         tags += ["fifo"]
 
-    lambda_graph = lambda_generate_graph(
-        name, cloudwatch_data_source, notifications=[]
-    )
+    lambda_graph = lambda_generate_graph(name, cloudwatch_data_source, notifications=[])
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
     )
@@ -393,7 +394,7 @@ def lambda_sns_sqs_dashboard(
     notifications: List[str],
     environment: str,
     topics: List[str],
-    fifo: bool
+    fifo: bool,
 ):
     """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment, "sns"]
@@ -401,9 +402,7 @@ def lambda_sns_sqs_dashboard(
     if fifo:
         tags += ["fifo"]
 
-    lambda_graph = lambda_generate_graph(
-        name, cloudwatch_data_source, notifications=[]
-    )
+    lambda_graph = lambda_generate_graph(name, cloudwatch_data_source, notifications=[])
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
     )

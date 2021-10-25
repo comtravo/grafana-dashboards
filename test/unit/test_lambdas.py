@@ -13,8 +13,6 @@ from lib.lambdas import (
     lambda_sns_sqs_dashboard,
 )
 
-import re
-
 
 class TestDispatcher:
     def test_should_throw_exception_when_dispatcher_called_with_wrong_arguments(self):
@@ -42,6 +40,7 @@ class TestDispatcher:
             "cloudwatch_data_source": "cloudwatch",
             "notifications": [],
             "topics": topics,
+            "fifo": False,
         }
 
         for trigger in expected_triggers:
@@ -194,6 +193,41 @@ class TestDispatcher:
             name=lambda_name,
             cloudwatch_data_source=cloudwatch_data_source,
             notifications=notifications,
+            fifo=False,
+        )
+        generated_lambd_graph.should.be.a(Graph)
+        generated_lambd_graph.should.have.property("title").with_value.equal(
+            "SQS Dead Letter Queue: {}".format(lambda_name)
+        )
+        generated_lambd_graph.should.have.property("dataSource").with_value.equal(
+            cloudwatch_data_source
+        )
+        generated_lambd_graph.should.have.property("targets")
+        generated_lambd_graph.targets.should.have.length_of(1)
+        generated_lambd_graph.targets[0].should.eql(expected_alert_query)
+        generated_lambd_graph.should.have.property("alert").be.a(Alert)
+        generated_lambd_graph.alert.executionErrorState.should.eql("alerting")
+        generated_lambd_graph.alert.noDataState.should.eql("no_data")
+
+    def test_should_create_lambda_sqs_dlq_fifo_graph(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "influxdb"
+        notifications = ["lorem"]
+
+        expected_alert_query = CloudwatchMetricsTarget(
+            alias="Approximate number of messages available",
+            namespace="AWS/SQS",
+            period="1m",
+            statistics=["Maximum"],
+            metricName="ApproximateNumberOfMessagesVisible",
+            dimensions={"QueueName": lambda_name},
+            refId="A",
+        )
+        generated_lambd_graph = create_lambda_sqs_dlq_graph(
+            name=lambda_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
+            fifo=True,
         )
         generated_lambd_graph.should.be.a(Graph)
         generated_lambd_graph.should.have.property("title").with_value.equal(
@@ -223,7 +257,34 @@ class TestDispatcher:
             refId="A",
         )
         generated_lambd_graph = create_lambda_sqs_graph(
-            name=lambda_name, cloudwatch_data_source=cloudwatch_data_source
+            name=lambda_name, cloudwatch_data_source=cloudwatch_data_source, fifo=False
+        )
+        generated_lambd_graph.should.be.a(Graph)
+        generated_lambd_graph.should.have.property("title").with_value.equal(
+            "SQS: {}".format(lambda_name)
+        )
+        generated_lambd_graph.should.have.property("dataSource").with_value.equal(
+            cloudwatch_data_source
+        )
+        generated_lambd_graph.should.have.property("targets")
+        generated_lambd_graph.targets.should.have.length_of(1)
+        generated_lambd_graph.targets[0].should.eql(expected_query)
+
+    def test_should_create_lambda_sqs_fifo_graph(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "cloudwatch"
+
+        expected_query = CloudwatchMetricsTarget(
+            alias="Number of messages sent to the queue",
+            namespace="AWS/SQS",
+            period="1m",
+            statistics=["Sum"],
+            metricName="NumberOfMessagesSent",
+            dimensions={"QueueName": lambda_name},
+            refId="A",
+        )
+        generated_lambd_graph = create_lambda_sqs_graph(
+            name=lambda_name, cloudwatch_data_source=cloudwatch_data_source, fifo=True
         )
         generated_lambd_graph.should.be.a(Graph)
         generated_lambd_graph.should.have.property("title").with_value.equal(
@@ -247,6 +308,29 @@ class TestDispatcher:
             "cloudwatch_data_source": cloudwatch_data_source,
             "influxdb_data_source": influxdb_data_source,
             "notifications": [],
+            "fifo": False,
+        }
+
+        generated_dashboard = lambda_sqs_dashboard(**call_args)
+        generated_dashboard.should.be.a(Dashboard)
+        generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
+        generated_dashboard.tags.sort().should.eql(
+            ["lambda", environment, "sqs"].sort()
+        )
+        generated_dashboard.rows.should.be.length_of(3)
+
+    def test_should_generate_lambda_sqs_fifo_dashboard(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "cloudwatch"
+        influxdb_data_source = "influxdb"
+        environment = "alpha"
+        call_args = {
+            "name": lambda_name,
+            "environment": environment,
+            "cloudwatch_data_source": cloudwatch_data_source,
+            "influxdb_data_source": influxdb_data_source,
+            "notifications": [],
+            "fifo": True,
         }
 
         generated_dashboard = lambda_sqs_dashboard(**call_args)
@@ -270,6 +354,32 @@ class TestDispatcher:
             "influxdb_data_source": influxdb_data_source,
             "notifications": [],
             "topics": topics,
+            "fifo": False,
+        }
+
+        generated_dashboard = lambda_sns_sqs_dashboard(**call_args)
+        generated_dashboard.should.be.a(Dashboard)
+        generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
+        generated_dashboard.tags.sort().should.eql(
+            ["lambda", environment, "sqs", "sns"].sort()
+        )
+        generated_dashboard.rows.should.be.length_of(4)
+        generated_dashboard.rows[0].panels.should.be.length_of(len(topics))
+
+    def test_should_generate_lambda_sns_sqs_fifo_dashboard(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "cloudwatch"
+        influxdb_data_source = "influxdb"
+        environment = "alpha"
+        topics = ["topic-1", "topic-2"]
+        call_args = {
+            "name": lambda_name,
+            "environment": environment,
+            "cloudwatch_data_source": cloudwatch_data_source,
+            "influxdb_data_source": influxdb_data_source,
+            "notifications": [],
+            "topics": topics,
+            "fifo": True,
         }
 
         generated_dashboard = lambda_sns_sqs_dashboard(**call_args)
