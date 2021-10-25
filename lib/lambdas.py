@@ -26,8 +26,6 @@ from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
     EDITABLE,
-    RAW_QUERY,
-    RETENTION_POLICY,
     SHARED_CROSSHAIR,
     TIMEZONE,
     TRANSPARENT,
