@@ -99,23 +99,23 @@ class TestDispatcher:
                 refId="A",
             ),
         ]
-        generated_lambd_graph = lambda_generate_graph(
+        generated_lambda_graph = lambda_generate_graph(
             name=lambda_name,
             cloudwatch_data_source=cloudwatch_data_source,
             influxdb_data_source=influxdb_data_source,
             notifications=[],
         )
-        generated_lambd_graph.should.be.a(Graph)
-        generated_lambd_graph.should.have.property("title").with_value.equal(
+        generated_lambda_graph.should.be.a(Graph)
+        generated_lambda_graph.should.have.property("title").with_value.equal(
             "Lambda: {}".format(lambda_name)
         )
-        generated_lambd_graph.should.have.property("dataSource").with_value.equal(
+        generated_lambda_graph.should.have.property("dataSource").with_value.equal(
             cloudwatch_data_source
         )
-        generated_lambd_graph.should.have.property("alert").with_value.equal(None)
-        generated_lambd_graph.should.have.property("targets")
-        generated_lambd_graph.targets.should.have.length_of(5)
-        generated_lambd_graph.targets.should.equal(expected_targets)
+        generated_lambda_graph.should.have.property("alert").with_value.equal(None)
+        generated_lambda_graph.should.have.property("targets")
+        generated_lambda_graph.targets.should.have.length_of(5)
+        generated_lambda_graph.targets.should.equal(expected_targets)
 
     def test_should_generate_lambda_graph_with_alert_notifications(self):
         lambda_name = "lambda-1"
@@ -132,20 +132,20 @@ class TestDispatcher:
             refId="A",
         )
 
-        generated_lambd_graph = lambda_generate_graph(
+        generated_lambda_graph = lambda_generate_graph(
             name=lambda_name,
             cloudwatch_data_source=cloudwatch_data_source,
             notifications=notifications,
         )
-        generated_lambd_graph.should.have.property("alert").be.a(Alert)
-        generated_lambd_graph.alert.executionErrorState.should.eql("alerting")
-        generated_lambd_graph.alert.noDataState.should.eql("no_data")
-        generated_lambd_graph.alert.alertConditions.should.have.length_of(1)
-        generated_lambd_graph.alert.alertConditions[0].should.be.a(AlertCondition)
-        generated_lambd_graph.alert.alertConditions[0].target.should.eql(
+        generated_lambda_graph.should.have.property("alert").be.a(Alert)
+        generated_lambda_graph.alert.executionErrorState.should.eql("alerting")
+        generated_lambda_graph.alert.noDataState.should.eql("no_data")
+        generated_lambda_graph.alert.alertConditions.should.have.length_of(1)
+        generated_lambda_graph.alert.alertConditions[0].should.be.a(AlertCondition)
+        generated_lambda_graph.alert.alertConditions[0].target.should.eql(
             Target(refId="A")
         )
-        generated_lambd_graph.targets.should.contain(expected_alert_query)
+        generated_lambda_graph.targets.should.contain(expected_alert_query)
 
     def test_should_generate_lambda_basic_dashboards(self):
         lambda_name = "lambda-1"
@@ -189,28 +189,29 @@ class TestDispatcher:
             dimensions={"QueueName": lambda_name},
             refId="A",
         )
-        generated_lambd_graph = create_lambda_sqs_dlq_graph(
+        generated_lambda_graph = create_lambda_sqs_dlq_graph(
             name=lambda_name,
             cloudwatch_data_source=cloudwatch_data_source,
             notifications=notifications,
             fifo=False,
         )
-        generated_lambd_graph.should.be.a(Graph)
-        generated_lambd_graph.should.have.property("title").with_value.equal(
+        generated_lambda_graph.should.be.a(Graph)
+        generated_lambda_graph.should.have.property("title").with_value.equal(
             "SQS Dead Letter Queue: {}".format(lambda_name)
         )
-        generated_lambd_graph.should.have.property("dataSource").with_value.equal(
+        generated_lambda_graph.should.have.property("dataSource").with_value.equal(
             cloudwatch_data_source
         )
-        generated_lambd_graph.should.have.property("targets")
-        generated_lambd_graph.targets.should.have.length_of(1)
-        generated_lambd_graph.targets[0].should.eql(expected_alert_query)
-        generated_lambd_graph.should.have.property("alert").be.a(Alert)
-        generated_lambd_graph.alert.executionErrorState.should.eql("alerting")
-        generated_lambd_graph.alert.noDataState.should.eql("no_data")
+        generated_lambda_graph.should.have.property("targets")
+        generated_lambda_graph.targets.should.have.length_of(1)
+        generated_lambda_graph.targets[0].should.eql(expected_alert_query)
+        generated_lambda_graph.should.have.property("alert").be.a(Alert)
+        generated_lambda_graph.alert.executionErrorState.should.eql("alerting")
+        generated_lambda_graph.alert.noDataState.should.eql("no_data")
 
     def test_should_create_lambda_sqs_dlq_fifo_graph(self):
         lambda_name = "lambda-1"
+        sqs_dlq_name = lambda_name + "-dlq"
         cloudwatch_data_source = "influxdb"
         notifications = ["lorem"]
 
@@ -220,28 +221,28 @@ class TestDispatcher:
             period="1m",
             statistics=["Maximum"],
             metricName="ApproximateNumberOfMessagesVisible",
-            dimensions={"QueueName": lambda_name},
+            dimensions={"QueueName": sqs_dlq_name + ".fifo"},
             refId="A",
         )
-        generated_lambd_graph = create_lambda_sqs_dlq_graph(
-            name=lambda_name,
+        generated_lambda_graph = create_lambda_sqs_dlq_graph(
+            name=sqs_dlq_name,
             cloudwatch_data_source=cloudwatch_data_source,
             notifications=notifications,
             fifo=True,
         )
-        generated_lambd_graph.should.be.a(Graph)
-        generated_lambd_graph.should.have.property("title").with_value.equal(
-            "SQS Dead Letter Queue: {}".format(lambda_name)
+        generated_lambda_graph.should.be.a(Graph)
+        generated_lambda_graph.should.have.property("title").with_value.equal(
+            "SQS Dead Letter Queue: {}.fifo".format(sqs_dlq_name)
         )
-        generated_lambd_graph.should.have.property("dataSource").with_value.equal(
+        generated_lambda_graph.should.have.property("dataSource").with_value.equal(
             cloudwatch_data_source
         )
-        generated_lambd_graph.should.have.property("targets")
-        generated_lambd_graph.targets.should.have.length_of(1)
-        generated_lambd_graph.targets[0].should.eql(expected_alert_query)
-        generated_lambd_graph.should.have.property("alert").be.a(Alert)
-        generated_lambd_graph.alert.executionErrorState.should.eql("alerting")
-        generated_lambd_graph.alert.noDataState.should.eql("no_data")
+        generated_lambda_graph.should.have.property("targets")
+        generated_lambda_graph.targets.should.have.length_of(1)
+        generated_lambda_graph.targets[0].should.eql(expected_alert_query)
+        generated_lambda_graph.should.have.property("alert").be.a(Alert)
+        generated_lambda_graph.alert.executionErrorState.should.eql("alerting")
+        generated_lambda_graph.alert.noDataState.should.eql("no_data")
 
     def test_should_create_lambda_sqs_graph(self):
         lambda_name = "lambda-1"
@@ -256,22 +257,23 @@ class TestDispatcher:
             dimensions={"QueueName": lambda_name},
             refId="A",
         )
-        generated_lambd_graph = create_lambda_sqs_graph(
+        generated_lambda_graph = create_lambda_sqs_graph(
             name=lambda_name, cloudwatch_data_source=cloudwatch_data_source, fifo=False
         )
-        generated_lambd_graph.should.be.a(Graph)
-        generated_lambd_graph.should.have.property("title").with_value.equal(
+        generated_lambda_graph.should.be.a(Graph)
+        generated_lambda_graph.should.have.property("title").with_value.equal(
             "SQS: {}".format(lambda_name)
         )
-        generated_lambd_graph.should.have.property("dataSource").with_value.equal(
+        generated_lambda_graph.should.have.property("dataSource").with_value.equal(
             cloudwatch_data_source
         )
-        generated_lambd_graph.should.have.property("targets")
-        generated_lambd_graph.targets.should.have.length_of(1)
-        generated_lambd_graph.targets[0].should.eql(expected_query)
+        generated_lambda_graph.should.have.property("targets")
+        generated_lambda_graph.targets.should.have.length_of(1)
+        generated_lambda_graph.targets[0].should.eql(expected_query)
 
     def test_should_create_lambda_sqs_fifo_graph(self):
         lambda_name = "lambda-1"
+        sqs_name = lambda_name + ".fifo"
         cloudwatch_data_source = "cloudwatch"
 
         expected_query = CloudwatchMetricsTarget(
@@ -280,22 +282,22 @@ class TestDispatcher:
             period="1m",
             statistics=["Sum"],
             metricName="NumberOfMessagesSent",
-            dimensions={"QueueName": lambda_name},
+            dimensions={"QueueName": sqs_name},
             refId="A",
         )
-        generated_lambd_graph = create_lambda_sqs_graph(
+        generated_lambda_graph = create_lambda_sqs_graph(
             name=lambda_name, cloudwatch_data_source=cloudwatch_data_source, fifo=True
         )
-        generated_lambd_graph.should.be.a(Graph)
-        generated_lambd_graph.should.have.property("title").with_value.equal(
-            "SQS: {}".format(lambda_name)
+        generated_lambda_graph.should.be.a(Graph)
+        generated_lambda_graph.should.have.property("title").with_value.equal(
+            "SQS: {}".format(sqs_name)
         )
-        generated_lambd_graph.should.have.property("dataSource").with_value.equal(
+        generated_lambda_graph.should.have.property("dataSource").with_value.equal(
             cloudwatch_data_source
         )
-        generated_lambd_graph.should.have.property("targets")
-        generated_lambd_graph.targets.should.have.length_of(1)
-        generated_lambd_graph.targets[0].should.eql(expected_query)
+        generated_lambda_graph.should.have.property("targets")
+        generated_lambda_graph.targets.should.have.length_of(1)
+        generated_lambda_graph.targets[0].should.eql(expected_query)
 
     def test_should_generate_lambda_sqs_dashboard(self):
         lambda_name = "lambda-1"
@@ -337,7 +339,7 @@ class TestDispatcher:
         generated_dashboard.should.be.a(Dashboard)
         generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
         generated_dashboard.tags.sort().should.eql(
-            ["lambda", environment, "sqs"].sort()
+            ["lambda", environment, "sqs", "fifo"].sort()
         )
         generated_dashboard.rows.should.be.length_of(3)
 
@@ -386,7 +388,7 @@ class TestDispatcher:
         generated_dashboard.should.be.a(Dashboard)
         generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
         generated_dashboard.tags.sort().should.eql(
-            ["lambda", environment, "sqs", "sns"].sort()
+            ["lambda", environment, "sqs", "sns", "fifo"].sort()
         )
         generated_dashboard.rows.should.be.length_of(4)
         generated_dashboard.rows[0].panels.should.be.length_of(len(topics))
