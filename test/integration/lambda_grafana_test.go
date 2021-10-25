@@ -124,10 +124,12 @@ func TerraformApplyAndValidateOutputs(t *testing.T, terraformOptions *terraform.
 
 	output := terraform.OutputMap(t, terraformOptions, "op")
 
-	expectedLen := 2
+	expectedLen := 4
 	notExpectedMap := map[string]string{
 		"dashboard_id": "",
 		"slug":         "",
+		"uid":          "",
+		"version":      "",
 	}
 
 	require.Len(t, output, expectedLen, "Output should contain %d items", expectedLen)
