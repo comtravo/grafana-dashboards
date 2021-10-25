@@ -352,9 +352,7 @@ def lambda_sqs_dashboard(
     """Create a dashboard with Lambda and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment]
 
-    lambda_graph = lambda_generate_graph(
-        name, cloudwatch_data_source, notifications=[]
-    )
+    lambda_graph = lambda_generate_graph(name, cloudwatch_data_source, notifications=[])
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source
     )
@@ -393,9 +391,7 @@ def lambda_sns_sqs_dashboard(
     """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment, "sns"]
 
-    lambda_graph = lambda_generate_graph(
-        name, cloudwatch_data_source, notifications=[]
-    )
+    lambda_graph = lambda_generate_graph(name, cloudwatch_data_source, notifications=[])
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source
     )
