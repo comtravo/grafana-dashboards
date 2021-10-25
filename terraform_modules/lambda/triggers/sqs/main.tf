@@ -20,6 +20,8 @@ locals {
   notification_args = length(var.grafana_configuration.notifications) > 0 ? "--notifications ${join(" ", var.grafana_configuration.notifications)}" : ""
   topics_args       = try(length(var.grafana_configuration.topics), 0) > 0 ? "--topics ${join(" ", var.grafana_configuration.topics)}" : ""
 
+  trigger = length(var.grafana_configuration.topics) > 0 ? "sns" : "sqs"
+
   fifo_args     = var.grafana_configuration.fifo == true ? "--fifo" : ""
   dahboard_path = "${path.module}/dashboard.json"
 }
@@ -29,7 +31,7 @@ resource "null_resource" "generate_dashboard" {
   count = var.enable ? 1 : 0
 
   provisioner "local-exec" {
-    command = "python3 ${path.module}/../../../../bin.py --name ${var.grafana_configuration.name} --environment ${var.grafana_configuration.environment} ${local.notification_args} --cloudwatch_data_source ${var.grafana_configuration.cloudwatch_data_source} lambda sqs ${local.topics_args} ${local.fifo_args} | json_pp > ${local.dahboard_path}"
+    command = "python3 ${path.module}/../../../../bin.py --name ${var.grafana_configuration.name} --environment ${var.grafana_configuration.environment} ${local.notification_args} --cloudwatch_data_source ${var.grafana_configuration.cloudwatch_data_source} lambda ${local.trigger} ${local.topics_args} ${local.fifo_args} | json_pp > ${local.dahboard_path}"
   }
 
   triggers = {
