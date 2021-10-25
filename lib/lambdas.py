@@ -353,7 +353,7 @@ def lambda_sqs_dashboard(
     tags = ["lambda", "sqs", environment]
 
     lambda_graph = lambda_generate_graph(
-        name, cloudwatch_data_source, notifications=notifications
+        name, cloudwatch_data_source, notifications=[]
     )
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source
@@ -394,7 +394,7 @@ def lambda_sns_sqs_dashboard(
     tags = ["lambda", "sqs", environment, "sns"]
 
     lambda_graph = lambda_generate_graph(
-        name, cloudwatch_data_source, notifications=notifications
+        name, cloudwatch_data_source, notifications=[]
     )
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source
