@@ -9,7 +9,7 @@ variable "name" {
 
 module "dashboard" {
 
-  source = "../../../terraform_modules/lambda/"
+  source = "../../../terraform_modules/lambda/triggers/generic"
 
   enable = true
   grafana_configuration = {
