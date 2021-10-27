@@ -19,7 +19,7 @@ variable "enable" {
 locals {
   notification_args = try(length(var.grafana_configuration.notifications), 0) > 0 ? flatten(["--notifications", var.grafana_configuration.notifications]) : []
   topics_args       = try(length(var.grafana_configuration.topics), 0) > 0 ? flatten(["--topics", var.grafana_configuration.topics]) : []
-  trigger           = length(var.grafana_configuration.topics) > 0 ? "sns" : "sqs"
+  trigger           = try(length(var.grafana_configuration.topics), 0) > 0 ? "sns" : "sqs"
   fifo_args         = var.grafana_configuration.fifo == true ? ["--fifo"] : []
 }
 
