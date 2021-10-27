@@ -20,7 +20,6 @@ module "dashboard" {
     name                   = var.name
     environment            = "prod"
     cloudwatch_data_source = "cloudwatch"
-    influxdb_data_source   = "influxdb"
     notifications          = ["slack"]
     folder                 = grafana_folder.this.id
     lambdas                = ["lambda-1", "lambda-2"]
