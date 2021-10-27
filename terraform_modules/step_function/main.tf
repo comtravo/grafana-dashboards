@@ -4,7 +4,6 @@ variable "grafana_configuration" {
     arn                    = string
     environment            = string
     cloudwatch_data_source = string
-    influxdb_data_source   = string
     notifications          = list(string)
     lambdas                = list(string)
     folder                 = string
