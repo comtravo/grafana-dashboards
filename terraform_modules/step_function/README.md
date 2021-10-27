@@ -27,7 +27,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_enable"></a> [enable](#input\_enable) | true to enable the module | `bool` | `false` | no |
-| <a name="input_grafana_configuration"></a> [grafana\_configuration](#input\_grafana\_configuration) | Configuration for creating Grafana dashboards and alerts | <pre>object({<br>    arn                    = string<br>    environment            = string<br>    cloudwatch_data_source = string<br>    influxdb_data_source   = string<br>    notifications          = list(string)<br>    lambdas                = list(string)<br>    folder                 = string<br>  })</pre> | n/a | yes |
+| <a name="input_grafana_configuration"></a> [grafana\_configuration](#input\_grafana\_configuration) | Configuration for creating Grafana dashboards and alerts | <pre>object({<br>    arn                    = string<br>    environment            = string<br>    cloudwatch_data_source = string<br>    notifications          = list(string)<br>    lambdas                = list(string)<br>    folder                 = string<br>  })</pre> | n/a | yes |
 
 ## Outputs
 
