@@ -48,7 +48,7 @@ clean-py:
 
 clean: clean-py clean-state
 
-generate-docs: fmt-go lint-go
+generate-docs: fmt lint
 	@find terraform_modules -maxdepth 1 -type d -not -path 'terraform_modules' -exec sh -c 'cd {} && $(GENERATE_DOCS_COMMAND)' ';'
 	@find terraform_modules/lambda/triggers -maxdepth 1 -type d -not -path 'terraform_modules/lambda/triggers' -exec sh -c 'cd {} && $(GENERATE_DOCS_COMMAND)' ';'
 

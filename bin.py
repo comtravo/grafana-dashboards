@@ -138,15 +138,13 @@ def dispatcher():
 def get_base64_encoded_dashboard(dashboard: str) -> str:
     """Get Base64 encoded JSON"""
 
-    return base64.b64encode(dashboard.encode('utf-8'))
+    return base64.b64encode(dashboard.encode("utf-8"))
 
 
 def print_base64_encoded_json(base64_encoded_json: str) -> None:
     """Print Base64 encoded JSON"""
 
-    print(json.dumps({
-        "base64EncodedJson": str(base64_encoded_json, "utf-8")
-    }))
+    print(json.dumps({"base64EncodedJson": str(base64_encoded_json, "utf-8")}))
 
 
 def main():  # pragma: no cover
@@ -160,6 +158,7 @@ def main():  # pragma: no cover
     dashboard_json = json.dumps(dashboard.to_json_data(), cls=DashboardEncoder)
     base64_encoded_json = get_base64_encoded_dashboard(dashboard_json)
     print_base64_encoded_json(base64_encoded_json)
+
 
 if __name__ == "__main__":  # pragma: no cover
     main()
