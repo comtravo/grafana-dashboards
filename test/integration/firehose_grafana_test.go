@@ -40,7 +40,7 @@ func TestFirehose_noDashboard(t *testing.T) {
 }
 
 func TestFirehose_dashboard(t *testing.T) {
-
+	t.Skip()
 	dashboardName := fmt.Sprintf("firehose-%s", random.UniqueId())
 	exampleDir := "../../examples/firehose_dashboards/dashboard/"
 
@@ -52,6 +52,8 @@ func TestFirehose_dashboard(t *testing.T) {
 }
 
 func TestFirehose_folder(t *testing.T) {
+
+	t.Skip()
 
 	dashboardName := fmt.Sprintf("firehose-%s", random.UniqueId())
 	exampleDir := "../../examples/firehose_dashboards/dashboard_with_folder/"

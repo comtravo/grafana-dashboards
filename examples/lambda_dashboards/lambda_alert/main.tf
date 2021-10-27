@@ -52,11 +52,9 @@ module "dashboard" {
     name                   = var.name
     environment            = "prod"
     cloudwatch_data_source = "cloudwatch"
-    influxdb_data_source   = "influxdb"
     trigger                = "cloudwatch-event-schedule"
     notifications          = [grafana_alert_notification.slack_1.id, grafana_alert_notification.slack_2.id]
     folder                 = null
-    topics                 = []
   }
 }
 

@@ -24,14 +24,14 @@ data "external" "dashboard" {
     "python3",
     "${path.module}/../../bin.py",
     "--name",
-    "${var.grafana_configuration.name}",
+    var.grafana_configuration.name,
     "--environment",
-    "${var.grafana_configuration.environment}",
-    "${local.notification_args}",
+    var.grafana_configuration.environment,
+    local.notification_args,
     "--cloudwatch_data_source",
-    "${var.grafana_configuration.cloudwatch_data_source}",
+    var.grafana_configuration.cloudwatch_data_source,
     "api-gateway",
-    "${local.lambda_args}"
+    local.lambda_args
   ])
 }
 

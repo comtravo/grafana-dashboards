@@ -10,7 +10,7 @@ import (
 )
 
 func TestRDS_noDashboard(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 	dashboardName := fmt.Sprintf("rds-%s", random.UniqueId())
 	exampleDir := "../../examples/rds_dashboards/no_dashboard/"
 
@@ -27,7 +27,7 @@ func TestRDS_noDashboard(t *testing.T) {
 }
 
 func TestRDS_dashboard(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 	dashboardName := fmt.Sprintf("rds-%s", random.UniqueId())
 	exampleDir := "../../examples/rds_dashboards/dashboard/"
 
@@ -39,7 +39,7 @@ func TestRDS_dashboard(t *testing.T) {
 }
 
 func TestRDS_folder(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 	dashboardName := fmt.Sprintf("rds-%s", random.UniqueId())
 	exampleDir := "../../examples/rds_dashboards/dashboard_with_folder/"
 
