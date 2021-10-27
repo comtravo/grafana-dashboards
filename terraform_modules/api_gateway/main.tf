@@ -4,7 +4,6 @@ variable "grafana_configuration" {
     name                   = string
     environment            = string
     cloudwatch_data_source = string
-    influxdb_data_source   = string
     notifications          = list(string)
     lambdas                = list(string)
     folder                 = string
@@ -17,35 +16,29 @@ variable "enable" {
 }
 
 locals {
-  notification_args = try(length(var.grafana_configuration.notifications), 0) > 0 ? "--notifications ${join(" ", var.grafana_configuration.notifications)}" : ""
-  lambda_args       = try(length(var.grafana_configuration.lambdas), 0) > 0 ? "--lambdas ${join(" ", var.grafana_configuration.lambdas)}" : ""
-  dahboard_path     = "${path.module}/dashboard.json"
+  notification_args = try(length(var.grafana_configuration.notifications), 0) > 0 ? flatten(["--notifications", var.grafana_configuration.notifications]) : []
+  lambda_args       = try(length(var.grafana_configuration.lambdas), 0) > 0 ? flatten(["--lambdas", var.grafana_configuration.lambdas]) : []
 }
-
-resource "null_resource" "generate_dashboard" {
-
-  count = var.enable ? 1 : 0
-
-  provisioner "local-exec" {
-    command = "python3 ${path.module}/../../bin.py --name ${var.grafana_configuration.name} --environment ${var.grafana_configuration.environment} ${local.notification_args} --cloudwatch_data_source ${var.grafana_configuration.cloudwatch_data_source} --influxdb_data_source ${var.grafana_configuration.influxdb_data_source} api-gateway ${local.lambda_args} | json_pp > ${local.dahboard_path}"
-  }
-
-  triggers = {
-    always = timestamp()
-  }
-}
-
-data "local_file" "dashboard" {
-  count    = var.enable ? 1 : 0
-  filename = local.dahboard_path
-
-  depends_on = [null_resource.generate_dashboard]
+data "external" "dashboard" {
+  program = flatten([
+    "python3",
+    "${path.module}/../../bin.py",
+    "--name",
+    var.grafana_configuration.name,
+    "--environment",
+    var.grafana_configuration.environment,
+    local.notification_args,
+    "--cloudwatch_data_source",
+    var.grafana_configuration.cloudwatch_data_source,
+    "api-gateway",
+    local.lambda_args
+  ])
 }
 
 resource "grafana_dashboard" "this" {
   count       = var.enable ? 1 : 0
   folder      = var.grafana_configuration.folder
-  config_json = data.local_file.dashboard[0].content
+  config_json = base64decode(data.external.dashboard.result.base64EncodedJson)
 }
 
 output "output" {

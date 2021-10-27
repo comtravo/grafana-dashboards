@@ -1,12 +1,11 @@
 variable "grafana_configuration" {
   description = "Configuration for creating Grafana dashboards and alerts"
   type = object({
-    arn                    = string
+    name                   = string
     environment            = string
     cloudwatch_data_source = string
-    influxdb_data_source   = string
+    trigger                = string
     notifications          = list(string)
-    lambdas                = list(string)
     folder                 = string
   })
 }
@@ -18,24 +17,24 @@ variable "enable" {
 
 locals {
   notification_args = try(length(var.grafana_configuration.notifications), 0) > 0 ? flatten(["--notifications", var.grafana_configuration.notifications]) : []
-  lambda_args       = try(length(var.grafana_configuration.lambdas), 0) > 0 ? flatten(["--lambdas", var.grafana_configuration.lambdas]) : []
 }
 
 data "external" "dashboard" {
   program = flatten([
     "python3",
-    "${path.module}/../../bin.py",
+    "${path.module}/../../../../bin.py",
     "--name",
-    var.grafana_configuration.arn,
+    var.grafana_configuration.name,
     "--environment",
     var.grafana_configuration.environment,
     local.notification_args,
     "--cloudwatch_data_source",
     var.grafana_configuration.cloudwatch_data_source,
-    "step-function",
-    local.lambda_args
+    "lambda",
+    var.grafana_configuration.trigger
   ])
 }
+
 
 resource "grafana_dashboard" "this" {
   count       = var.enable ? 1 : 0

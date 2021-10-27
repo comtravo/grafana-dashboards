@@ -14,6 +14,7 @@ from lib.elasticsearch import (
 from lib.rds import generate_rds_dashboard as rds_dispatcher
 
 import argparse
+import base64
 import json
 
 
@@ -134,6 +135,18 @@ def dispatcher():
     }
 
 
+def get_base64_encoded_dashboard(dashboard: str) -> str:
+    """Get Base64 encoded JSON"""
+
+    return base64.b64encode(dashboard.encode("utf-8"))
+
+
+def print_base64_encoded_json(base64_encoded_json: str) -> None:
+    """Print Base64 encoded JSON"""
+
+    print(json.dumps({"base64EncodedJson": str(base64_encoded_json, "utf-8")}))
+
+
 def main():  # pragma: no cover
     """
     main
@@ -143,7 +156,8 @@ def main():  # pragma: no cover
     dispatch = dispatcher()
     dashboard = dispatch[args.service](**args.__dict__)
     dashboard_json = json.dumps(dashboard.to_json_data(), cls=DashboardEncoder)
-    print(dashboard_json)
+    base64_encoded_json = get_base64_encoded_dashboard(dashboard_json)
+    print_base64_encoded_json(base64_encoded_json)
 
 
 if __name__ == "__main__":  # pragma: no cover
