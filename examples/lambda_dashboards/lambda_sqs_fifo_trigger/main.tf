@@ -19,7 +19,7 @@ module "dashboard" {
     notifications          = ["slack"]
     folder                 = null
     fifo                   = true
-    topics                 = []
+    topics                 = null
   }
 }
 
