@@ -54,7 +54,6 @@ module "dashboard" {
     client_id              = "1234567890"
     environment            = "prod"
     cloudwatch_data_source = "cloudwatch"
-    influxdb_data_source   = "influxdb"
     folder                 = null
     notifications          = [grafana_alert_notification.slack_1.uid, grafana_alert_notification.slack_2.uid]
   }
