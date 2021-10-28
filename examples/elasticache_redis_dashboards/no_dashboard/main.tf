@@ -16,7 +16,7 @@ module "dashboard" {
     name                   = "es"
     cache_cluster_id       = "1234567890"
     environment            = "prod"
-    cloudwatch_data_source = "cloudwatch"
+    cloudwatch_data_source = ""
     folder                 = null
     notifications          = []
   }

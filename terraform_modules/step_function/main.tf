@@ -21,6 +21,7 @@ locals {
 }
 
 data "external" "dashboard" {
+  count = var.enable ? 1 : 0
   program = flatten([
     "python3",
     "${path.module}/../../bin.py",
@@ -39,7 +40,7 @@ data "external" "dashboard" {
 resource "grafana_dashboard" "this" {
   count       = var.enable ? 1 : 0
   folder      = var.grafana_configuration.folder
-  config_json = base64decode(data.external.dashboard.result.base64EncodedJson)
+  config_json = base64decode(data.external.dashboard[0].result.base64EncodedJson)
 }
 
 output "output" {
