@@ -40,9 +40,9 @@ NAMESPACE = "AWS/Lambda"
 LAMBDA_DASHBOARD_PREFIX = "Lambda: "
 
 
-DURATION_MINIMUM_ALIAS = "Min"
-DURATION_AVERGAE_ALIAS = "Avg"
-DURATION_MAXIMUM_ALIAS = "Max"
+MINIMUM_ALIAS = "Min"
+AVERAGE_ALIAS = "Avg"
+MAXIMUM_ALIAS = "Max"
 LAMBDA_INVOCATIONS_ALIAS = "Invocations"
 LAMBDA_ERRORS_ALIAS = "Errors"
 
@@ -85,20 +85,16 @@ def lambda_generate_memory_utilization_graph(
     Generate lambda graph
     """
 
-    memory_utilization_minimum_alias = "min"
-    memory_utilization_maximum_alias = "max"
-    memory_utilization_average_alias = "avg"
-
     targets = [
         CloudwatchMetricsTarget(
-            alias=memory_utilization_minimum_alias,
+            alias=MINIMUM_ALIAS,
             namespace=lambda_insights_namespace,
             statistics=["Minimum"],
             metricName="memory_utilization",
             dimensions={"function_name": name},
         ),
         CloudwatchMetricsTarget(
-            alias=memory_utilization_average_alias,
+            alias=AVERAGE_ALIAS,
             namespace=lambda_insights_namespace,
             statistics=["Average"],
             metricName="memory_utilization",
@@ -106,7 +102,7 @@ def lambda_generate_memory_utilization_graph(
             refId=ALERT_REF_ID
         ),
         CloudwatchMetricsTarget(
-            alias=memory_utilization_maximum_alias,
+            alias=MAXIMUM_ALIAS,
             namespace=lambda_insights_namespace,
             statistics=["Maximum"],
             metricName="memory_utilization",
@@ -120,12 +116,12 @@ def lambda_generate_memory_utilization_graph(
     )
 
     seriesOverrides = [
-        {"alias": memory_utilization_minimum_alias, "color": "#C8F2C2", "lines": False},
-        {"alias": memory_utilization_average_alias, "color": "#FADE2A", "fill": 0},
+        {"alias": MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
+        {"alias": AVERAGE_ALIAS, "color": "#FADE2A", "fill": 0},
         {
-            "alias": memory_utilization_maximum_alias,
+            "alias": MAXIMUM_ALIAS,
             "color": "rgb(77, 159, 179)",
-            "fillBelowTo": memory_utilization_minimum_alias,
+            "fillBelowTo": MINIMUM_ALIAS,
             "lines": False,
         },
     ]
@@ -172,21 +168,21 @@ def lambda_generate_duration_graph(
 
     targets = [
         CloudwatchMetricsTarget(
-            alias=DURATION_MINIMUM_ALIAS,
+            alias=MINIMUM_ALIAS,
             namespace=NAMESPACE,
             statistics=["Minimum"],
             metricName="Duration",
             dimensions={"FunctionName": name},
         ),
         CloudwatchMetricsTarget(
-            alias=DURATION_AVERGAE_ALIAS,
+            alias=AVERAGE_ALIAS,
             namespace=NAMESPACE,
             statistics=["Average"],
             metricName="Duration",
             dimensions={"FunctionName": name},
         ),
         CloudwatchMetricsTarget(
-            alias=DURATION_MAXIMUM_ALIAS,
+            alias=MAXIMUM_ALIAS,
             namespace=NAMESPACE,
             statistics=["Maximum"],
             metricName="Duration",
@@ -200,12 +196,12 @@ def lambda_generate_duration_graph(
     )
 
     seriesOverrides = [
-        {"alias": DURATION_MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
-        {"alias": DURATION_AVERGAE_ALIAS, "color": "#FADE2A", "fill": 0},
+        {"alias": MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
+        {"alias": AVERAGE_ALIAS, "color": "#FADE2A", "fill": 0},
         {
-            "alias": DURATION_MAXIMUM_ALIAS,
+            "alias": MAXIMUM_ALIAS,
             "color": "rgb(77, 159, 179)",
-            "fillBelowTo": DURATION_MINIMUM_ALIAS,
+            "fillBelowTo": MINIMUM_ALIAS,
             "lines": False,
         },
     ]
