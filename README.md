@@ -26,7 +26,7 @@ With Grafana, one can not only define dashboards but also alerts. When one visit
 
 ## Introduction
 
-This project (very much a WIP) generates dynamic Grafana canned dashboards and alerts for various services that are running on AWS. This project assumes that you are running [InfluxDB](https://www.influxdata.com/products/influxdb/) as the time series database and using [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/) for scraping cloudwatch metrics. This project also contains [Terraform](https://www.terraform.io/) modules in the [terraform_modules](./terraform_modules/) folder to integrate with your Terraform code. This project makes use of [Grafanalib](https://grafanalib.readthedocs.io/en/latest/index.html) to generate dashboards and alerts
+This project (very much a WIP) generates dynamic Grafana canned dashboards and alerts for various services that are running on AWS. This project uses Cloudwatch metrics and logs to display dashboards and create alerts. This project also contains companion [Terraform](https://www.terraform.io/) modules in the [terraform_modules](./terraform_modules/) folder to integrate with your Terraform code. This project makes use of [Grafanalib](https://grafanalib.readthedocs.io/en/latest/index.html) to generate dashboards and alerts.
 
 ## Requirements
 
@@ -52,5 +52,6 @@ The [examples](./examples) directory showcases various possibilies on using the 
 ## TODO
 
  - [ ] Create snapshots of dashboards in the [examples](./examples) directory
- - [ ] Add ECS
+ - [ ] Add ECS Cluster metrics
+ - [ ] Add ECS Service metrics
  - [ ] Add MongoDB
