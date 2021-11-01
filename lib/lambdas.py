@@ -253,16 +253,12 @@ def lambda_generate_invocations_graph(
     seriesOverrides = [
         {
             "alias": LAMBDA_INVOCATIONS_ALIAS,
-            "lines": False,
             "points": False,
-            "bars": True,
             "color": colors.GREEN,
         },
         {
             "alias": LAMBDA_ERRORS_ALIAS,
-            "lines": False,
             "points": False,
-            "bars": True,
             "color": colors.RED,
         },
     ]
