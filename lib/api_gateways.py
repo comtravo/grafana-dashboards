@@ -4,10 +4,8 @@ from grafanalib.core import (
     Dashboard,
     Graph,
     GreaterThan,
-    MILLISECONDS_FORMAT,
     OP_AND,
     RTYPE_MAX,
-    single_y_axis,
     SHORT_FORMAT,
     TimeRange,
     Row,
@@ -22,15 +20,13 @@ from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
     EDITABLE,
-    RAW_QUERY,
-    RETENTION_POLICY,
     SHARED_CROSSHAIR,
     TIMEZONE,
     TRANSPARENT,
 )
 
 from lib.templating import get_release_templating
-from lib.lambdas import lambda_generate_graph
+from lib.lambdas import lambda_generate_graphs
 from lib import colors
 
 from typing import List
@@ -55,7 +51,6 @@ def generate_api_gateway_requests_5xx_graph(
         CloudwatchMetricsTarget(
             alias=API_GATEWAY_5XX_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             statistics=["Sum"],
             metricName="5XXError",
             dimensions={"ApiName": name},
@@ -64,7 +59,6 @@ def generate_api_gateway_requests_5xx_graph(
         CloudwatchMetricsTarget(
             alias=API_GATEWAY_REQUESTS_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             statistics=["Sum"],
             metricName="Count",
             dimensions={"ApiName": name},
@@ -139,7 +133,6 @@ def generate_api_gateway_requests_4xx_graph(
         CloudwatchMetricsTarget(
             alias=API_GATEWAY_4XX_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             statistics=["Sum"],
             metricName="4XXError",
             dimensions={"ApiName": name},
@@ -148,7 +141,6 @@ def generate_api_gateway_requests_4xx_graph(
         CloudwatchMetricsTarget(
             alias=API_GATEWAY_REQUESTS_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             statistics=["Sum"],
             metricName="Count",
             dimensions={"ApiName": name},
@@ -199,6 +191,7 @@ def generate_api_gateways_dashboard(
     name: str,
     cloudwatch_data_source: str,
     influxdb_data_source: str,
+    lambda_insights_namespace: str,
     notifications: List[str],
     environment: str,
     lambdas: List[str],
@@ -216,12 +209,12 @@ def generate_api_gateways_dashboard(
     api_gateway_5xx_graph = generate_api_gateway_requests_5xx_graph(
         name, cloudwatch_data_source, notifications
     )
-    lambda_panels = [
-        lambda_generate_graph(
-            name=l, cloudwatch_data_source=cloudwatch_data_source, notifications=[]
+    lambda_panels = []
+
+    for l in lambdas:
+        lambda_panels.append(
+            lambda_generate_graphs(name=l, cloudwatch_data_source=cloudwatch_data_source, lambda_insights_namespace=lambda_insights_namespace, notifications=[])
         )
-        for l in lambdas
-    ]
 
     rows = [Row(panels=[api_gateway_4xx_graph]), Row(panels=[api_gateway_5xx_graph])]
 

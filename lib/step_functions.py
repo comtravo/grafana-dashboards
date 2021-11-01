@@ -7,7 +7,6 @@ from grafanalib.core import (
     MILLISECONDS_FORMAT,
     OP_OR,
     RTYPE_MAX,
-    single_y_axis,
     SHORT_FORMAT,
     TimeRange,
     Row,
@@ -19,18 +18,15 @@ from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.annotations import get_release_annotations
 from lib.commons import (
-    ALERT_REF_ID,
     ALERT_THRESHOLD,
     EDITABLE,
-    RAW_QUERY,
-    RETENTION_POLICY,
     SHARED_CROSSHAIR,
     TIMEZONE,
     TRANSPARENT,
 )
 
 from lib.templating import get_release_templating
-from lib.lambdas import lambda_generate_graph
+from lib.lambdas import lambda_generate_graphs
 from lib import colors
 
 from typing import List
@@ -268,6 +264,7 @@ def generate_sfn_dashboard(
     name: str,
     cloudwatch_data_source: str,
     influxdb_data_source: str,
+    lambda_insights_namespace: str,
     notifications: List[str],
     environment: str,
     lambdas: List[str],
@@ -294,12 +291,12 @@ def generate_sfn_dashboard(
     if lambdas:
         tags = tags + ["lambda"]
 
-        lambda_graphs = [
-            lambda_generate_graph(
-                name=l, cloudwatch_data_source=cloudwatch_data_source, notifications=[]
-            )
-            for l in lambdas
-        ]
+        lambda_graphs = []
+
+        for l in lambdas:
+            lambda_graphs += lambda_generate_graphs(
+                    name=l, cloudwatch_data_source=cloudwatch_data_source, lambda_insights_namespace=lambda_insights_namespace, notifications=[]
+                )
 
         lambda_rows = [Row(panels=[g]) for g in lambda_graphs]
 

@@ -40,14 +40,11 @@ NAMESPACE = "AWS/Lambda"
 LAMBDA_DASHBOARD_PREFIX = "Lambda: "
 
 
-DURATION_MINIMUM_ALIAS = "Duration - Minimum"
-DURATION_AVERGAE_ALIAS = "Duration - Average"
-DURATION_MAXIMUM_ALIAS = "Duration - Maximum"
-LAMBDA_INVOCATIONS_ALIAS = "Invocations - Sum"
-LAMBDA_ERRORS_ALIAS = "Errors - Sum"
-
-LAMBDA_DURATION_METRIC_GROUP_BY = "5m"
-LAMBDA_INVOCATION_METRIC_GROUP_BY = "1m"
+DURATION_MINIMUM_ALIAS = "Min"
+DURATION_AVERGAE_ALIAS = "Avg"
+DURATION_MAXIMUM_ALIAS = "Max"
+LAMBDA_INVOCATIONS_ALIAS = "Invocations"
+LAMBDA_ERRORS_ALIAS = "Errors"
 
 
 def dispatcher(service, trigger, *args, **kwargs):
@@ -71,9 +68,104 @@ def dispatcher(service, trigger, *args, **kwargs):
     return dispatch[trigger](**kwargs)
 
 
-def lambda_generate_graph(
+def lambda_generate_graphs(
+    name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, notifications: List[str], *args, **kwargs
+) -> List[Graph]:
+    return [
+        lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=notifications),
+        lambda_generate_duration_graph(name, cloudwatch_data_source, notifications=notifications),
+        lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications)
+    ]
+
+
+def lambda_generate_memory_utilization_graph(
+    name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, notifications: List[str], *args, **kwargs
+) -> Graph:
+    """
+    Generate lambda graph
+    """
+
+    memory_utilization_minimum_alias = "min"
+    memory_utilization_maximum_alias = "max"
+    memory_utilization_average_alias = "avg"
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=memory_utilization_minimum_alias,
+            namespace=lambda_insights_namespace,
+            statistics=["Minimum"],
+            metricName="memory_utilization",
+            dimensions={"function_name": name},
+        ),
+        CloudwatchMetricsTarget(
+            alias=memory_utilization_average_alias,
+            namespace=lambda_insights_namespace,
+            statistics=["Average"],
+            metricName="memory_utilization",
+            dimensions={"function_name": name},
+            refId=ALERT_REF_ID
+        ),
+        CloudwatchMetricsTarget(
+            alias=memory_utilization_maximum_alias,
+            namespace=lambda_insights_namespace,
+            statistics=["Maximum"],
+            metricName="memory_utilization",
+            dimensions={"function_name": name},
+        ),
+    ]
+
+    yAxes = YAxes(
+        YAxis(format=SHORT_FORMAT, decimals=2),
+        YAxis(format=SHORT_FORMAT, decimals=2),
+    )
+
+    seriesOverrides = [
+        {"alias": memory_utilization_minimum_alias, "color": "#C8F2C2", "lines": False},
+        {"alias": memory_utilization_average_alias, "color": "#FADE2A", "fill": 0},
+        {
+            "alias": memory_utilization_maximum_alias,
+            "color": "rgb(77, 159, 179)",
+            "fillBelowTo": memory_utilization_minimum_alias,
+            "lines": False,
+        },
+    ]
+
+    alert = None
+
+    # https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics.html
+    if notifications:
+        alert = Alert(
+            name="{} Memory utilization Errors".format(name),
+            message="{} is having Memory utilization errors".format(name),
+            executionErrorState="alerting",
+            alertConditions=[
+                AlertCondition(
+                    Target(refId=ALERT_REF_ID),
+                    timeRange=TimeRange("5m", "now"),
+                    evaluator=GreaterThan(90),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_AND,
+                )
+            ],
+            gracePeriod="1m",
+            notifications=notifications,
+        )
+
+    return Graph(
+        title="Lambda Memory Utilization: {}".format(name),
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        seriesOverrides=seriesOverrides,
+        yAxes=yAxes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        alert=alert,
+        alertThreshold=ALERT_THRESHOLD,
+    ).auto_ref_ids()
+
+def lambda_generate_duration_graph(
     name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
-):
+) -> Graph:
     """
     Generate lambda graph
     """
@@ -82,7 +174,6 @@ def lambda_generate_graph(
         CloudwatchMetricsTarget(
             alias=DURATION_MINIMUM_ALIAS,
             namespace=NAMESPACE,
-            period=LAMBDA_DURATION_METRIC_GROUP_BY,
             statistics=["Minimum"],
             metricName="Duration",
             dimensions={"FunctionName": name},
@@ -90,7 +181,6 @@ def lambda_generate_graph(
         CloudwatchMetricsTarget(
             alias=DURATION_AVERGAE_ALIAS,
             namespace=NAMESPACE,
-            period=LAMBDA_DURATION_METRIC_GROUP_BY,
             statistics=["Average"],
             metricName="Duration",
             dimensions={"FunctionName": name},
@@ -98,28 +188,10 @@ def lambda_generate_graph(
         CloudwatchMetricsTarget(
             alias=DURATION_MAXIMUM_ALIAS,
             namespace=NAMESPACE,
-            period=LAMBDA_DURATION_METRIC_GROUP_BY,
             statistics=["Maximum"],
             metricName="Duration",
             dimensions={"FunctionName": name},
-        ),
-        CloudwatchMetricsTarget(
-            alias=LAMBDA_INVOCATIONS_ALIAS,
-            namespace=NAMESPACE,
-            period=LAMBDA_INVOCATION_METRIC_GROUP_BY,
-            statistics=["Sum"],
-            metricName="Invocations",
-            dimensions={"FunctionName": name},
-        ),
-        CloudwatchMetricsTarget(
-            alias=LAMBDA_ERRORS_ALIAS,
-            namespace=NAMESPACE,
-            period=LAMBDA_INVOCATION_METRIC_GROUP_BY,
-            statistics=["Sum"],
-            metricName="Errors",
-            dimensions={"FunctionName": name},
-            refId=ALERT_REF_ID,
-        ),
+        )
     ]
 
     yAxes = YAxes(
@@ -128,22 +200,6 @@ def lambda_generate_graph(
     )
 
     seriesOverrides = [
-        {
-            "alias": LAMBDA_INVOCATIONS_ALIAS,
-            "yaxis": 2,
-            "lines": False,
-            "points": False,
-            "bars": True,
-            "color": colors.GREEN,
-        },
-        {
-            "alias": LAMBDA_ERRORS_ALIAS,
-            "yaxis": 2,
-            "lines": False,
-            "points": False,
-            "bars": True,
-            "color": colors.RED,
-        },
         {"alias": DURATION_MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
         {"alias": DURATION_AVERGAE_ALIAS, "color": "#FADE2A", "fill": 0},
         {
@@ -151,6 +207,67 @@ def lambda_generate_graph(
             "color": "rgb(77, 159, 179)",
             "fillBelowTo": DURATION_MINIMUM_ALIAS,
             "lines": False,
+        },
+    ]
+
+    alert = None
+
+    return Graph(
+        title="Lambda Invocation Duration: {}".format(name),
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        seriesOverrides=seriesOverrides,
+        yAxes=yAxes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        alert=alert,
+        alertThreshold=ALERT_THRESHOLD,
+    ).auto_ref_ids()
+
+def lambda_generate_invocations_graph(
+    name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
+) -> Graph:
+    """
+    Generate lambda graph
+    """
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=LAMBDA_INVOCATIONS_ALIAS,
+            namespace=NAMESPACE,
+            statistics=["Sum"],
+            metricName="Invocations",
+            dimensions={"FunctionName": name},
+        ),
+        CloudwatchMetricsTarget(
+            alias=LAMBDA_ERRORS_ALIAS,
+            namespace=NAMESPACE,
+            statistics=["Sum"],
+            metricName="Errors",
+            dimensions={"FunctionName": name},
+            refId=ALERT_REF_ID,
+        ),
+    ]
+
+    yAxes = YAxes(
+        YAxis(format=SHORT_FORMAT, decimals=2),
+        YAxis(format=SHORT_FORMAT, decimals=2),
+    )
+
+    seriesOverrides = [
+        {
+            "alias": LAMBDA_INVOCATIONS_ALIAS,
+            "lines": False,
+            "points": False,
+            "bars": True,
+            "color": colors.GREEN,
+        },
+        {
+            "alias": LAMBDA_ERRORS_ALIAS,
+            "lines": False,
+            "points": False,
+            "bars": True,
+            "color": colors.RED,
         },
     ]
 
@@ -176,7 +293,7 @@ def lambda_generate_graph(
         )
 
     return Graph(
-        title="Lambda: {}".format(name),
+        title="Lambda Invocations and Errors: {}".format(name),
         dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
@@ -233,6 +350,7 @@ def create_lambda_only_dashboard(
     name: str,
     cloudwatch_data_source: str,
     influxdb_data_source: str,
+    lambda_insights_namespace: str,
     notifications: List[str],
     environment: str,
     *args,
@@ -250,11 +368,7 @@ def create_lambda_only_dashboard(
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
             Row(
-                panels=[
-                    lambda_generate_graph(
-                        name, cloudwatch_data_source, notifications=notifications
-                    )
-                ]
+                panels=lambda_generate_graphs(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications)
             )
         ],
     ).auto_panel_ids()
@@ -348,6 +462,7 @@ def lambda_sqs_dashboard(
     name: str,
     cloudwatch_data_source: str,
     influxdb_data_source: str,
+    lambda_insights_namespace: str,
     notifications: List[str],
     environment: str,
     fifo: bool,
@@ -360,7 +475,7 @@ def lambda_sqs_dashboard(
     if fifo:
         tags += ["fifo"]
 
-    lambda_graph = lambda_generate_graph(name, cloudwatch_data_source, notifications=[])
+    lambda_graphs = lambda_generate_graphs(name, cloudwatch_data_source, lambda_insights_namespace, notifications=[])
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
     )
@@ -380,7 +495,7 @@ def lambda_sqs_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
-            Row(panels=[lambda_graph]),
+            Row(panels=lambda_graphs),
             Row(panels=[sqs_graph]),
             Row(panels=[dead_letter_sqs_graph]),
         ],
@@ -391,6 +506,7 @@ def lambda_sns_sqs_dashboard(
     name: str,
     cloudwatch_data_source: str,
     influxdb_data_source: str,
+    lambda_insights_namespace: str,
     notifications: List[str],
     environment: str,
     topics: List[str],
@@ -402,7 +518,7 @@ def lambda_sns_sqs_dashboard(
     if fifo:
         tags += ["fifo"]
 
-    lambda_graph = lambda_generate_graph(name, cloudwatch_data_source, notifications=[])
+    lambda_graphs = lambda_generate_graphs(name, cloudwatch_data_source, lambda_insights_namespace, notifications=[])
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
     )
@@ -432,7 +548,7 @@ def lambda_sns_sqs_dashboard(
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
             Row(panels=sns_topic_panels),
-            Row(panels=[lambda_graph]),
+            Row(panels=lambda_graphs),
             Row(panels=[sqs_graph]),
             Row(panels=[dead_letter_sqs_graph]),
         ],
