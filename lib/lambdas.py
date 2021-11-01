@@ -15,7 +15,7 @@ from grafanalib.core import (
     SHORT_FORMAT,
     Stat,
     TimeRange,
-    Row,
+    RowPanel,
     Target,
     YAxes,
     YAxis,
@@ -387,7 +387,7 @@ def create_lambda_only_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
-            Row(
+            RowPanel(
                 panels=lambda_generate_graphs(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications)
             )
         ],
@@ -515,9 +515,9 @@ def lambda_sqs_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
-            Row(panels=lambda_graphs),
-            Row(panels=[sqs_graph]),
-            Row(panels=[dead_letter_sqs_graph]),
+            RowPanel(panels=lambda_graphs),
+            RowPanel(panels=[sqs_graph]),
+            RowPanel(panels=[dead_letter_sqs_graph]),
         ],
     ).auto_panel_ids()
 
@@ -567,9 +567,9 @@ def lambda_sns_sqs_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
-            Row(panels=sns_topic_panels),
-            Row(panels=lambda_graphs),
-            Row(panels=[sqs_graph]),
-            Row(panels=[dead_letter_sqs_graph]),
+            RowPanel(panels=sns_topic_panels),
+            RowPanel(panels=lambda_graphs),
+            RowPanel(panels=[sqs_graph]),
+            RowPanel(panels=[dead_letter_sqs_graph]),
         ],
     ).auto_panel_ids()
