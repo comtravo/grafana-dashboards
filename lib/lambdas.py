@@ -106,7 +106,7 @@ def lambda_generate_logs_panel(name: str, cloudwatch_data_source: str) -> Logs:
         wrapLogMessages=True,
         prettifyLogMessage=True,
         enableLogDetails=True,
-        gridPos=GridPos(8,24,0,0)
+        # gridPos=GridPos(8,24,0,0)
     )
 
 def lambda_generate_memory_utilization_percentage_graph(
@@ -188,7 +188,7 @@ def lambda_generate_memory_utilization_percentage_graph(
         editable=EDITABLE,
         alert=alert,
         alertThreshold=ALERT_THRESHOLD,
-        gridPos=GridPos(8,12,0,0)
+        # gridPos=GridPos(8,12,0,0)
     ).auto_ref_ids()
 
 def lambda_generate_memory_utilization_graph(
@@ -245,7 +245,7 @@ def lambda_generate_memory_utilization_graph(
         editable=EDITABLE,
         alert=alert,
         alertThreshold=ALERT_THRESHOLD,
-        gridPos=GridPos(8,12,12,0)
+        # gridPos=GridPos(8,12,12,0)
     ).auto_ref_ids()
 
 def lambda_generate_duration_graph(
@@ -307,7 +307,7 @@ def lambda_generate_duration_graph(
         editable=EDITABLE,
         alert=alert,
         alertThreshold=ALERT_THRESHOLD,
-        gridPos=GridPos(8,12,12,0)
+        # gridPos=GridPos(8,12,12,0)
     ).auto_ref_ids()
 
 
@@ -340,7 +340,7 @@ def lambda_generate_maximum_memory_stat(
             }
         ],
         editable=EDITABLE,
-        gridPos=GridPos(7,4,20,9)
+        # gridPos=GridPos(7,4,20,9)
     )
 
 def lambda_generate_invocations_graph(
@@ -417,7 +417,7 @@ def lambda_generate_invocations_graph(
         editable=EDITABLE,
         alert=alert,
         alertThreshold=ALERT_THRESHOLD,
-        gridPos=GridPos(8,12,0,0)
+        # gridPos=GridPos(8,12,0,0)
     ).auto_ref_ids()
 
 
@@ -691,25 +691,25 @@ def lambda_sns_sqs_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
-            Row(panels=sns_topic_panels),
-            Row(
+            Row(title="SNS topics", showTitle=True, collapse=True, panels=sns_topic_panels),
+            Row(title="Invocations", showTitle=True, collapse=True,
                 panels=[
                     lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=[]),
                     lambda_generate_duration_graph(name, cloudwatch_data_source),
                 ]
             ),
-            Row(
+            Row(title="Memory Utilization", showTitle=True, collapse=True,
                 panels=[
                     lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
                     lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace),
                 ]
             ),
-            Row(
+            Row(title="Logs", showTitle=True, collapse=True,
                 panels=[
                     lambda_generate_logs_panel(name, cloudwatch_data_source),
                 ]
             ),
-            Row(panels=[sqs_graph]),
-            Row(panels=[dead_letter_sqs_graph]),
+            Row(title="Queues", showTitle=True, collapse=True,
+                panels=[sqs_graph, dead_letter_sqs_graph]),
         ],
     ).auto_panel_ids()
