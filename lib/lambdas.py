@@ -179,7 +179,7 @@ def lambda_generate_memory_utilization_percentage_graph(
         )
 
     return Graph(
-        title="Lambda Memory Utilization",
+        title="Lambda Memory Utilization Percentage",
         dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
@@ -663,7 +663,6 @@ def lambda_sns_sqs_dashboard(
     if fifo:
         tags += ["fifo"]
 
-    lambda_graphs = lambda_generate_invocation_graphs(name, cloudwatch_data_source, lambda_insights_namespace, notifications=[])
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
     )
@@ -693,7 +692,23 @@ def lambda_sns_sqs_dashboard(
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
             Row(panels=sns_topic_panels),
-            Row(panels=lambda_graphs),
+            Row(
+                panels=[
+                    lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=[]),
+                    lambda_generate_duration_graph(name, cloudwatch_data_source),
+                ]
+            ),
+            Row(
+                panels=[
+                    lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
+                    lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace),
+                ]
+            ),
+            Row(
+                panels=[
+                    lambda_generate_logs_panel(name, cloudwatch_data_source),
+                ]
+            ),
             Row(panels=[sqs_graph]),
             Row(panels=[dead_letter_sqs_graph]),
         ],
