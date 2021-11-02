@@ -17,7 +17,7 @@ from grafanalib.core import (
     SHORT_FORMAT,
     Stat,
     TimeRange,
-    RowPanel,
+    Row,
     Target,
     YAxes,
     YAxis,
@@ -192,7 +192,7 @@ def lambda_generate_memory_utilization_percentage_graph(
     ).auto_ref_ids()
 
 def lambda_generate_memory_utilization_graph(
-    name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, notifications: List[str], *args, **kwargs
+    name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, *args, **kwargs
 ) -> Graph:
     """
     Generate lambda graph
@@ -249,7 +249,7 @@ def lambda_generate_memory_utilization_graph(
     ).auto_ref_ids()
 
 def lambda_generate_duration_graph(
-    name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
+    name: str, cloudwatch_data_source: str, *args, **kwargs
 ) -> Graph:
     """
     Generate lambda graph
@@ -483,20 +483,24 @@ def create_lambda_only_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
-            lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=notifications),
-            lambda_generate_duration_graph(name, cloudwatch_data_source, notifications=notifications),
-            lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
-            lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
-            lambda_generate_logs_panel(name, cloudwatch_data_source),
+            Row(
+                panels=[
+                    lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=notifications),
+                    lambda_generate_duration_graph(name, cloudwatch_data_source),
+                ]
+            ),
+            Row(
+                panels=[
+                    lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
+                    lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace),
+                ]
+            ),
+            Row(
+                panels=[
+                    lambda_generate_logs_panel(name, cloudwatch_data_source),
+                ]
+            ),
         ]
-
-        # panels=[
-        #     lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=notifications),
-        #     lambda_generate_duration_graph(name, cloudwatch_data_source, notifications=notifications),
-        #     lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
-        #     lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
-        #     lambda_generate_logs_panel(name, cloudwatch_data_source),
-        # ]
     ).auto_panel_ids()
 
 
@@ -601,7 +605,6 @@ def lambda_sqs_dashboard(
     if fifo:
         tags += ["fifo"]
 
-    lambda_graphs = lambda_generate_invocation_graphs(name, cloudwatch_data_source, lambda_insights_namespace, notifications=[])
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
     )
@@ -621,10 +624,26 @@ def lambda_sqs_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
-            RowPanel(panels=lambda_graphs),
-            RowPanel(panels=[sqs_graph]),
-            RowPanel(panels=[dead_letter_sqs_graph]),
-        ],
+            Row(
+                panels=[
+                    lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=[]),
+                    lambda_generate_duration_graph(name, cloudwatch_data_source),
+                ]
+            ),
+            Row(
+                panels=[
+                    lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
+                    lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace),
+                ]
+            ),
+            Row(
+                panels=[
+                    lambda_generate_logs_panel(name, cloudwatch_data_source),
+                ]
+            ),
+            Row(panels=[sqs_graph]),
+            Row(panels=[dead_letter_sqs_graph]),
+        ]
     ).auto_panel_ids()
 
 
@@ -673,9 +692,9 @@ def lambda_sns_sqs_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
-            RowPanel(panels=sns_topic_panels),
-            RowPanel(panels=lambda_graphs),
-            RowPanel(panels=[sqs_graph]),
-            RowPanel(panels=[dead_letter_sqs_graph]),
+            Row(panels=sns_topic_panels),
+            Row(panels=lambda_graphs),
+            Row(panels=[sqs_graph]),
+            Row(panels=[dead_letter_sqs_graph]),
         ],
     ).auto_panel_ids()
