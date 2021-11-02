@@ -9,6 +9,7 @@ from grafanalib.core import (
     Graph,
     GreaterThan,
     GridPos,
+    Logs,
     MILLISECONDS_FORMAT,
     OP_AND,
     RTYPE_MAX,
@@ -21,7 +22,7 @@ from grafanalib.core import (
     YAxes,
     YAxis,
 )
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.cloudwatch import CloudwatchMetricsTarget, CloudwatchLogsInsightsTarget
 
 from lib.annotations import get_release_annotations
 from lib.commons import (
@@ -86,6 +87,27 @@ def lambda_generate_memory_utilization_graphs(
         lambda_generate_maximum_memory_stat(name, cloudwatch_data_source, lambda_insights_namespace)
     ]
 
+
+def lambda_generate_logs_panel(name: str, cloudwatch_data_source: str) -> Logs:
+    """
+    Generate Logs panel
+    """
+    targets = [
+        CloudwatchLogsInsightsTarget(
+            expression="fields @timestamp, @xrayTraceId, @message | filter @message like /^(?!.*(START|END|REPORT|LOGS|EXTENSION)).*$/ | sort @timestamp desc",
+            logGroupNames = ["/aws/lambda/{}".format(name)]
+        ),
+    ]
+
+    return Logs(
+        title="Logs",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        wrapLogMessages=True,
+        prettifyLogMessage=True,
+        enableLogDetails=True,
+        gridPos=GridPos(8,24,0,0)
+    )
 
 def lambda_generate_memory_utilization_percentage_graph(
     name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, notifications: List[str], *args, **kwargs
@@ -465,7 +487,7 @@ def create_lambda_only_dashboard(
             lambda_generate_duration_graph(name, cloudwatch_data_source, notifications=notifications),
             lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
             lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
-            # lambda_generate_maximum_memory_stat(name, cloudwatch_data_source, lambda_insights_namespace),
+            lambda_generate_logs_panel(name, cloudwatch_data_source),
         ]
     ).auto_panel_ids()
 
