@@ -26,7 +26,7 @@ from lib.commons import (
 )
 
 from lib.templating import get_release_templating
-from lib.lambdas import lambda_generate_graphs
+from lib.lambdas import lambda_generate_invocation_graphs
 from lib import colors
 
 from typing import List
@@ -213,7 +213,7 @@ def generate_api_gateways_dashboard(
 
     for l in lambdas:
         lambda_panels.append(
-            lambda_generate_graphs(name=l, cloudwatch_data_source=cloudwatch_data_source, lambda_insights_namespace=lambda_insights_namespace, notifications=[])
+            lambda_generate_invocation_graphs(name=l, cloudwatch_data_source=cloudwatch_data_source, lambda_insights_namespace=lambda_insights_namespace, notifications=[])
         )
 
     rows = [Row(panels=[api_gateway_4xx_graph]), Row(panels=[api_gateway_5xx_graph])]

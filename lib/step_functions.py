@@ -26,7 +26,7 @@ from lib.commons import (
 )
 
 from lib.templating import get_release_templating
-from lib.lambdas import lambda_generate_graphs
+from lib.lambdas import lambda_generate_invocation_graphs
 from lib import colors
 
 from typing import List
@@ -294,7 +294,7 @@ def generate_sfn_dashboard(
         lambda_graphs = []
 
         for l in lambdas:
-            lambda_graphs += lambda_generate_graphs(
+            lambda_graphs += lambda_generate_invocation_graphs(
                     name=l, cloudwatch_data_source=cloudwatch_data_source, lambda_insights_namespace=lambda_insights_namespace, notifications=[]
                 )
 

@@ -8,6 +8,7 @@ from grafanalib.core import (
     Dashboard,
     Graph,
     GreaterThan,
+    GridPos,
     MILLISECONDS_FORMAT,
     OP_AND,
     RTYPE_MAX,
@@ -69,18 +70,24 @@ def dispatcher(service, trigger, *args, **kwargs):
     return dispatch[trigger](**kwargs)
 
 
-def lambda_generate_graphs(
+def lambda_generate_invocation_graphs(
     name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, notifications: List[str], *args, **kwargs
-) -> List[Graph]:
+):
     return [
         lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=notifications),
         lambda_generate_duration_graph(name, cloudwatch_data_source, notifications=notifications),
-        lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
+    ]
+
+def lambda_generate_memory_utilization_graphs(
+    name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, notifications: List[str], *args, **kwargs
+):
+    return [
+        lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
         lambda_generate_maximum_memory_stat(name, cloudwatch_data_source, lambda_insights_namespace)
     ]
 
 
-def lambda_generate_memory_utilization_graph(
+def lambda_generate_memory_utilization_percentage_graph(
     name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, notifications: List[str], *args, **kwargs
 ) -> Graph:
     """
@@ -150,7 +157,7 @@ def lambda_generate_memory_utilization_graph(
         )
 
     return Graph(
-        title="Lambda Memory Utilization: {}".format(name),
+        title="Lambda Memory Utilization",
         dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
@@ -159,6 +166,64 @@ def lambda_generate_memory_utilization_graph(
         editable=EDITABLE,
         alert=alert,
         alertThreshold=ALERT_THRESHOLD,
+        gridPos=GridPos(8,12,0,0)
+    ).auto_ref_ids()
+
+def lambda_generate_memory_utilization_graph(
+    name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, notifications: List[str], *args, **kwargs
+) -> Graph:
+    """
+    Generate lambda graph
+    """
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias="used_memory_max",
+            namespace=lambda_insights_namespace,
+            statistics=["Maximum"],
+            metricName="used_memory_max",
+            dimensions={"function_name": name},
+        ),
+        CloudwatchMetricsTarget(
+            alias="allocated_memory",
+            namespace=lambda_insights_namespace,
+            statistics=["Maximum"],
+            metricName="total_memory",
+            dimensions={"function_name": name},
+        ),
+    ]
+
+    yAxes = YAxes(
+        YAxis(format="decmbytes"),
+    )
+
+    seriesOverrides = [
+        {
+            "alias": "used_memory_max",
+            "points": False,
+            "color": colors.GREEN,
+        },
+        {
+            "alias": "allocated_memory",
+            "points": False,
+            "color": colors.RED,
+            "fill": 0
+        },
+    ]
+
+    alert = None
+
+    return Graph(
+        title="Lambda Memory Utilization",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        seriesOverrides=seriesOverrides,
+        yAxes=yAxes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        alert=alert,
+        alertThreshold=ALERT_THRESHOLD,
+        gridPos=GridPos(8,12,12,0)
     ).auto_ref_ids()
 
 def lambda_generate_duration_graph(
@@ -211,7 +276,7 @@ def lambda_generate_duration_graph(
     alert = None
 
     return Graph(
-        title="Lambda Invocation Duration: {}".format(name),
+        title="Lambda Invocation Duration",
         dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
@@ -220,6 +285,7 @@ def lambda_generate_duration_graph(
         editable=EDITABLE,
         alert=alert,
         alertThreshold=ALERT_THRESHOLD,
+        gridPos=GridPos(8,12,12,0)
     ).auto_ref_ids()
 
 
@@ -241,11 +307,18 @@ def lambda_generate_maximum_memory_stat(
     ]
 
     return Stat(
-        title="Lambda Allocated Memory: {}".format(name),
+        title="Lambda Allocated Memory",
         dataSource=cloudwatch_data_source,
         targets=targets,
         transparent=TRANSPARENT,
-        editable=EDITABLE
+        format="decmbytes",
+        thresholds=[
+            {
+                "color": "green"
+            }
+        ],
+        editable=EDITABLE,
+        gridPos=GridPos(7,4,20,9)
     )
 
 def lambda_generate_invocations_graph(
@@ -313,7 +386,7 @@ def lambda_generate_invocations_graph(
         )
 
     return Graph(
-        title="Lambda Invocations and Errors: {}".format(name),
+        title="Lambda Invocations and Errors",
         dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
@@ -322,6 +395,7 @@ def lambda_generate_invocations_graph(
         editable=EDITABLE,
         alert=alert,
         alertThreshold=ALERT_THRESHOLD,
+        gridPos=GridPos(8,12,0,0)
     ).auto_ref_ids()
 
 
@@ -386,11 +460,13 @@ def create_lambda_only_dashboard(
         tags=tags + ["lambda", environment],
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
-        rows=[
-            RowPanel(
-                panels=lambda_generate_graphs(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications)
-            )
-        ],
+        panels=[
+            lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=notifications),
+            lambda_generate_duration_graph(name, cloudwatch_data_source, notifications=notifications),
+            lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
+            lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
+            # lambda_generate_maximum_memory_stat(name, cloudwatch_data_source, lambda_insights_namespace),
+        ]
     ).auto_panel_ids()
 
 
@@ -495,7 +571,7 @@ def lambda_sqs_dashboard(
     if fifo:
         tags += ["fifo"]
 
-    lambda_graphs = lambda_generate_graphs(name, cloudwatch_data_source, lambda_insights_namespace, notifications=[])
+    lambda_graphs = lambda_generate_invocation_graphs(name, cloudwatch_data_source, lambda_insights_namespace, notifications=[])
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
     )
@@ -538,7 +614,7 @@ def lambda_sns_sqs_dashboard(
     if fifo:
         tags += ["fifo"]
 
-    lambda_graphs = lambda_generate_graphs(name, cloudwatch_data_source, lambda_insights_namespace, notifications=[])
+    lambda_graphs = lambda_generate_invocation_graphs(name, cloudwatch_data_source, lambda_insights_namespace, notifications=[])
     sqs_graph = create_lambda_sqs_graph(
         name=name, cloudwatch_data_source=cloudwatch_data_source, fifo=fifo
     )
