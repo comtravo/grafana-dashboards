@@ -482,13 +482,21 @@ def create_lambda_only_dashboard(
         tags=tags + ["lambda", environment],
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
-        panels=[
+        rows=[
             lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=notifications),
             lambda_generate_duration_graph(name, cloudwatch_data_source, notifications=notifications),
             lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
             lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
             lambda_generate_logs_panel(name, cloudwatch_data_source),
         ]
+
+        # panels=[
+        #     lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=notifications),
+        #     lambda_generate_duration_graph(name, cloudwatch_data_source, notifications=notifications),
+        #     lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
+        #     lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
+        #     lambda_generate_logs_panel(name, cloudwatch_data_source),
+        # ]
     ).auto_panel_ids()
 
 
