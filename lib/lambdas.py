@@ -692,13 +692,13 @@ def lambda_sns_sqs_dashboard(
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
             Row(title="SNS topics", showTitle=True, collapse=True, panels=sns_topic_panels),
-            Row(title="Invocations", showTitle=True, collapse=True,
+            Row(title="Invocations", showTitle=True,
                 panels=[
                     lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=[]),
                     lambda_generate_duration_graph(name, cloudwatch_data_source),
                 ]
             ),
-            Row(title="Memory Utilization", showTitle=True, collapse=True,
+            Row(title="Memory Utilization", showTitle=True,
                 panels=[
                     lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
                     lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace),
@@ -709,7 +709,9 @@ def lambda_sns_sqs_dashboard(
                     lambda_generate_logs_panel(name, cloudwatch_data_source),
                 ]
             ),
-            Row(title="Queues", showTitle=True, collapse=True,
-                panels=[sqs_graph, dead_letter_sqs_graph]),
+            Row(title="Queues", showTitle=True,
+                panels=[sqs_graph]),
+            Row(title="Dead Letter Queues", showTitle=True,
+                panels=[dead_letter_sqs_graph]),
         ],
     ).auto_panel_ids()
