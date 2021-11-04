@@ -26,7 +26,7 @@ from lib.commons import (
 )
 
 from lib.templating import get_release_templating
-from lib.lambdas import lambda_generate_invocation_graphs
+from lib.lambdas import lambda_generate_invocations_graph, lambda_generate_duration_graph, lambda_generate_memory_utilization_percentage_graph, lambda_generate_memory_utilization_graph, lambda_generate_logs_panel
 from lib import colors
 
 from typing import List
@@ -149,17 +149,27 @@ def generate_api_gateways_dashboard(
     api_gateway_graph = generate_api_gateway_requests_graph(
         name, cloudwatch_data_source, notifications
     )
-    lambda_panels = []
 
-    for l in lambdas:
-        lambda_panels.append(
-            lambda_generate_invocation_graphs(name=l, cloudwatch_data_source=cloudwatch_data_source, lambda_insights_namespace=lambda_insights_namespace, notifications=[])
-        )
+    rows = [
+        Row(title="API Gateway Metrics", showTitle=True, panels=[api_gateway_graph])
+    ]
 
-    rows = [Row(title="API Gateway Metrics", showTitle=True, panels=[api_gateway_graph])]
+    if lambdas:
+        for l in lambdas:
+            lambda_metrics_row = Row(title="{} Lambda Metrics".format(l), showTitle=True, collapse=True, panels=[
+                    lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=[]),
+                    lambda_generate_duration_graph(name, cloudwatch_data_source),
+                    lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
+                    lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace),
+                ]
+            )
+            lambda_logs_row = Row(title="{} Lambda Logs".format(l), showTitle=True, collapse=True, panels=[
+                    lambda_generate_logs_panel(name, cloudwatch_data_source),
+                ]
+            )
 
-    if lambda_panels:
-        rows = rows + [Row(panels=lambda_panels)]
+            rows.append(lambda_metrics_row)
+            rows.append(lambda_logs_row)
 
     return Dashboard(
         title="{} {}".format("API Gateway:", name),

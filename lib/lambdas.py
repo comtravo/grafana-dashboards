@@ -104,9 +104,8 @@ def lambda_generate_logs_panel(name: str, cloudwatch_data_source: str) -> Logs:
         dataSource=cloudwatch_data_source,
         targets=targets,
         wrapLogMessages=True,
-        prettifyLogMessage=True,
+        prettifyLogMessage=False,
         enableLogDetails=True,
-        # gridPos=GridPos(8,24,0,0)
     )
 
 def lambda_generate_memory_utilization_percentage_graph(
