@@ -624,25 +624,25 @@ def lambda_sqs_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
-            Row(
+            Row(title="Invocations", showTitle=True,
                 panels=[
                     lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=[]),
                     lambda_generate_duration_graph(name, cloudwatch_data_source),
                 ]
             ),
-            Row(
+            Row(title="Memory utilization", showTitle=True,
                 panels=[
                     lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
                     lambda_generate_memory_utilization_graph(name, cloudwatch_data_source, lambda_insights_namespace),
                 ]
             ),
-            Row(
+            Row(title="Logs", showTitle=True, collapse=True,
                 panels=[
                     lambda_generate_logs_panel(name, cloudwatch_data_source),
                 ]
             ),
-            Row(panels=[sqs_graph]),
-            Row(panels=[dead_letter_sqs_graph]),
+            Row(title="Queues", showTitle=True, panels=[sqs_graph]),
+            Row(title="Dead Letter Queues", showTitle=True, panels=[dead_letter_sqs_graph]),
         ]
     ).auto_panel_ids()
 
