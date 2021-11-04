@@ -44,7 +44,7 @@ API_GATEWAY_REQUESTS_ALIAS = "requests"
 API_GATEWAY_REQUESTS_REF_ID = "C"
 
 
-def generate_api_gateway_requests_5xx_graph(
+def generate_api_gateway_requests_graph(
     name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
 ):
     targets = [
@@ -64,6 +64,14 @@ def generate_api_gateway_requests_5xx_graph(
             dimensions={"ApiName": name},
             refId=API_GATEWAY_REQUESTS_REF_ID,
         ),
+        CloudwatchMetricsTarget(
+            alias=API_GATEWAY_4XX_ALIAS,
+            namespace=NAMESPACE,
+            statistics=["Sum"],
+            metricName="4XXError",
+            dimensions={"ApiName": name},
+            refId=API_GATEWAY_4XX_REF_ID,
+        ),
     ]
 
     yAxes = YAxes(
@@ -74,19 +82,16 @@ def generate_api_gateway_requests_5xx_graph(
     seriesOverrides = [
         {
             "alias": API_GATEWAY_REQUESTS_ALIAS,
-            "lines": False,
             "points": False,
-            "bars": True,
             "color": colors.GREEN,
         },
         {
+            "alias": API_GATEWAY_4XX_ALIAS,
+            "color": colors.YELLOW,
+        },
+        {
             "alias": API_GATEWAY_5XX_ALIAS,
-            "yaxis": 2,
-            "lines": False,
-            "points": False,
-            "bars": True,
             "color": colors.RED,
-            "zindex": 1,
         },
     ]
 
@@ -113,69 +118,7 @@ def generate_api_gateway_requests_5xx_graph(
         )
 
     return Graph(
-        title="API Gateway Requests and 5XX errors: {}".format(name),
-        dataSource=cloudwatch_data_source,
-        targets=targets,
-        seriesOverrides=seriesOverrides,
-        yAxes=yAxes,
-        transparent=TRANSPARENT,
-        editable=EDITABLE,
-        alert=alert,
-        alertThreshold=ALERT_THRESHOLD,
-    ).auto_ref_ids()
-
-
-def generate_api_gateway_requests_4xx_graph(
-    name: str, cloudwatch_data_source: str, *args, **kwargs
-):
-
-    targets = [
-        CloudwatchMetricsTarget(
-            alias=API_GATEWAY_4XX_ALIAS,
-            namespace=NAMESPACE,
-            statistics=["Sum"],
-            metricName="4XXError",
-            dimensions={"ApiName": name},
-            refId="A",
-        ),
-        CloudwatchMetricsTarget(
-            alias=API_GATEWAY_REQUESTS_ALIAS,
-            namespace=NAMESPACE,
-            statistics=["Sum"],
-            metricName="Count",
-            dimensions={"ApiName": name},
-            refId="B",
-        ),
-    ]
-
-    yAxes = YAxes(
-        YAxis(format=SHORT_FORMAT),
-        YAxis(format=SHORT_FORMAT),
-    )
-
-    seriesOverrides = [
-        {
-            "alias": API_GATEWAY_REQUESTS_ALIAS,
-            "lines": False,
-            "points": False,
-            "bars": True,
-            "color": colors.GREEN,
-        },
-        {
-            "alias": API_GATEWAY_4XX_ALIAS,
-            "yaxis": 2,
-            "lines": False,
-            "points": False,
-            "bars": True,
-            "color": colors.RED,
-            "zindex": 1,
-        },
-    ]
-
-    alert = None
-
-    return Graph(
-        title="API Gateway Requests and 4XX errors: {}".format(name),
+        title="API Gateway Requests: {}".format(name),
         dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
@@ -203,10 +146,7 @@ def generate_api_gateways_dashboard(
     if lambdas:
         tags = tags + ["lambda"]
 
-    api_gateway_4xx_graph = generate_api_gateway_requests_4xx_graph(
-        name, cloudwatch_data_source
-    )
-    api_gateway_5xx_graph = generate_api_gateway_requests_5xx_graph(
+    api_gateway_graph = generate_api_gateway_requests_graph(
         name, cloudwatch_data_source, notifications
     )
     lambda_panels = []
@@ -216,7 +156,7 @@ def generate_api_gateways_dashboard(
             lambda_generate_invocation_graphs(name=l, cloudwatch_data_source=cloudwatch_data_source, lambda_insights_namespace=lambda_insights_namespace, notifications=[])
         )
 
-    rows = [Row(panels=[api_gateway_4xx_graph]), Row(panels=[api_gateway_5xx_graph])]
+    rows = [Row(title="Queues", showTitle=True, panels=[api_gateway_graph])]
 
     if lambda_panels:
         rows = rows + [Row(panels=lambda_panels)]
