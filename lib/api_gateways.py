@@ -156,7 +156,7 @@ def generate_api_gateways_dashboard(
             lambda_generate_invocation_graphs(name=l, cloudwatch_data_source=cloudwatch_data_source, lambda_insights_namespace=lambda_insights_namespace, notifications=[])
         )
 
-    rows = [Row(title="Queues", showTitle=True, panels=[api_gateway_graph])]
+    rows = [Row(title="API Gateway Metrics", showTitle=True, panels=[api_gateway_graph])]
 
     if lambda_panels:
         rows = rows + [Row(panels=lambda_panels)]
