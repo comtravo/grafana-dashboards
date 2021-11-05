@@ -467,27 +467,27 @@ class TestGraphs:
         generated_lambda_graph.targets.should.have.length_of(1)
         generated_lambda_graph.targets[0].should.eql(expected_query)
 
-    # def test_should_generate_lambda_sqs_dashboard(self):
-    #     lambda_name = "lambda-1"
-    #     cloudwatch_data_source = "cloudwatch"
-    #     lambda_insights_namespace = "insights"
-    #     environment = "alpha"
-    #     call_args = {
-    #         "name": lambda_name,
-    #         "environment": environment,
-    #         "cloudwatch_data_source": cloudwatch_data_source,
-    #         "lambda_insights_namespace": lambda_insights_namespace,
-    #         "notifications": [],
-    #         "fifo": False,
-    #     }
+    def test_should_generate_lambda_sqs_dashboard(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "cloudwatch"
+        lambda_insights_namespace = "insights"
+        environment = "alpha"
+        call_args = {
+            "name": lambda_name,
+            "environment": environment,
+            "cloudwatch_data_source": cloudwatch_data_source,
+            "lambda_insights_namespace": lambda_insights_namespace,
+            "notifications": [],
+            "fifo": False,
+        }
 
-    #     generated_dashboard = lambda_sqs_dashboard(**call_args)
-    #     generated_dashboard.should.be.a(Dashboard)
-    #     generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
-    #     generated_dashboard.tags.sort().should.eql(
-    #         ["lambda", environment, "sqs"].sort()
-    #     )
-    #     generated_dashboard.rows.should.be.length_of(3)
+        generated_dashboard = lambda_sqs_dashboard(**call_args)
+        generated_dashboard.should.be.a(Dashboard)
+        generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
+        generated_dashboard.tags.sort().should.eql(
+            ["lambda", environment, "sqs"].sort()
+        )
+        # generated_dashboard.rows.should.be.length_of(3)
 
     # def test_should_generate_lambda_sqs_fifo_dashboard(self):
     #     lambda_name = "lambda-1"
