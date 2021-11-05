@@ -197,20 +197,20 @@ class TestStepFunctionDashboards:
             lambdas=lambdas,
         ).should.throw(Exception, r"Statemachine ARN should be provided")
 
-    # def test_should_generate_proper_dashboard_with_arn(self):
-    #     name = "arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-1"
-    #     cloudwatch_data_source = "prod"
-    #     influxdb_data_source = "prod"
-    #     environment = "prod"
-    #     notifications = ["foo-1", "foo-2"]
-    #     lambdas = ["lambda-1", "lambda-2"]
+    def test_should_generate_proper_dashboard_with_arn(self):
+        name = "arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-1"
+        cloudwatch_data_source = "prod"
+        lambda_insights_namespace = "prod"
+        environment = "prod"
+        notifications = ["foo-1", "foo-2"]
+        lambdas = ["lambda-1", "lambda-2"]
 
-    #     generated_dashboard = generate_sfn_dashboard(
-    #         name=name,
-    #         cloudwatch_data_source=cloudwatch_data_source,
-    #         influxdb_data_source=influxdb_data_source,
-    #         notifications=notifications,
-    #         environment=environment,
-    #         lambdas=lambdas,
-    #     )
-    #     generated_dashboard.title.should.match(r"Step Function: sfn-1")
+        generated_dashboard = generate_sfn_dashboard(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            lambda_insights_namespace=lambda_insights_namespace,
+            notifications=notifications,
+            environment=environment,
+            lambdas=lambdas,
+        )
+        generated_dashboard.title.should.match(r"Step Function: sfn-1")
