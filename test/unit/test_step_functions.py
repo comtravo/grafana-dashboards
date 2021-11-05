@@ -158,29 +158,27 @@ class TestStepFunctionDashboards:
         generated_graph.targets.should.equal(expected_targets)
         generated_graph.alert.should.be(None)
 
-    # def test_should_generate_proper_dashboard(self):
-    #     name = "arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-1"
-    #     cloudwatch_data_source = "prod"
-    #     influxdb_data_source = "prod"
-    #     environment = "prod"
-    #     notifications = ["foo-1", "foo-2"]
-    #     lambdas = []
+    def test_should_generate_proper_dashboard(self):
+        name = "arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-1"
+        cloudwatch_data_source = "prod"
+        lambda_insights_namespace = "prod"
+        environment = "prod"
+        notifications = ["foo-1", "foo-2"]
+        lambdas = []
 
-    #     generated_dashboard = generate_sfn_dashboard(
-    #         name=name,
-    #         cloudwatch_data_source=cloudwatch_data_source,
-    #         influxdb_data_source=influxdb_data_source,
-    #         notifications=notifications,
-    #         environment=environment,
-    #         lambdas=lambdas,
-    #     )
+        generated_dashboard = generate_sfn_dashboard(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            lambda_insights_namespace=lambda_insights_namespace,
+            notifications=notifications,
+            environment=environment,
+            lambdas=lambdas,
+        )
 
-    #     generated_dashboard.should.be.a(Dashboard)
-    #     generated_dashboard.title.should.match(r"Step Function:")
-    #     generated_dashboard.annotations.should.be.a(Annotations)
-    #     generated_dashboard.templating.should.be.a(Templating)
-    #     generated_dashboard.tags.should.have.length_of(2)
-    #     generated_dashboard.rows.should.have.length_of(1)
+        generated_dashboard.should.be.a(Dashboard)
+        generated_dashboard.title.should.match(r"Step Function:")
+        generated_dashboard.tags.should.have.length_of(2)
+        generated_dashboard.rows.should.have.length_of(1)
 
     # def test_should_throw_error_when_sfn_arn_not_specified(self):
     #     name = "sfn-1"

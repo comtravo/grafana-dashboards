@@ -273,7 +273,6 @@ def generate_sfn_execution_duration_graph(
 def generate_sfn_dashboard(
     name: str,
     cloudwatch_data_source: str,
-    influxdb_data_source: str,
     lambda_insights_namespace: str,
     notifications: List[str],
     environment: str,
@@ -348,8 +347,6 @@ def generate_sfn_dashboard(
     return Dashboard(
         title="{}{}".format(SFN_DASHBOARD_PREFIX, sfn_name),
         editable=EDITABLE,
-        annotations=get_release_annotations(influxdb_data_source),
-        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
