@@ -26,7 +26,7 @@ from lib.commons import (
 )
 
 from lib.templating import get_release_templating
-from lib.lambdas import lambda_generate_invocation_graphs
+from lib.lambdas import lambda_generate_invocations_graph, lambda_generate_duration_graph, lambda_generate_memory_utilization_percentage_graph, lambda_generate_memory_utilization_graph, lambda_generate_logs_panel
 from lib import colors
 
 from typing import List
@@ -52,7 +52,7 @@ SFN_EXECUTIONS_TIMEDOUT_ALIAS = "Executions - Timeout"
 SFN_EXECUTIONS_TIMEDOUT_REF_ID = "D"
 
 
-def generate_sfn_graph(
+def generate_sfn_execution_metrics_graph(
     name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
 ):
     """
@@ -61,33 +61,8 @@ def generate_sfn_graph(
 
     targets = [
         CloudwatchMetricsTarget(
-            alias=DURATION_MINIMUM_ALIAS,
-            namespace=NAMESPACE,
-            period="1m",
-            metricName="ExecutionTime",
-            statistics=["Minimum"],
-            dimensions={"StateMachineArn": name},
-        ),
-        CloudwatchMetricsTarget(
-            alias=DURATION_AVERAGE_ALIAS,
-            namespace=NAMESPACE,
-            period="1m",
-            metricName="ExecutionTime",
-            statistics=["Average"],
-            dimensions={"StateMachineArn": name},
-        ),
-        CloudwatchMetricsTarget(
-            alias=DURATION_MAXIMUM_ALIAS,
-            namespace=NAMESPACE,
-            period="1m",
-            metricName="ExecutionTime",
-            statistics=["Maximum"],
-            dimensions={"StateMachineArn": name},
-        ),
-        CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_STARTED_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             metricName="ExecutionsStarted",
             statistics=["Sum"],
             dimensions={"StateMachineArn": name},
@@ -95,7 +70,6 @@ def generate_sfn_graph(
         CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_SUCCEEDED_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             metricName="ExecutionsSucceeded",
             statistics=["Sum"],
             dimensions={"StateMachineArn": name},
@@ -103,7 +77,6 @@ def generate_sfn_graph(
         CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_ABORTED_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             metricName="ExecutionsAborted",
             statistics=["Sum"],
             dimensions={"StateMachineArn": name},
@@ -112,7 +85,6 @@ def generate_sfn_graph(
         CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_FAILED_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             metricName="ExecutionsFailed",
             statistics=["Sum"],
             dimensions={"StateMachineArn": name},
@@ -121,7 +93,6 @@ def generate_sfn_graph(
         CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_THROTTLED_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             metricName="ExecutionsThrottled",
             statistics=["Sum"],
             dimensions={"StateMachineArn": name},
@@ -130,7 +101,6 @@ def generate_sfn_graph(
         CloudwatchMetricsTarget(
             alias=SFN_EXECUTIONS_TIMEDOUT_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             metricName="ExecutionsTimedOut",
             statistics=["Sum"],
             dimensions={"StateMachineArn": name},
@@ -139,68 +109,40 @@ def generate_sfn_graph(
     ]
 
     yAxes = YAxes(
-        YAxis(format=MILLISECONDS_FORMAT, decimals=2),
+        YAxis(format=SHORT_FORMAT, decimals=2),
         YAxis(format=SHORT_FORMAT, decimals=2),
     )
 
     seriesOverrides = [
         {
             "alias": SFN_EXECUTIONS_STARTED_ALIAS,
-            "yaxis": 2,
-            "lines": False,
             "points": False,
-            "bars": True,
             "color": colors.BLUE,
-            "zindex": -2,
         },
         {
             "alias": SFN_EXECUTIONS_SUCCEEDED_ALIAS,
-            "yaxis": 2,
-            "lines": False,
             "points": False,
-            "bars": True,
             "color": colors.GREEN,
-            "zindex": -1,
         },
         {
             "alias": SFN_EXECUTIONS_ABORTED_ALIAS,
-            "yaxis": 2,
-            "lines": False,
             "points": False,
-            "bars": True,
             "color": colors.RED,
         },
         {
             "alias": SFN_EXECUTIONS_FAILED_ALIAS,
-            "yaxis": 2,
-            "lines": False,
             "points": False,
-            "bars": True,
             "color": colors.RED,
         },
         {
             "alias": SFN_EXECUTIONS_THROTTLED_ALIAS,
-            "yaxis": 2,
-            "lines": False,
             "points": False,
-            "bars": True,
             "color": colors.ORANGE,
         },
         {
             "alias": SFN_EXECUTIONS_TIMEDOUT_ALIAS,
-            "yaxis": 2,
-            "lines": False,
             "points": False,
-            "bars": True,
             "color": colors.RED,
-        },
-        {"alias": DURATION_MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
-        {"alias": DURATION_AVERAGE_ALIAS, "color": "#FADE2A", "fill": 0},
-        {
-            "alias": DURATION_MAXIMUM_ALIAS,
-            "color": "rgb(77, 159, 179)",
-            "fillBelowTo": DURATION_MINIMUM_ALIAS,
-            "lines": False,
         },
     ]
 
@@ -259,6 +201,67 @@ def generate_sfn_graph(
         alertThreshold=ALERT_THRESHOLD,
     ).auto_ref_ids()
 
+def generate_sfn_execution_duration_graph(
+    name: str, cloudwatch_data_source: str, *args, **kwargs
+):
+    """
+    Generate step function graph
+    """
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=DURATION_MINIMUM_ALIAS,
+            namespace=NAMESPACE,
+            metricName="ExecutionTime",
+            statistics=["Minimum"],
+            dimensions={"StateMachineArn": name},
+        ),
+        CloudwatchMetricsTarget(
+            alias=DURATION_AVERAGE_ALIAS,
+            namespace=NAMESPACE,
+            metricName="ExecutionTime",
+            statistics=["Average"],
+            dimensions={"StateMachineArn": name},
+        ),
+        CloudwatchMetricsTarget(
+            alias=DURATION_MAXIMUM_ALIAS,
+            namespace=NAMESPACE,
+            metricName="ExecutionTime",
+            statistics=["Maximum"],
+            dimensions={"StateMachineArn": name},
+        ),
+    ]
+
+    yAxes = YAxes(
+        YAxis(format=MILLISECONDS_FORMAT, decimals=2),
+        YAxis(format=MILLISECONDS_FORMAT, decimals=2),
+    )
+
+    seriesOverrides = [
+        {"alias": DURATION_MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
+        {"alias": DURATION_AVERAGE_ALIAS, "color": "#FADE2A", "fill": 0},
+        {
+            "alias": DURATION_MAXIMUM_ALIAS,
+            "color": "rgb(77, 159, 179)",
+            "fillBelowTo": DURATION_MINIMUM_ALIAS,
+            "lines": False,
+        },
+    ]
+
+    alert = None
+
+    return Graph(
+        title="Step function execution duration",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        seriesOverrides=seriesOverrides,
+        yAxes=yAxes,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        alert=alert,
+        alertThreshold=ALERT_THRESHOLD,
+    ).auto_ref_ids()
+
 
 def generate_sfn_dashboard(
     name: str,
@@ -280,27 +283,43 @@ def generate_sfn_dashboard(
 
     sfn_name = name.split(":")[-1]
 
-    sfn_graph = generate_sfn_graph(
+    sfn_execution_duration_graph = generate_sfn_execution_duration_graph(
         name=name,
         cloudwatch_data_source=cloudwatch_data_source,
-        notifications=notifications,
     )
 
-    rows = [Row(panels=[sfn_graph])]
+    sfn_execution_metrics_graph = generate_sfn_execution_metrics_graph(
+        name=name,
+        cloudwatch_data_source=cloudwatch_data_source,
+        notifications=notifications
+    )
+
+    rows = [
+        Row(title="Step Function Execution Metrics", showTitle=True,
+            panels=[
+                sfn_execution_duration_graph, sfn_execution_metrics_graph
+            ]
+        )
+    ]
 
     if lambdas:
         tags = tags + ["lambda"]
 
-        lambda_graphs = []
-
         for l in lambdas:
-            lambda_graphs += lambda_generate_invocation_graphs(
-                    name=l, cloudwatch_data_source=cloudwatch_data_source, lambda_insights_namespace=lambda_insights_namespace, notifications=[]
-                )
+            lambda_metrics_row = Row(title="{} Lambda Metrics".format(l), showTitle=True, collapse=True, panels=[
+                    lambda_generate_invocations_graph(l, cloudwatch_data_source, notifications=[]),
+                    lambda_generate_duration_graph(l, cloudwatch_data_source),
+                    lambda_generate_memory_utilization_percentage_graph(l, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
+                    lambda_generate_memory_utilization_graph(l, cloudwatch_data_source, lambda_insights_namespace),
+                ]
+            )
+            lambda_logs_row = Row(title="{} Lambda Logs".format(l), showTitle=True, collapse=True, panels=[
+                    lambda_generate_logs_panel(l, cloudwatch_data_source),
+                ]
+            )
 
-        lambda_rows = [Row(panels=[g]) for g in lambda_graphs]
-
-        rows = rows + lambda_rows
+            rows.append(lambda_metrics_row)
+            rows.append(lambda_logs_row)
 
     return Dashboard(
         title="{}{}".format(SFN_DASHBOARD_PREFIX, sfn_name),

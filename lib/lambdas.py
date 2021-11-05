@@ -71,30 +71,13 @@ def dispatcher(service, trigger, *args, **kwargs):
     return dispatch[trigger](**kwargs)
 
 
-def lambda_generate_invocation_graphs(
-    name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, notifications: List[str], *args, **kwargs
-):
-    return [
-        lambda_generate_invocations_graph(name, cloudwatch_data_source, notifications=notifications),
-        lambda_generate_duration_graph(name, cloudwatch_data_source, notifications=notifications),
-    ]
-
-def lambda_generate_memory_utilization_graphs(
-    name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, notifications: List[str], *args, **kwargs
-):
-    return [
-        lambda_generate_memory_utilization_percentage_graph(name, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
-        lambda_generate_maximum_memory_stat(name, cloudwatch_data_source, lambda_insights_namespace)
-    ]
-
-
 def lambda_generate_logs_panel(name: str, cloudwatch_data_source: str) -> Logs:
     """
     Generate Logs panel
     """
     targets = [
         CloudwatchLogsInsightsTarget(
-            expression="fields @timestamp, @xrayTraceId, @message | filter @message like /^(?!.*(START|END|REPORT|LOGS|EXTENSION)).*$/ | sort @timestamp desc",
+            expression="fields @timestamp, @message | filter @message like /^(?!.*(START|END|REPORT|LOGS|EXTENSION)).*$/ | sort @timestamp desc",
             logGroupNames = ["/aws/lambda/{}".format(name)]
         ),
     ]
@@ -309,38 +292,6 @@ def lambda_generate_duration_graph(
         # gridPos=GridPos(8,12,12,0)
     ).auto_ref_ids()
 
-
-def lambda_generate_maximum_memory_stat(
-    name: str, cloudwatch_data_source: str, lambda_insights_namespace: str
-) -> Stat:
-    """
-    Generate lambda graph
-    """
-
-    targets = [
-        CloudwatchMetricsTarget(
-            alias=MAXIMUM_ALIAS,
-            namespace=lambda_insights_namespace,
-            statistics=["Maximum"],
-            metricName="total_memory",
-            dimensions={"function_name": name},
-        )
-    ]
-
-    return Stat(
-        title="Lambda Allocated Memory",
-        dataSource=cloudwatch_data_source,
-        targets=targets,
-        transparent=TRANSPARENT,
-        format="decmbytes",
-        thresholds=[
-            {
-                "color": "green"
-            }
-        ],
-        editable=EDITABLE,
-        # gridPos=GridPos(7,4,20,9)
-    )
 
 def lambda_generate_invocations_graph(
     name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
