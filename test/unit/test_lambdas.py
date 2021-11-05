@@ -343,8 +343,8 @@ class TestGraphs:
             generated_dashboard = dahboard_generator(**call_args)
             generated_dashboard.should.be.a(Dashboard)
             generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
-            generated_dashboard.tags.sort().should.eql(
-                ["lambda", environment, expected_dashboard_tag].sort()
+            sorted(generated_dashboard.tags).should.eql(
+                sorted(["lambda", environment, expected_dashboard_tag])
             )
 
     def test_should_create_lambda_sqs_dlq_graph(self):
@@ -484,8 +484,8 @@ class TestGraphs:
         generated_dashboard = lambda_sqs_dashboard(**call_args)
         generated_dashboard.should.be.a(Dashboard)
         generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
-        generated_dashboard.tags.sort().should.eql(
-            ["lambda", environment, "sqs"].sort()
+        sorted(generated_dashboard.tags).should.eql(
+            sorted(["lambda", environment, "sqs"])
         )
         generated_dashboard.rows.should.be.length_of(5)
         generated_dashboard.rows[0].title.should.eql("Invocations")
@@ -516,8 +516,8 @@ class TestGraphs:
         generated_dashboard = lambda_sqs_dashboard(**call_args)
         generated_dashboard.should.be.a(Dashboard)
         generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
-        generated_dashboard.tags.sort().should.eql(
-            ["lambda", environment, "sqs", "fifo"].sort()
+        sorted(generated_dashboard.tags).should.eql(
+            sorted(["lambda", environment, "sqs", "fifo"])
         )
         generated_dashboard.rows.should.be.length_of(5)
         generated_dashboard.rows[0].title.should.eql("Invocations")
@@ -550,8 +550,8 @@ class TestGraphs:
         generated_dashboard = lambda_sns_sqs_dashboard(**call_args)
         generated_dashboard.should.be.a(Dashboard)
         generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
-        generated_dashboard.tags.sort().should.eql(
-            ["lambda", environment, "sqs", "sns"].sort()
+        sorted(generated_dashboard.tags).should.eql(
+            sorted(["lambda", environment, "sqs", "sns"])
         )
         generated_dashboard.rows.should.be.length_of(6)
         generated_dashboard.rows[0].panels.should.be.length_of(len(topics))
