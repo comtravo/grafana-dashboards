@@ -214,3 +214,4 @@ class TestStepFunctionDashboards:
             lambdas=lambdas,
         )
         generated_dashboard.title.should.match(r"Step Function: sfn-1")
+        generated_dashboard.rows.should.have.length_of((len(lambdas) * 2) + 1)
