@@ -221,6 +221,37 @@ class TestGraphs:
         generated_lambda_graph.targets.should.have.length_of(3)
         generated_lambda_graph.targets.should.equal(expected_targets)
 
+    def test_should_generate_lambda_memory_utilization_percentage_graph_with_alert_notifications(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "cloudwatch"
+        lambda_insights_namespace="insights"
+        notifications = ["lorem", "ipsum"]
+
+        expected_alert_query = CloudwatchMetricsTarget(
+            alias="Avg",
+            namespace=lambda_insights_namespace,
+            statistics=["Average"],
+            metricName="memory_utilization",
+            dimensions={"function_name": lambda_name},
+            refId="A",
+        )
+
+        generated_lambda_graph = lambda_generate_memory_utilization_percentage_graph(
+            name=lambda_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            lambda_insights_namespace=lambda_insights_namespace,
+            notifications=notifications,
+        )
+        generated_lambda_graph.should.have.property("alert").be.a(Alert)
+        generated_lambda_graph.alert.executionErrorState.should.eql("alerting")
+        generated_lambda_graph.alert.noDataState.should.eql("no_data")
+        generated_lambda_graph.alert.alertConditions.should.have.length_of(1)
+        generated_lambda_graph.alert.alertConditions[0].should.be.a(AlertCondition)
+        generated_lambda_graph.alert.alertConditions[0].target.should.eql(
+            Target(refId="A")
+        )
+        generated_lambda_graph.targets.should.contain(expected_alert_query)
+
     # def test_should_generate_lambda_basic_dashboards(self):
     #     lambda_name = "lambda-1"
     #     cloudwatch_data_source = "influxdb"
