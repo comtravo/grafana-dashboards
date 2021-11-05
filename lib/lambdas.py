@@ -415,7 +415,6 @@ def create_lambda_only_dashboard(
     tags: List[str],
     name: str,
     cloudwatch_data_source: str,
-    influxdb_data_source: str,
     lambda_insights_namespace: str,
     notifications: List[str],
     environment: str,
@@ -427,8 +426,6 @@ def create_lambda_only_dashboard(
     return Dashboard(
         title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
-        annotations=get_release_annotations(influxdb_data_source),
-        templating=get_release_templating(influxdb_data_source),
         tags=tags + ["lambda", environment],
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
@@ -541,7 +538,6 @@ def create_lambda_sqs_graph(name: str, cloudwatch_data_source: str, fifo: bool):
 def lambda_sqs_dashboard(
     name: str,
     cloudwatch_data_source: str,
-    influxdb_data_source: str,
     lambda_insights_namespace: str,
     notifications: List[str],
     environment: str,
@@ -568,8 +564,6 @@ def lambda_sqs_dashboard(
     return Dashboard(
         title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
-        annotations=get_release_annotations(influxdb_data_source),
-        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
@@ -600,7 +594,6 @@ def lambda_sqs_dashboard(
 def lambda_sns_sqs_dashboard(
     name: str,
     cloudwatch_data_source: str,
-    influxdb_data_source: str,
     lambda_insights_namespace: str,
     notifications: List[str],
     environment: str,
@@ -635,8 +628,6 @@ def lambda_sns_sqs_dashboard(
     return Dashboard(
         title="{}{}".format(LAMBDA_DASHBOARD_PREFIX, name),
         editable=EDITABLE,
-        annotations=get_release_annotations(influxdb_data_source),
-        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,

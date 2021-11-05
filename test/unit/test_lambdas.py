@@ -40,7 +40,6 @@ class TestDispatcher:
         call_args = {
             "name": lambda_name,
             "environment": environment,
-            "influxdb_data_source": "influxdb",
             "cloudwatch_data_source": "cloudwatch",
             "lambda_insights_namespace": "insights",
             "notifications": [],
@@ -252,33 +251,33 @@ class TestGraphs:
         )
         generated_lambda_graph.targets.should.contain(expected_alert_query)
 
-    # def test_should_generate_lambda_basic_dashboards(self):
-    #     lambda_name = "lambda-1"
-    #     cloudwatch_data_source = "influxdb"
-    #     influxdb_data_source = "influxdb"
-    #     environment = "alpha"
-    #     call_args = {
-    #         "name": lambda_name,
-    #         "environment": environment,
-    #         "cloudwatch_data_source": cloudwatch_data_source,
-    #         "influxdb_data_source": influxdb_data_source,
-    #         "notifications": [],
-    #     }
+    def test_should_generate_lambda_basic_dashboards(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "influxdb"
+        lambda_insights_namespace = "insights"
+        environment = "alpha"
+        call_args = {
+            "name": lambda_name,
+            "environment": environment,
+            "cloudwatch_data_source": cloudwatch_data_source,
+            "lambda_insights_namespace": lambda_insights_namespace,
+            "notifications": [],
+        }
 
-    #     test_matrix = {
-    #         lambda_cron_dashboard: "cron",
-    #         lambda_cognito_dashboard: "cognito",
-    #         lambda_events_dashboard: "cloudwatch events",
-    #         lambda_logs_dashboard: "cloudwatch logs",
-    #     }
+        test_matrix = {
+            lambda_cron_dashboard: "cron",
+            lambda_cognito_dashboard: "cognito",
+            lambda_events_dashboard: "cloudwatch events",
+            lambda_logs_dashboard: "cloudwatch logs",
+        }
 
-    #     for dahboard_generator, expected_dashboard_tag in test_matrix.items():
-    #         generated_dashboard = dahboard_generator(**call_args)
-    #         generated_dashboard.should.be.a(Dashboard)
-    #         generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
-    #         generated_dashboard.tags.sort().should.eql(
-    #             ["lambda", environment, expected_dashboard_tag].sort()
-    #         )
+        for dahboard_generator, expected_dashboard_tag in test_matrix.items():
+            generated_dashboard = dahboard_generator(**call_args)
+            generated_dashboard.should.be.a(Dashboard)
+            generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
+            generated_dashboard.tags.sort().should.eql(
+                ["lambda", environment, expected_dashboard_tag].sort()
+            )
 
     # def test_should_create_lambda_sqs_dlq_graph(self):
     #     lambda_name = "lambda-1"
