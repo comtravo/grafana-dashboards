@@ -593,7 +593,7 @@ def lambda_sqs_dashboard(
                 ],
             ),
             Row(
-                title="Memory utilization",
+                title="Memory Utilization",
                 showTitle=True,
                 panels=[
                     lambda_generate_memory_utilization_percentage_graph(
@@ -667,7 +667,7 @@ def lambda_sns_sqs_dashboard(
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=[
             Row(
-                title="SNS topics",
+                title="SNS Topics",
                 showTitle=True,
                 collapse=True,
                 panels=sns_topic_panels,

@@ -490,7 +490,7 @@ class TestGraphs:
         generated_dashboard.rows.should.be.length_of(5)
         generated_dashboard.rows[0].title.should.eql("Invocations")
         generated_dashboard.rows[0].panels.should.be.length_of(2)
-        generated_dashboard.rows[1].title.should.eql("Memory utilization")
+        generated_dashboard.rows[1].title.should.eql("Memory Utilization")
         generated_dashboard.rows[1].panels.should.be.length_of(2)
         generated_dashboard.rows[2].title.should.eql("Logs")
         generated_dashboard.rows[2].panels.should.be.length_of(1)
@@ -522,7 +522,7 @@ class TestGraphs:
         generated_dashboard.rows.should.be.length_of(5)
         generated_dashboard.rows[0].title.should.eql("Invocations")
         generated_dashboard.rows[0].panels.should.be.length_of(2)
-        generated_dashboard.rows[1].title.should.eql("Memory utilization")
+        generated_dashboard.rows[1].title.should.eql("Memory Utilization")
         generated_dashboard.rows[1].panels.should.be.length_of(2)
         generated_dashboard.rows[2].title.should.eql("Logs")
         generated_dashboard.rows[2].panels.should.be.length_of(1)
@@ -531,30 +531,46 @@ class TestGraphs:
         generated_dashboard.rows[4].title.should.eql("Dead Letter Queues")
         generated_dashboard.rows[4].panels.should.be.length_of(1)
 
-    # def test_should_generate_lambda_sns_sqs_dashboard(self):
-    #     lambda_name = "lambda-1"
-    #     cloudwatch_data_source = "cloudwatch"
-    #     influxdb_data_source = "influxdb"
-    #     environment = "alpha"
-    #     topics = ["topic-1", "topic-2"]
-    #     call_args = {
-    #         "name": lambda_name,
-    #         "environment": environment,
-    #         "cloudwatch_data_source": cloudwatch_data_source,
-    #         "influxdb_data_source": influxdb_data_source,
-    #         "notifications": [],
-    #         "topics": topics,
-    #         "fifo": False,
-    #     }
+    def test_should_generate_lambda_sns_sqs_dashboard(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "cloudwatch"
+        lambda_insights_namespace = "insights"
+        environment = "alpha"
+        topics = ["topic-1", "topic-2"]
+        call_args = {
+            "name": lambda_name,
+            "environment": environment,
+            "cloudwatch_data_source": cloudwatch_data_source,
+            "lambda_insights_namespace": lambda_insights_namespace,
+            "notifications": [],
+            "fifo": False,
+            "topics": topics,
+        }
 
-    #     generated_dashboard = lambda_sns_sqs_dashboard(**call_args)
-    #     generated_dashboard.should.be.a(Dashboard)
-    #     generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
-    #     generated_dashboard.tags.sort().should.eql(
-    #         ["lambda", environment, "sqs", "sns"].sort()
-    #     )
-    #     generated_dashboard.rows.should.be.length_of(4)
-    #     generated_dashboard.rows[0].panels.should.be.length_of(len(topics))
+        generated_dashboard = lambda_sns_sqs_dashboard(**call_args)
+        generated_dashboard.should.be.a(Dashboard)
+        generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
+        generated_dashboard.tags.sort().should.eql(
+            ["lambda", environment, "sqs", "sns"].sort()
+        )
+        generated_dashboard.rows.should.be.length_of(6)
+        generated_dashboard.rows[0].panels.should.be.length_of(len(topics))
+        generated_dashboard.rows[0].title.should.eql("SNS Topics")
+
+        generated_dashboard.rows[1].title.should.eql("Invocations")
+        generated_dashboard.rows[1].panels.should.be.length_of(2)
+
+        generated_dashboard.rows[2].title.should.eql("Memory Utilization")
+        generated_dashboard.rows[2].panels.should.be.length_of(2)
+
+        generated_dashboard.rows[3].title.should.eql("Logs")
+        generated_dashboard.rows[3].panels.should.be.length_of(1)
+
+        generated_dashboard.rows[4].title.should.eql("Queues")
+        generated_dashboard.rows[4].panels.should.be.length_of(1)
+
+        generated_dashboard.rows[5].title.should.eql("Dead Letter Queues")
+        generated_dashboard.rows[5].panels.should.be.length_of(1)
 
     # def test_should_generate_lambda_sns_sqs_fifo_dashboard(self):
     #     lambda_name = "lambda-1"
