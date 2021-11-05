@@ -12,6 +12,7 @@ from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.step_functions import (
     generate_sfn_execution_metrics_graph,
+    generate_sfn_execution_duration_graph,
     generate_sfn_dashboard,
 )
 
@@ -112,6 +113,50 @@ class TestStepFunctionDashboards:
         generated_graph.alert.alertConditions[2].operator.should.equal(OP_OR)
         generated_graph.alert.alertConditions[3].target.should.equal(Target(refId="D"))
         generated_graph.alert.alertConditions[3].operator.should.equal(OP_OR)
+
+    def test_should_generate_sfn_execution_duration_graph(self):
+        sfn_name = "arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-1"
+        cloudwatch_data_source = "prod"
+        notifications = []
+
+        expected_targets = [
+            CloudwatchMetricsTarget(
+                alias="Min",
+                namespace="AWS/States",
+                metricName="ExecutionTime",
+                statistics=["Minimum"],
+                dimensions={"StateMachineArn": sfn_name},
+                refId="A",
+            ),
+            CloudwatchMetricsTarget(
+                alias="Avg",
+                namespace="AWS/States",
+                metricName="ExecutionTime",
+                statistics=["Average"],
+                dimensions={"StateMachineArn": sfn_name},
+                refId="B",
+            ),
+            CloudwatchMetricsTarget(
+                alias="Max",
+                namespace="AWS/States",
+                metricName="ExecutionTime",
+                statistics=["Maximum"],
+                dimensions={"StateMachineArn": sfn_name},
+                refId="C",
+            ),
+        ]
+
+        generated_graph = generate_sfn_execution_duration_graph(
+            name=sfn_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
+        )
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(r"Step function execution duration")
+        generated_graph.dataSource.should.equal(cloudwatch_data_source)
+        generated_graph.targets.should.have.length_of(3)
+        generated_graph.targets.should.equal(expected_targets)
+        generated_graph.alert.should.be(None)
 
     # def test_should_generate_proper_dashboard(self):
     #     name = "arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-1"
