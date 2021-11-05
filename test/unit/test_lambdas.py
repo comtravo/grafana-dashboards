@@ -1,5 +1,5 @@
-from grafanalib.core import Alert, AlertCondition, Dashboard, Graph, Target
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.core import Alert, AlertCondition, Dashboard, Graph, Panel, Target
+from grafanalib.cloudwatch import CloudwatchMetricsTarget, CloudwatchLogsInsightsTarget
 from lib.lambdas import (
     dispatcher,
     lambda_generate_duration_graph,
@@ -290,6 +290,33 @@ class TestGraphs:
         generated_lambda_graph.should.have.property("targets")
         generated_lambda_graph.targets.should.have.length_of(2)
         generated_lambda_graph.targets.should.equal(expected_targets)
+
+    def test_should_generate_generate_logs_panel(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "cloudwatch"
+        expected_targets = [
+            CloudwatchLogsInsightsTarget(
+                expression="fields @timestamp, @message | filter @message like /^(?!.*(START|END|REPORT|LOGS|EXTENSION)).*$/ | sort @timestamp desc",
+                logGroupNames = ["/aws/lambda/{}".format(lambda_name)]
+            ),
+        ]
+        generated_lambda_graph = lambda_generate_logs_panel(
+            name=lambda_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+        )
+        generated_lambda_graph.should.be.a(Panel)
+        generated_lambda_graph.should.have.property("title").with_value.equal(
+            "Logs"
+        )
+        generated_lambda_graph.should.have.property("dataSource").with_value.equal(
+            cloudwatch_data_source
+        )
+        generated_lambda_graph.should.have.property("targets")
+        generated_lambda_graph.targets.should.have.length_of(1)
+        generated_lambda_graph.targets.should.equal(expected_targets)
+        generated_lambda_graph.wrapLogMessages.should.equal(True)
+        generated_lambda_graph.prettifyLogMessage.should.equal(False)
+        generated_lambda_graph.enableLogDetails.should.equal(True)
 
     def test_should_generate_lambda_basic_dashboards(self):
         lambda_name = "lambda-1"
