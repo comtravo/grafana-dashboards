@@ -156,4 +156,4 @@ class TestAPIGatewayDashboards:
         generated_dashboard.annotations.should.be.a(Annotations)
         generated_dashboard.templating.should.be.a(Templating)
         generated_dashboard.tags.should.have.length_of(3)
-        generated_dashboard.rows.should.have.length_of((len(lambdas) * 2) + 2)
+        generated_dashboard.rows.should.have.length_of((len(lambdas) * 2) + 1)
