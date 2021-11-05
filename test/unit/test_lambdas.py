@@ -440,44 +440,43 @@ class TestGraphs:
         generated_lambda_graph.targets.should.have.length_of(1)
         generated_lambda_graph.targets[0].should.eql(expected_query)
 
-    # def test_should_create_lambda_sqs_fifo_graph(self):
-    #     lambda_name = "lambda-1"
-    #     sqs_name = lambda_name + ".fifo"
-    #     cloudwatch_data_source = "cloudwatch"
+    def test_should_create_lambda_sqs_fifo_graph(self):
+        lambda_name = "lambda-1"
+        sqs_name = lambda_name + ".fifo"
+        cloudwatch_data_source = "cloudwatch"
 
-    #     expected_query = CloudwatchMetricsTarget(
-    #         alias="Number of messages sent to the queue",
-    #         namespace="AWS/SQS",
-    #         period="1m",
-    #         statistics=["Sum"],
-    #         metricName="NumberOfMessagesSent",
-    #         dimensions={"QueueName": sqs_name},
-    #         refId="A",
-    #     )
-    #     generated_lambda_graph = create_lambda_sqs_graph(
-    #         name=lambda_name, cloudwatch_data_source=cloudwatch_data_source, fifo=True
-    #     )
-    #     generated_lambda_graph.should.be.a(Graph)
-    #     generated_lambda_graph.should.have.property("title").with_value.equal(
-    #         "SQS: {}".format(sqs_name)
-    #     )
-    #     generated_lambda_graph.should.have.property("dataSource").with_value.equal(
-    #         cloudwatch_data_source
-    #     )
-    #     generated_lambda_graph.should.have.property("targets")
-    #     generated_lambda_graph.targets.should.have.length_of(1)
-    #     generated_lambda_graph.targets[0].should.eql(expected_query)
+        expected_query = CloudwatchMetricsTarget(
+            alias="Number of messages sent to the queue",
+            namespace="AWS/SQS",
+            statistics=["Sum"],
+            metricName="NumberOfMessagesSent",
+            dimensions={"QueueName": sqs_name},
+            refId="A",
+        )
+        generated_lambda_graph = create_lambda_sqs_graph(
+            name=lambda_name, cloudwatch_data_source=cloudwatch_data_source, fifo=True
+        )
+        generated_lambda_graph.should.be.a(Graph)
+        generated_lambda_graph.should.have.property("title").with_value.equal(
+            "SQS: {}".format(sqs_name)
+        )
+        generated_lambda_graph.should.have.property("dataSource").with_value.equal(
+            cloudwatch_data_source
+        )
+        generated_lambda_graph.should.have.property("targets")
+        generated_lambda_graph.targets.should.have.length_of(1)
+        generated_lambda_graph.targets[0].should.eql(expected_query)
 
     # def test_should_generate_lambda_sqs_dashboard(self):
     #     lambda_name = "lambda-1"
     #     cloudwatch_data_source = "cloudwatch"
-    #     influxdb_data_source = "influxdb"
+    #     lambda_insights_namespace = "insights"
     #     environment = "alpha"
     #     call_args = {
     #         "name": lambda_name,
     #         "environment": environment,
     #         "cloudwatch_data_source": cloudwatch_data_source,
-    #         "influxdb_data_source": influxdb_data_source,
+    #         "lambda_insights_namespace": lambda_insights_namespace,
     #         "notifications": [],
     #         "fifo": False,
     #     }
