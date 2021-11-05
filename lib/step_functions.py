@@ -26,7 +26,13 @@ from lib.commons import (
 )
 
 from lib.templating import get_release_templating
-from lib.lambdas import lambda_generate_invocations_graph, lambda_generate_duration_graph, lambda_generate_memory_utilization_percentage_graph, lambda_generate_memory_utilization_graph, lambda_generate_logs_panel
+from lib.lambdas import (
+    lambda_generate_invocations_graph,
+    lambda_generate_duration_graph,
+    lambda_generate_memory_utilization_percentage_graph,
+    lambda_generate_memory_utilization_graph,
+    lambda_generate_logs_panel,
+)
 from lib import colors
 
 from typing import List
@@ -201,6 +207,7 @@ def generate_sfn_execution_metrics_graph(
         alertThreshold=ALERT_THRESHOLD,
     ).auto_ref_ids()
 
+
 def generate_sfn_execution_duration_graph(
     name: str, cloudwatch_data_source: str, *args, **kwargs
 ):
@@ -291,14 +298,14 @@ def generate_sfn_dashboard(
     sfn_execution_metrics_graph = generate_sfn_execution_metrics_graph(
         name=name,
         cloudwatch_data_source=cloudwatch_data_source,
-        notifications=notifications
+        notifications=notifications,
     )
 
     rows = [
-        Row(title="Step Function Execution Metrics", showTitle=True,
-            panels=[
-                sfn_execution_duration_graph, sfn_execution_metrics_graph
-            ]
+        Row(
+            title="Step Function Execution Metrics",
+            showTitle=True,
+            panels=[sfn_execution_duration_graph, sfn_execution_metrics_graph],
         )
     ]
 
@@ -306,16 +313,33 @@ def generate_sfn_dashboard(
         tags = tags + ["lambda"]
 
         for l in lambdas:
-            lambda_metrics_row = Row(title="{} Lambda Metrics".format(l), showTitle=True, collapse=True, panels=[
-                    lambda_generate_invocations_graph(l, cloudwatch_data_source, notifications=[]),
+            lambda_metrics_row = Row(
+                title="{} Lambda Metrics".format(l),
+                showTitle=True,
+                collapse=True,
+                panels=[
+                    lambda_generate_invocations_graph(
+                        l, cloudwatch_data_source, notifications=[]
+                    ),
                     lambda_generate_duration_graph(l, cloudwatch_data_source),
-                    lambda_generate_memory_utilization_percentage_graph(l, cloudwatch_data_source, lambda_insights_namespace, notifications=notifications),
-                    lambda_generate_memory_utilization_graph(l, cloudwatch_data_source, lambda_insights_namespace),
-                ]
+                    lambda_generate_memory_utilization_percentage_graph(
+                        l,
+                        cloudwatch_data_source,
+                        lambda_insights_namespace,
+                        notifications=notifications,
+                    ),
+                    lambda_generate_memory_utilization_graph(
+                        l, cloudwatch_data_source, lambda_insights_namespace
+                    ),
+                ],
             )
-            lambda_logs_row = Row(title="{} Lambda Logs".format(l), showTitle=True, collapse=True, panels=[
+            lambda_logs_row = Row(
+                title="{} Lambda Logs".format(l),
+                showTitle=True,
+                collapse=True,
+                panels=[
                     lambda_generate_logs_panel(l, cloudwatch_data_source),
-                ]
+                ],
             )
 
             rows.append(lambda_metrics_row)
