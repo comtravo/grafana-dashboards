@@ -479,7 +479,6 @@ def create_lambda_sqs_dlq_graph(
         CloudwatchMetricsTarget(
             alias="Approximate number of messages available",
             namespace="AWS/SQS",
-            period="1m",
             statistics=["Maximum"],
             metricName="ApproximateNumberOfMessagesVisible",
             dimensions={"QueueName": name},
@@ -532,7 +531,6 @@ def create_lambda_sqs_graph(name: str, cloudwatch_data_source: str, fifo: bool):
         CloudwatchMetricsTarget(
             alias="Number of messages sent to the queue",
             namespace="AWS/SQS",
-            period="1m",
             statistics=["Sum"],
             metricName="NumberOfMessagesSent",
             dimensions={"QueueName": name},

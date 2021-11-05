@@ -347,74 +347,72 @@ class TestGraphs:
                 ["lambda", environment, expected_dashboard_tag].sort()
             )
 
-    # def test_should_create_lambda_sqs_dlq_graph(self):
-    #     lambda_name = "lambda-1"
-    #     cloudwatch_data_source = "influxdb"
-    #     notifications = ["lorem"]
+    def test_should_create_lambda_sqs_dlq_graph(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "influxdb"
+        notifications = ["lorem"]
 
-    #     expected_alert_query = CloudwatchMetricsTarget(
-    #         alias="Approximate number of messages available",
-    #         namespace="AWS/SQS",
-    #         period="1m",
-    #         statistics=["Maximum"],
-    #         metricName="ApproximateNumberOfMessagesVisible",
-    #         dimensions={"QueueName": lambda_name},
-    #         refId="A",
-    #     )
-    #     generated_lambda_graph = create_lambda_sqs_dlq_graph(
-    #         name=lambda_name,
-    #         cloudwatch_data_source=cloudwatch_data_source,
-    #         notifications=notifications,
-    #         fifo=False,
-    #     )
-    #     generated_lambda_graph.should.be.a(Graph)
-    #     generated_lambda_graph.should.have.property("title").with_value.equal(
-    #         "SQS Dead Letter Queue: {}".format(lambda_name)
-    #     )
-    #     generated_lambda_graph.should.have.property("dataSource").with_value.equal(
-    #         cloudwatch_data_source
-    #     )
-    #     generated_lambda_graph.should.have.property("targets")
-    #     generated_lambda_graph.targets.should.have.length_of(1)
-    #     generated_lambda_graph.targets[0].should.eql(expected_alert_query)
-    #     generated_lambda_graph.should.have.property("alert").be.a(Alert)
-    #     generated_lambda_graph.alert.executionErrorState.should.eql("alerting")
-    #     generated_lambda_graph.alert.noDataState.should.eql("no_data")
+        expected_alert_query = CloudwatchMetricsTarget(
+            alias="Approximate number of messages available",
+            namespace="AWS/SQS",
+            statistics=["Maximum"],
+            metricName="ApproximateNumberOfMessagesVisible",
+            dimensions={"QueueName": lambda_name},
+            refId="A",
+        )
+        generated_lambda_graph = create_lambda_sqs_dlq_graph(
+            name=lambda_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
+            fifo=False,
+        )
+        generated_lambda_graph.should.be.a(Graph)
+        generated_lambda_graph.should.have.property("title").with_value.equal(
+            "SQS Dead Letter Queue: {}".format(lambda_name)
+        )
+        generated_lambda_graph.should.have.property("dataSource").with_value.equal(
+            cloudwatch_data_source
+        )
+        generated_lambda_graph.should.have.property("targets")
+        generated_lambda_graph.targets.should.have.length_of(1)
+        generated_lambda_graph.targets[0].should.eql(expected_alert_query)
+        generated_lambda_graph.should.have.property("alert").be.a(Alert)
+        generated_lambda_graph.alert.executionErrorState.should.eql("alerting")
+        generated_lambda_graph.alert.noDataState.should.eql("no_data")
 
-    # def test_should_create_lambda_sqs_dlq_fifo_graph(self):
-    #     lambda_name = "lambda-1"
-    #     sqs_dlq_name = lambda_name + "-dlq"
-    #     cloudwatch_data_source = "influxdb"
-    #     notifications = ["lorem"]
+    def test_should_create_lambda_sqs_dlq_fifo_graph(self):
+        lambda_name = "lambda-1"
+        sqs_dlq_name = lambda_name + "-dlq"
+        cloudwatch_data_source = "influxdb"
+        notifications = ["lorem"]
 
-    #     expected_alert_query = CloudwatchMetricsTarget(
-    #         alias="Approximate number of messages available",
-    #         namespace="AWS/SQS",
-    #         period="1m",
-    #         statistics=["Maximum"],
-    #         metricName="ApproximateNumberOfMessagesVisible",
-    #         dimensions={"QueueName": sqs_dlq_name + ".fifo"},
-    #         refId="A",
-    #     )
-    #     generated_lambda_graph = create_lambda_sqs_dlq_graph(
-    #         name=sqs_dlq_name,
-    #         cloudwatch_data_source=cloudwatch_data_source,
-    #         notifications=notifications,
-    #         fifo=True,
-    #     )
-    #     generated_lambda_graph.should.be.a(Graph)
-    #     generated_lambda_graph.should.have.property("title").with_value.equal(
-    #         "SQS Dead Letter Queue: {}.fifo".format(sqs_dlq_name)
-    #     )
-    #     generated_lambda_graph.should.have.property("dataSource").with_value.equal(
-    #         cloudwatch_data_source
-    #     )
-    #     generated_lambda_graph.should.have.property("targets")
-    #     generated_lambda_graph.targets.should.have.length_of(1)
-    #     generated_lambda_graph.targets[0].should.eql(expected_alert_query)
-    #     generated_lambda_graph.should.have.property("alert").be.a(Alert)
-    #     generated_lambda_graph.alert.executionErrorState.should.eql("alerting")
-    #     generated_lambda_graph.alert.noDataState.should.eql("no_data")
+        expected_alert_query = CloudwatchMetricsTarget(
+            alias="Approximate number of messages available",
+            namespace="AWS/SQS",
+            statistics=["Maximum"],
+            metricName="ApproximateNumberOfMessagesVisible",
+            dimensions={"QueueName": sqs_dlq_name + ".fifo"},
+            refId="A",
+        )
+        generated_lambda_graph = create_lambda_sqs_dlq_graph(
+            name=sqs_dlq_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
+            fifo=True,
+        )
+        generated_lambda_graph.should.be.a(Graph)
+        generated_lambda_graph.should.have.property("title").with_value.equal(
+            "SQS Dead Letter Queue: {}.fifo".format(sqs_dlq_name)
+        )
+        generated_lambda_graph.should.have.property("dataSource").with_value.equal(
+            cloudwatch_data_source
+        )
+        generated_lambda_graph.should.have.property("targets")
+        generated_lambda_graph.targets.should.have.length_of(1)
+        generated_lambda_graph.targets[0].should.eql(expected_alert_query)
+        generated_lambda_graph.should.have.property("alert").be.a(Alert)
+        generated_lambda_graph.alert.executionErrorState.should.eql("alerting")
+        generated_lambda_graph.alert.noDataState.should.eql("no_data")
 
     # def test_should_create_lambda_sqs_graph(self):
     #     lambda_name = "lambda-1"
