@@ -34,8 +34,6 @@ from lib import colors
 from lib.commons import (
     ALERT_REF_ID,
     EDITABLE,
-    RAW_QUERY,
-    RETENTION_POLICY,
     SHARED_CROSSHAIR,
     TIMEZONE,
     TRANSPARENT,

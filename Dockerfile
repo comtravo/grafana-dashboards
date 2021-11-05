@@ -4,7 +4,7 @@ WORKDIR /opt/ct
 
 COPY --from=hashicorp/terraform:0.13.5 /bin/terraform /bin/
 COPY --from=cytopia/terraform-docs /usr/local/bin/terraform-docs /bin/
-RUN apt-get update && apt-get -y install python3 python3-pip && go version && python3 --version && terraform version && terraform-docs version
+RUN apt-get update && apt-get -y install python3 python3-pip jq && go version && python3 --version && terraform version && terraform-docs version
 
 COPY ./requirements.txt ./Makefile ./
 

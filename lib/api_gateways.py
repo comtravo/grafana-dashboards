@@ -4,10 +4,8 @@ from grafanalib.core import (
     Dashboard,
     Graph,
     GreaterThan,
-    MILLISECONDS_FORMAT,
     OP_AND,
     RTYPE_MAX,
-    single_y_axis,
     SHORT_FORMAT,
     TimeRange,
     Row,
@@ -22,15 +20,19 @@ from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
     EDITABLE,
-    RAW_QUERY,
-    RETENTION_POLICY,
     SHARED_CROSSHAIR,
     TIMEZONE,
     TRANSPARENT,
 )
 
 from lib.templating import get_release_templating
-from lib.lambdas import lambda_generate_graph
+from lib.lambdas import (
+    lambda_generate_invocations_graph,
+    lambda_generate_duration_graph,
+    lambda_generate_memory_utilization_percentage_graph,
+    lambda_generate_memory_utilization_graph,
+    lambda_generate_logs_panel,
+)
 from lib import colors
 
 from typing import List
@@ -48,14 +50,13 @@ API_GATEWAY_REQUESTS_ALIAS = "requests"
 API_GATEWAY_REQUESTS_REF_ID = "C"
 
 
-def generate_api_gateway_requests_5xx_graph(
+def generate_api_gateway_requests_graph(
     name: str, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs
 ):
     targets = [
         CloudwatchMetricsTarget(
             alias=API_GATEWAY_5XX_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             statistics=["Sum"],
             metricName="5XXError",
             dimensions={"ApiName": name},
@@ -64,11 +65,18 @@ def generate_api_gateway_requests_5xx_graph(
         CloudwatchMetricsTarget(
             alias=API_GATEWAY_REQUESTS_ALIAS,
             namespace=NAMESPACE,
-            period="1m",
             statistics=["Sum"],
             metricName="Count",
             dimensions={"ApiName": name},
             refId=API_GATEWAY_REQUESTS_REF_ID,
+        ),
+        CloudwatchMetricsTarget(
+            alias=API_GATEWAY_4XX_ALIAS,
+            namespace=NAMESPACE,
+            statistics=["Sum"],
+            metricName="4XXError",
+            dimensions={"ApiName": name},
+            refId=API_GATEWAY_4XX_REF_ID,
         ),
     ]
 
@@ -80,19 +88,16 @@ def generate_api_gateway_requests_5xx_graph(
     seriesOverrides = [
         {
             "alias": API_GATEWAY_REQUESTS_ALIAS,
-            "lines": False,
             "points": False,
-            "bars": True,
             "color": colors.GREEN,
         },
         {
+            "alias": API_GATEWAY_4XX_ALIAS,
+            "color": colors.YELLOW,
+        },
+        {
             "alias": API_GATEWAY_5XX_ALIAS,
-            "yaxis": 2,
-            "lines": False,
-            "points": False,
-            "bars": True,
             "color": colors.RED,
-            "zindex": 1,
         },
     ]
 
@@ -119,71 +124,7 @@ def generate_api_gateway_requests_5xx_graph(
         )
 
     return Graph(
-        title="API Gateway Requests and 5XX errors: {}".format(name),
-        dataSource=cloudwatch_data_source,
-        targets=targets,
-        seriesOverrides=seriesOverrides,
-        yAxes=yAxes,
-        transparent=TRANSPARENT,
-        editable=EDITABLE,
-        alert=alert,
-        alertThreshold=ALERT_THRESHOLD,
-    ).auto_ref_ids()
-
-
-def generate_api_gateway_requests_4xx_graph(
-    name: str, cloudwatch_data_source: str, *args, **kwargs
-):
-
-    targets = [
-        CloudwatchMetricsTarget(
-            alias=API_GATEWAY_4XX_ALIAS,
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Sum"],
-            metricName="4XXError",
-            dimensions={"ApiName": name},
-            refId="A",
-        ),
-        CloudwatchMetricsTarget(
-            alias=API_GATEWAY_REQUESTS_ALIAS,
-            namespace=NAMESPACE,
-            period="1m",
-            statistics=["Sum"],
-            metricName="Count",
-            dimensions={"ApiName": name},
-            refId="B",
-        ),
-    ]
-
-    yAxes = YAxes(
-        YAxis(format=SHORT_FORMAT),
-        YAxis(format=SHORT_FORMAT),
-    )
-
-    seriesOverrides = [
-        {
-            "alias": API_GATEWAY_REQUESTS_ALIAS,
-            "lines": False,
-            "points": False,
-            "bars": True,
-            "color": colors.GREEN,
-        },
-        {
-            "alias": API_GATEWAY_4XX_ALIAS,
-            "yaxis": 2,
-            "lines": False,
-            "points": False,
-            "bars": True,
-            "color": colors.RED,
-            "zindex": 1,
-        },
-    ]
-
-    alert = None
-
-    return Graph(
-        title="API Gateway Requests and 4XX errors: {}".format(name),
+        title="API Gateway Requests: {}".format(name),
         dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
@@ -198,7 +139,7 @@ def generate_api_gateway_requests_4xx_graph(
 def generate_api_gateways_dashboard(
     name: str,
     cloudwatch_data_source: str,
-    influxdb_data_source: str,
+    lambda_insights_namespace: str,
     notifications: List[str],
     environment: str,
     lambdas: List[str],
@@ -210,29 +151,51 @@ def generate_api_gateways_dashboard(
     if lambdas:
         tags = tags + ["lambda"]
 
-    api_gateway_4xx_graph = generate_api_gateway_requests_4xx_graph(
-        name, cloudwatch_data_source
-    )
-    api_gateway_5xx_graph = generate_api_gateway_requests_5xx_graph(
+    api_gateway_graph = generate_api_gateway_requests_graph(
         name, cloudwatch_data_source, notifications
     )
-    lambda_panels = [
-        lambda_generate_graph(
-            name=l, cloudwatch_data_source=cloudwatch_data_source, notifications=[]
-        )
-        for l in lambdas
+
+    rows = [
+        Row(title="API Gateway Metrics", showTitle=True, panels=[api_gateway_graph])
     ]
 
-    rows = [Row(panels=[api_gateway_4xx_graph]), Row(panels=[api_gateway_5xx_graph])]
+    if lambdas:
+        for l in lambdas:
+            lambda_metrics_row = Row(
+                title="{} Lambda Metrics".format(l),
+                showTitle=True,
+                collapse=True,
+                panels=[
+                    lambda_generate_invocations_graph(
+                        name, cloudwatch_data_source, notifications=[]
+                    ),
+                    lambda_generate_duration_graph(name, cloudwatch_data_source),
+                    lambda_generate_memory_utilization_percentage_graph(
+                        name,
+                        cloudwatch_data_source,
+                        lambda_insights_namespace,
+                        notifications=notifications,
+                    ),
+                    lambda_generate_memory_utilization_graph(
+                        name, cloudwatch_data_source, lambda_insights_namespace
+                    ),
+                ],
+            )
+            lambda_logs_row = Row(
+                title="{} Lambda Logs".format(l),
+                showTitle=True,
+                collapse=True,
+                panels=[
+                    lambda_generate_logs_panel(name, cloudwatch_data_source),
+                ],
+            )
 
-    if lambda_panels:
-        rows = rows + [Row(panels=lambda_panels)]
+            rows.append(lambda_metrics_row)
+            rows.append(lambda_logs_row)
 
     return Dashboard(
         title="{} {}".format("API Gateway:", name),
         editable=EDITABLE,
-        annotations=get_release_annotations(influxdb_data_source),
-        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,

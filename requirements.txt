@@ -1,5 +1,5 @@
 black
 coverage
-git+https://github.com/weaveworks/grafanalib.git@f18f3c62938d2e43857f0b7a41a20bc2f3ecbf87
+git+https://github.com/weaveworks/grafanalib@5e1f0ec493c0257a729e6bd0a3d2e7e3dcdd4cf1
 pytest
 sure
