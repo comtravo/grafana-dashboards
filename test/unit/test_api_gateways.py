@@ -63,46 +63,52 @@ class TestAPIGatewayDashboards:
         generated_graph.targets.should.have.length_of(len(targets))
         generated_graph.alert.should.eql(None)
 
-    # def test_should_generate_proper_requests_5xx_graph_with_notifications(self):
-    #     apig_name = "apig-1"
-    #     cloudwatch_data_source = "prod"
-    #     influxdb_data_source = "influxdb"
-    #     notifications = ["foo-1", "foo-2"]
+    def test_should_generate_proper_api_gateway_requests_graph_with_notifications(self):
+        apig_name = "apig-1"
+        cloudwatch_data_source = "prod"
+        lambda_insights_namespace = "insights"
+        notifications = ["foo-1", "foo-2"]
 
-    #     targets = [
-    #         CloudwatchMetricsTarget(
-    #             alias="5xx",
-    #             namespace="AWS/ApiGateway",
-    #             period="1m",
-    #             statistics=["Sum"],
-    #             metricName="5XXError",
-    #             dimensions={"ApiName": apig_name},
-    #             refId="A",
-    #         ),
-    #         CloudwatchMetricsTarget(
-    #             alias="requests",
-    #             namespace="AWS/ApiGateway",
-    #             dimensions={"ApiName": apig_name},
-    #             period="1m",
-    #             statistics=["Sum"],
-    #             metricName="Count",
-    #             refId="B",
-    #         ),
-    #     ]
+        targets = [
+            CloudwatchMetricsTarget(
+                alias="5xx",
+                namespace="AWS/ApiGateway",
+                statistics=["Sum"],
+                metricName="5XXError",
+                dimensions={"ApiName": apig_name},
+                refId="A",
+            ),
+            CloudwatchMetricsTarget(
+                alias="requests",
+                namespace="AWS/ApiGateway",
+                dimensions={"ApiName": apig_name},
+                statistics=["Sum"],
+                metricName="Count",
+                refId="B",
+            ),
+            CloudwatchMetricsTarget(
+                alias="requests",
+                namespace="AWS/ApiGateway",
+                dimensions={"ApiName": apig_name},
+                statistics=["Sum"],
+                metricName="4XXError",
+                refId="C",
+            ),
+        ]
 
-    #     generated_graph = generate_api_gateway_requests_5xx_graph(
-    #         name=apig_name,
-    #         cloudwatch_data_source=cloudwatch_data_source,
-    #         influxdb_data_source=influxdb_data_source,
-    #         notifications=notifications,
-    #     )
-    #     generated_graph.should.be.a(Graph)
-    #     generated_graph.title.should.match(r"API Gateway Requests and 5XX errors")
-    #     generated_graph.dataSource.should.eql(cloudwatch_data_source)
-    #     generated_graph.alert.should.be.a(Alert)
-    #     generated_graph.alert.alertConditions.should.have.length_of(1)
-    #     generated_graph.alert.alertConditions[0].target.should.equal(Target(refId="A"))
-    #     generated_graph.targets[0].should.eql(targets[0])
+        generated_graph = generate_api_gateway_requests_graph(
+            name=apig_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            lambda_insights_namespace=lambda_insights_namespace,
+            notifications=notifications,
+        )
+        generated_graph.should.be.a(Graph)
+        generated_graph.title.should.match(r"API Gateway Requests")
+        generated_graph.dataSource.should.eql(cloudwatch_data_source)
+        generated_graph.alert.should.be.a(Alert)
+        generated_graph.alert.alertConditions.should.have.length_of(1)
+        generated_graph.alert.alertConditions[0].target.should.equal(Target(refId="A"))
+        generated_graph.targets[0].should.eql(targets[0])
 
     # def test_should_generate_proper_requests_4xx_graph(self):
     #     apig_name = "apig-1"
