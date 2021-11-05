@@ -102,47 +102,45 @@ class TestGraphs:
         generated_lambda_graph.targets.should.have.length_of(3)
         generated_lambda_graph.targets.should.equal(expected_targets)
 
-    # def test_should_generate_lambda_generate_invocations_graph(self):
-    #     lambda_name = "lambda-1"
-    #     cloudwatch_data_source = "cloudwatch"
-    #     lambda_insights_namespace="insights"
-    #     expected_targets = [
-    #         CloudwatchMetricsTarget(
-    #             alias="Invocations - Sum",
-    #             namespace="AWS/Lambda",
-    #             period="1m",
-    #             statistics=["Sum"],
-    #             metricName="Invocations",
-    #             dimensions={"FunctionName": lambda_name},
-    #             refId="E",
-    #         ),
-    #         CloudwatchMetricsTarget(
-    #             alias="Errors - Sum",
-    #             namespace="AWS/Lambda",
-    #             period="1m",
-    #             statistics=["Sum"],
-    #             metricName="Errors",
-    #             dimensions={"FunctionName": lambda_name},
-    #             refId="A",
-    #         ),
-    #     ]
-    #     generated_lambda_graph = lambda_generate_invocations_graph(
-    #         name=lambda_name,
-    #         cloudwatch_data_source=cloudwatch_data_source,
-    #         lambda_insights_namespace=lambda_insights_namespace,
-    #         notifications=[],
-    #     )
-    #     generated_lambda_graph.should.be.a(Graph)
-    #     generated_lambda_graph.should.have.property("title").with_value.equal(
-    #         "Lambda Invocations and Errors"
-    #     )
-    #     generated_lambda_graph.should.have.property("dataSource").with_value.equal(
-    #         cloudwatch_data_source
-    #     )
-    #     generated_lambda_graph.should.have.property("alert").with_value.equal(None)
-    #     generated_lambda_graph.should.have.property("targets")
-    #     generated_lambda_graph.targets.should.have.length_of(2)
-    #     generated_lambda_graph.targets.should.equal(expected_targets)
+    def test_should_generate_lambda_generate_invocations_graph(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "cloudwatch"
+        lambda_insights_namespace="insights"
+        expected_targets = [
+            CloudwatchMetricsTarget(
+                alias="Invocations",
+                namespace="AWS/Lambda",
+                statistics=["Sum"],
+                metricName="Invocations",
+                dimensions={"FunctionName": lambda_name},
+                refId="B",
+            ),
+            CloudwatchMetricsTarget(
+                alias="Errors",
+                namespace="AWS/Lambda",
+                statistics=["Sum"],
+                metricName="Errors",
+                dimensions={"FunctionName": lambda_name},
+                refId="A",
+            ),
+        ]
+        generated_lambda_graph = lambda_generate_invocations_graph(
+            name=lambda_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            lambda_insights_namespace=lambda_insights_namespace,
+            notifications=[],
+        )
+        generated_lambda_graph.should.be.a(Graph)
+        generated_lambda_graph.should.have.property("title").with_value.equal(
+            "Lambda Invocations and Errors"
+        )
+        generated_lambda_graph.should.have.property("dataSource").with_value.equal(
+            cloudwatch_data_source
+        )
+        generated_lambda_graph.should.have.property("alert").with_value.equal(None)
+        generated_lambda_graph.should.have.property("targets")
+        generated_lambda_graph.targets.should.have.length_of(2)
+        generated_lambda_graph.targets.should.equal(expected_targets)
 
     # def test_should_generate_lambda_generate_invocations_graph_with_alert_notifications(self):
     #     lambda_name = "lambda-1"
