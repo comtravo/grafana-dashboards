@@ -42,9 +42,9 @@ from typing import List
 NAMESPACE = "AWS/States"
 SFN_DASHBOARD_PREFIX = "Step Function: "
 
-DURATION_MINIMUM_ALIAS = "Duration - Minimum"
-DURATION_AVERAGE_ALIAS = "Duration - Average"
-DURATION_MAXIMUM_ALIAS = "Duration - Maximum"
+DURATION_MINIMUM_ALIAS = "Min"
+DURATION_AVERAGE_ALIAS = "Avg"
+DURATION_MAXIMUM_ALIAS = "Max"
 
 SFN_EXECUTIONS_STARTED_ALIAS = "Executions - Started"
 SFN_EXECUTIONS_SUCCEEDED_ALIAS = "Executions - Succeeded"
