@@ -631,6 +631,8 @@ def lambda_sns_sqs_dashboard(
     environment: str,
     topics: List[str],
     fifo: bool,
+    *args,
+    **kwargs
 ):
     """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment, "sns"]

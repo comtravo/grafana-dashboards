@@ -39,7 +39,7 @@ def parse_options():  # pragma: no cover
         "--lambda_insights_namespace",
         type=str,
         default="LambdaInsights",
-        help="influxDB datasource name",
+        help="LambdaInsights Namespace",
     )
     parser.add_argument("--notifications", nargs="+", help="Notify alerts")
 
