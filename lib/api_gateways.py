@@ -139,7 +139,6 @@ def generate_api_gateway_requests_graph(
 def generate_api_gateways_dashboard(
     name: str,
     cloudwatch_data_source: str,
-    influxdb_data_source: str,
     lambda_insights_namespace: str,
     notifications: List[str],
     environment: str,
@@ -197,8 +196,6 @@ def generate_api_gateways_dashboard(
     return Dashboard(
         title="{} {}".format("API Gateway:", name),
         editable=EDITABLE,
-        annotations=get_release_annotations(influxdb_data_source),
-        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
