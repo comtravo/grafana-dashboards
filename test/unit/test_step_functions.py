@@ -180,22 +180,22 @@ class TestStepFunctionDashboards:
         generated_dashboard.tags.should.have.length_of(2)
         generated_dashboard.rows.should.have.length_of(1)
 
-    # def test_should_throw_error_when_sfn_arn_not_specified(self):
-    #     name = "sfn-1"
-    #     cloudwatch_data_source = "prod"
-    #     influxdb_data_source = "prod"
-    #     environment = "prod"
-    #     notifications = ["foo-1", "foo-2"]
-    #     lambdas = ["lambda-1", "lambda-2"]
+    def test_should_throw_error_when_sfn_arn_not_specified(self):
+        name = "sfn-1"
+        cloudwatch_data_source = "prod"
+        lambda_insights_namespace = "prod"
+        environment = "prod"
+        notifications = ["foo-1", "foo-2"]
+        lambdas = ["lambda-1", "lambda-2"]
 
-    #     generate_sfn_dashboard.when.called_with(
-    #         name=name,
-    #         cloudwatch_data_source=cloudwatch_data_source,
-    #         influxdb_data_source=influxdb_data_source,
-    #         notifications=notifications,
-    #         environment=environment,
-    #         lambdas=lambdas,
-    #     ).should.throw(Exception, r"Statemachine ARN should be provided")
+        generate_sfn_dashboard.when.called_with(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            lambda_insights_namespace=lambda_insights_namespace,
+            notifications=notifications,
+            environment=environment,
+            lambdas=lambdas,
+        ).should.throw(Exception, r"Statemachine ARN should be provided")
 
     # def test_should_generate_proper_dashboard_with_arn(self):
     #     name = "arn:aws:states:eu-west-1:1234567890:stateMachine:sfn-1"
