@@ -251,6 +251,46 @@ class TestGraphs:
         )
         generated_lambda_graph.targets.should.contain(expected_alert_query)
 
+    def test_should_generate_lambda_memory_utilization_percentage_graph(self):
+        lambda_name = "lambda-1"
+        cloudwatch_data_source = "cloudwatch"
+        lambda_insights_namespace="insights"
+        expected_targets = [
+            CloudwatchMetricsTarget(
+                alias="used_memory_max",
+                namespace=lambda_insights_namespace,
+                statistics=["Maximum"],
+                metricName="used_memory_max",
+                dimensions={"function_name": lambda_name},
+                refId="A",
+            ),
+            CloudwatchMetricsTarget(
+                alias="allocated_memory",
+                namespace=lambda_insights_namespace,
+                statistics=["Maximum"],
+                metricName="total_memory",
+                dimensions={"function_name": lambda_name},
+                refId="B",
+            ),
+        ]
+        generated_lambda_graph = lambda_generate_memory_utilization_graph(
+            name=lambda_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            lambda_insights_namespace=lambda_insights_namespace,
+            notifications=[],
+        )
+        generated_lambda_graph.should.be.a(Graph)
+        generated_lambda_graph.should.have.property("title").with_value.equal(
+            "Lambda Memory Utilization"
+        )
+        generated_lambda_graph.should.have.property("dataSource").with_value.equal(
+            cloudwatch_data_source
+        )
+        generated_lambda_graph.should.have.property("alert").with_value.equal(None)
+        generated_lambda_graph.should.have.property("targets")
+        generated_lambda_graph.targets.should.have.length_of(2)
+        generated_lambda_graph.targets.should.equal(expected_targets)
+
     def test_should_generate_lambda_basic_dashboards(self):
         lambda_name = "lambda-1"
         cloudwatch_data_source = "influxdb"
