@@ -669,7 +669,7 @@ def lambda_sns_sqs_dashboard(
             Row(
                 title="SNS Topics",
                 showTitle=True,
-                collapse=True,
+                collapse=False,
                 panels=sns_topic_panels,
             ),
             Row(
