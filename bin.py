@@ -33,6 +33,9 @@ def parse_options():  # pragma: no cover
         "--cloudwatch_data_source", type=str, help="Cloudwatch datasource name"
     )
     parser.add_argument(
+        "--elasticsearch_data_source", type=str, help="Elasticsearch datasource name"
+    )
+    parser.add_argument(
         "--influxdb_data_source", type=str, help="influxDB datasource name"
     )
     parser.add_argument(
@@ -40,6 +43,12 @@ def parse_options():  # pragma: no cover
         type=str,
         default="LambdaInsights",
         help="LambdaInsights Namespace",
+    )
+    parser.add_argument(
+        "--ecs_insights_namespace",
+        type=str,
+        default="ECS/ContainerInsights",
+        help="ContainerInsights Namespace",
     )
     parser.add_argument("--notifications", nargs="+", help="Notify alerts")
 
@@ -70,6 +79,9 @@ def parse_options():  # pragma: no cover
     elasticache_redis.add_argument(
         "--cache_cluster_id", type=str, help="Cache Cluster Id", required=True
     )
+
+    ecs = subparsers.add_parser("ecs", help="Create dashboard for AWS ECS Service")
+    ecs.add_argument("--target_group", type=str, help="Client id", required=True)
 
     es = subparsers.add_parser("elasticsearch", help="Create dashboard for AWS ES")
     es.add_argument("--client_id", type=str, help="Client id", required=True)
