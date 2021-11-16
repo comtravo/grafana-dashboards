@@ -102,7 +102,7 @@ def generate_cpu_utilization_graph(
     cluster_name: str,
     *args,
     **kwargs
-) -> Stat:
+) -> Graph:
     """
     Generate lambda graph
     """
@@ -167,7 +167,7 @@ def generate_mem_utilization_graph(
     cluster_name: str,
     *args,
     **kwargs
-) -> Stat:
+) -> Graph:
     """
     Generate lambda graph
     """
@@ -207,7 +207,7 @@ def generate_mem_utilization_graph(
             alias="Memory reserved",
             namespace=CONTAINER_INSIGHTS_NAMESPACE,
             statistics=["Maximum"],
-            metricName="MemoryUtilized",
+            metricName="MemoryReserved",
             dimensions={
               "ServiceName": name,
               "ClusterName": cluster_name
@@ -216,6 +216,7 @@ def generate_mem_utilization_graph(
     ]
 
     seriesOverrides = [
+        {"alias": "Memory reserved", "color": colors.RED, "fill": 0},
         {"alias": MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
         {"alias": AVERAGE_ALIAS, "color": "#FADE2A", "fill": 0},
         {
@@ -228,6 +229,135 @@ def generate_mem_utilization_graph(
 
     return Graph(
         title="Memory utilization",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        seriesOverrides=seriesOverrides,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+    ).auto_ref_ids()
+
+def generate_req_count_graph(
+    name: str,
+    cloudwatch_data_source: str,
+    loaadbalancer: str,
+    target_group: str,
+    *args,
+    **kwargs
+) -> Graph:
+    """
+    Generate req graph
+    """
+
+    request_count_alias = "RequestCount"
+    request_count_per_target_alias = "RequestCountPerTarget"
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=request_count_alias,
+            namespace="AWS/ApplicationELB",
+            statistics=["Sum"],
+            metricName="RequestCount",
+            dimensions={
+              "LoadBalancer": loaadbalancer,
+              "TargetGroup": target_group
+              },
+        ),
+        CloudwatchMetricsTarget(
+            alias=request_count_per_target_alias,
+            namespace="AWS/ApplicationELB",
+            statistics=["Sum"],
+            metricName="RequestCountPerTarget",
+            dimensions={
+              "LoadBalancer": loaadbalancer,
+              "TargetGroup": target_group
+              },
+        ),
+    ]
+
+    seriesOverrides = [
+        {"alias": request_count_alias, "color": colors.YELLOW, "fill": 0},
+        {"alias": request_count_per_target_alias, "color": colors.GREEN, "fill": 0}
+    ]
+
+    return Graph(
+        title="Requests",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        seriesOverrides=seriesOverrides,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+    ).auto_ref_ids()
+
+
+def generate_res_count_graph(
+    name: str,
+    cloudwatch_data_source: str,
+    loaadbalancer: str,
+    target_group: str,
+    *args,
+    **kwargs
+) -> Graph:
+    """
+    Generate res graph
+    """
+
+    xx2_alias = "2xx"
+    xx3_alias = "3xx"
+    xx4_alias = "4xx"
+    xx5_alias = "5xx"
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=xx2_alias,
+            namespace="AWS/ApplicationELB",
+            statistics=["Sum"],
+            metricName="HTTPCode_Target_2XX_Count",
+            dimensions={
+              "LoadBalancer": loaadbalancer,
+              "TargetGroup": target_group
+              },
+        ),
+        CloudwatchMetricsTarget(
+            alias=xx3_alias,
+            namespace="AWS/ApplicationELB",
+            statistics=["Sum"],
+            metricName="HTTPCode_Target_3XX_Count",
+            dimensions={
+              "LoadBalancer": loaadbalancer,
+              "TargetGroup": target_group
+              },
+        ),
+        CloudwatchMetricsTarget(
+            alias=xx4_alias,
+            namespace="AWS/ApplicationELB",
+            statistics=["Sum"],
+            metricName="HTTPCode_Target_4XX_Count",
+            dimensions={
+              "LoadBalancer": loaadbalancer,
+              "TargetGroup": target_group
+              },
+        ),
+        CloudwatchMetricsTarget(
+            alias=xx5_alias,
+            namespace="AWS/ApplicationELB",
+            statistics=["Sum"],
+            metricName="HTTPCode_Target_5XX_Count",
+            dimensions={
+              "LoadBalancer": loaadbalancer,
+              "TargetGroup": target_group
+              },
+        ),
+    ]
+
+    seriesOverrides = [
+        {"alias": xx2_alias, "color": colors.GREEN, "fill": 0},
+        {"alias": xx3_alias, "color": colors.YELLOW, "fill": 0},
+        {"alias": xx4_alias, "color": colors.ORANGE, "fill": 0},
+        {"alias": xx5_alias, "color": colors.RED, "fill": 0},
+    ]
+
+    return Graph(
+        title="Responses",
         dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
@@ -291,6 +421,10 @@ def generate_ecs_service_dashboard(
     Row(title="Utilization",showTitle=True, collapse=False, panels=[
       generate_cpu_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
       generate_mem_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
+    ]),
+    Row(title="Requests and Responses",showTitle=True, collapse=False, panels=[
+      generate_req_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
+      generate_res_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
     ])
   ]
   return Dashboard(

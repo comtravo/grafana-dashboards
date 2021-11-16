@@ -76,6 +76,7 @@ def parse_options():  # pragma: no cover
     )
 
     ecs_service = subparsers.add_parser("ecs-service", help="Create dashboard for AWS ECS Service")
+    ecs_service.add_argument("--loadbalancer", type=str, help="Loadbalancer", required=True, dest="loaadbalancer")
     ecs_service.add_argument("--target-group", type=str, help="Client id", required=True, dest="target_group")
     ecs_service.add_argument("--cluster-name", type=str, help="Client id", required=True, dest="cluster_name")
     ecs_service.add_argument("--max", type=int, help="Maximum number of containers", required=True)
