@@ -11,6 +11,7 @@ from grafanalib.core import (
     Logs,
     OP_AND,
     Row,
+    RowPanel,
     RTYPE_MAX,
     Stat,
     Target,
@@ -28,6 +29,7 @@ from lib.commons import (
 )
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.elasticsearch import ElasticsearchTarget
 from lib import colors
 
 from typing import List
@@ -424,6 +426,26 @@ def generate_deployment_graph(
         editable=EDITABLE,
         axisPlacement="hidden",
         tooltipMode="none"
+    )
+
+
+def generate_5xx_logs_panel(name: str, elasticsearch_data_source: str) -> Logs:
+    """
+    Generate Logs panel
+    """
+    targets = [
+        ElasticsearchTarget(
+            query="tag: \"{}\" AND log.res.statusCode: [500 TO *] AND NOT log.msg: \"\"".format(name),
+        ),
+    ]
+
+    return Logs(
+        title="5XX Logs",
+        dataSource=elasticsearch_data_source,
+        targets=targets,
+        wrapLogMessages=False,
+        prettifyLogMessage=False,
+        enableLogDetails=True,
     )
 
 def generate_ecs_service_dashboard(
