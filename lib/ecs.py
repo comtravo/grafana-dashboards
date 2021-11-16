@@ -9,8 +9,12 @@ from grafanalib.core import (
     Graph,
     GreaterThan,
     Logs,
+    OP_AND,
     Row,
+    RTYPE_MAX,
     Stat,
+    Target,
+    TimeRange,
     TimeSeries,
 )
 
@@ -165,6 +169,8 @@ def generate_mem_utilization_graph(
     name: str,
     cloudwatch_data_source: str,
     cluster_name: str,
+    memory: str,
+    notifications: List[str],
     *args,
     **kwargs
 ) -> Graph:
@@ -192,6 +198,7 @@ def generate_mem_utilization_graph(
               "ServiceName": name,
               "ClusterName": cluster_name
               },
+            refId=ALERT_REF_ID,
         ),
         CloudwatchMetricsTarget(
             alias=MAXIMUM_ALIAS,
@@ -203,20 +210,20 @@ def generate_mem_utilization_graph(
               "ClusterName": cluster_name
               },
         ),
-        CloudwatchMetricsTarget(
-            alias="Memory reserved",
-            namespace=CONTAINER_INSIGHTS_NAMESPACE,
-            statistics=["Maximum"],
-            metricName="MemoryReserved",
-            dimensions={
-              "ServiceName": name,
-              "ClusterName": cluster_name
-              },
-        ),
+        # CloudwatchMetricsTarget(
+        #     alias="Memory reserved",
+        #     namespace=CONTAINER_INSIGHTS_NAMESPACE,
+        #     statistics=["Maximum"],
+        #     metricName="MemoryReserved",
+        #     dimensions={
+        #       "ServiceName": name,
+        #       "ClusterName": cluster_name
+        #       },
+        # ),
     ]
 
     seriesOverrides = [
-        {"alias": "Memory reserved", "color": colors.RED, "fill": 0},
+        # {"alias": "Memory reserved", "color": colors.RED, "fill": 0},
         {"alias": MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
         {"alias": AVERAGE_ALIAS, "color": "#FADE2A", "fill": 0},
         {
@@ -227,6 +234,25 @@ def generate_mem_utilization_graph(
         },
     ]
 
+    alert = None
+    if notifications:
+        alert = Alert(
+            name="{} Memory utilization Errors".format(name),
+            message="{} is having Memory utilization errors".format(name),
+            executionErrorState="alerting",
+            alertConditions=[
+                AlertCondition(
+                    Target(refId=ALERT_REF_ID),
+                    timeRange=TimeRange("30m", "now"),
+                    evaluator=GreaterThan(memory),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_AND,
+                )
+            ],
+            gracePeriod="1m",
+            notifications=notifications,
+        )
+
     return Graph(
         title="Memory utilization",
         dataSource=cloudwatch_data_source,
@@ -234,6 +260,7 @@ def generate_mem_utilization_graph(
         seriesOverrides=seriesOverrides,
         transparent=TRANSPARENT,
         editable=EDITABLE,
+        alert=alert,
     ).auto_ref_ids()
 
 def generate_req_count_graph(
@@ -420,7 +447,7 @@ def generate_ecs_service_dashboard(
     ]),
     Row(title="Utilization",showTitle=True, collapse=False, panels=[
       generate_cpu_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
-      generate_mem_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
+      generate_mem_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
     ]),
     Row(title="Requests and Responses",showTitle=True, collapse=False, panels=[
       generate_req_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
