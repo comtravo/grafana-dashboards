@@ -44,7 +44,7 @@ MINIMUM_ALIAS = "Min"
 AVERAGE_ALIAS = "Avg"
 MAXIMUM_ALIAS = "Max"
 
-def generate_running_count_graph(
+def generate_running_count_stats_panel(
     name: str,
     cloudwatch_data_source: str,
     cluster_name: str,
@@ -102,7 +102,8 @@ def generate_running_count_graph(
         {
           "color": "blue"
         }
-      ]
+      ],
+      gridPos=GridPos(8, 12, 0, 0)
     )
 
 def generate_cpu_utilization_graph(
@@ -433,7 +434,8 @@ def generate_deployment_graph(
         transparent=TRANSPARENT,
         editable=EDITABLE,
         axisPlacement="hidden",
-        tooltipMode="none"
+        tooltipMode="none",
+        gridPos=GridPos(8, 12, 13, 0),
     )
 
 
@@ -466,6 +468,57 @@ def generate_5xx_logs_panel(name: str, elasticsearch_data_source: str, *args, **
         dedupStrategy="exact"
     )
 
+def generate_running_count_graph(name: str, cluster_name: str, min: int, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
+    # y_axes = single_y_axis(format=MEGA_BYTES)
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=AVERAGE_ALIAS,
+            namespace=CONTAINER_INSIGHTS_NAMESPACE,
+            statistics=["Maximum"],
+            metricName="RunningTaskCount",
+            dimensions={
+              "ServiceName": name,
+              "ClusterName": cluster_name
+              },
+            refId=ALERT_REF_ID,
+        ),
+    ]
+
+    alert = None
+    # if notifications:
+    #     alert = Alert(
+    #         name="{} Memory utilization Errors".format(name),
+    #         message="{} is having Memory utilization errors".format(name),
+    #         executionErrorState="alerting",
+    #         alertConditions=[
+    #             AlertCondition(
+    #                 Target(refId=ALERT_REF_ID),
+    #                 timeRange=TimeRange("30m", "now"),
+    #                 evaluator=GreaterThan(memory),
+    #                 reducerType=RTYPE_MAX,
+    #                 operator=OP_AND,
+    #             )
+    #         ],
+    #         gracePeriod="1m",
+    #         notifications=notifications,
+    #     )
+
+    return Graph(
+        title="Running Tasks",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        alert=alert,
+        gridPos=grid_pos,
+    ).auto_ref_ids()
+
+
+def generate_count_graphs(name: str, cluster_name: str, min: int, max: int, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs):
+    return [
+        generate_running_count_graph(name=name, cluster_name=cluster_name, min=min, max=max, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,8,0,0), notifications=notifications),
+    ]
+
 def generate_ecs_alb_service_dashboard(
     name: str,
     cloudwatch_data_source: str,
@@ -478,30 +531,65 @@ def generate_ecs_alb_service_dashboard(
   """
   tags = ["ecs", "ecs-service", "containers", "service", environment]
 
-  running_count_graph = generate_running_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
+  running_count_stats_panel = generate_running_count_stats_panel(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
   deployment_graph = generate_deployment_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
-  rows = [
-    Row(title="Deployments",showTitle=True, collapse=False, panels=[
-      running_count_graph,
-      deployment_graph
-    ]),
-    Row(title="Utilization",showTitle=True, collapse=False, panels=[
-      generate_cpu_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
-      generate_mem_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
-    ]),
-    Row(title="Requests and Responses",showTitle=True, collapse=False, panels=[
-      generate_req_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
-      generate_res_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
-    ]),
-    # Row(title="Error logs",showTitle=True, collapse=False, panels=[
+  panels = [
+        RowPanel(
+            title="Summary",
+            gridPos=GridPos(8, 24, 0, 0)
+        ),
+        running_count_stats_panel,
+        deployment_graph,
+        RowPanel(
+            title="Capacity",
+            gridPos=GridPos(8, 24, 0, 0)
+        ),
+      *generate_count_graphs(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
+    # RowPanel(
+    #     title="Deployments - 2",
+    #     gridPos=GridPos(8, 24, 0, 0)
+    # ),
+    #   running_count_graph,
+    #   deployment_graph,
+    # RowPanel(title="Deployments", panels=[
+    #   running_count_graph,
+    #   deployment_graph
+    # ]),
+    # RowPanel(title="Utilization", panels=[
+    #   generate_cpu_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
+    #   generate_mem_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
+    # ]),
+    # RowPanel(title="Requests and Responses", panels=[
+    #   generate_req_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
+    #   generate_res_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
+    # ]),
+    # RowPanel(title="Error logs", panels=[
     #   generate_5xx_logs_panel(name=name, *args, **kwargs),
     # ])
   ]
+#   rows = [
+#     Row(title="Deployments",showTitle=True, collapse=False, panels=[
+#       running_count_graph,
+#       deployment_graph
+#     ]),
+#     Row(title="Utilization",showTitle=True, collapse=False, panels=[
+#       generate_cpu_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
+#       generate_mem_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
+#     ]),
+#     Row(title="Requests and Responses",showTitle=True, collapse=False, panels=[
+#       generate_req_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
+#       generate_res_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
+#     ]),
+#     # Row(title="Error logs",showTitle=True, collapse=False, panels=[
+#     #   generate_5xx_logs_panel(name=name, *args, **kwargs),
+#     # ])
+#   ]
   return Dashboard(
       title="{} {}".format("ECS Service:", name),
       editable=EDITABLE,
       tags=tags,
       timezone=TIMEZONE,
       sharedCrosshair=SHARED_CROSSHAIR,
-      rows=rows,
+      panels=panels,
+    #   rows=rows,
   ).auto_panel_ids()
