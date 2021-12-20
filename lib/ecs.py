@@ -285,6 +285,7 @@ def generate_req_count_graph(
     cloudwatch_data_source: str,
     loaadbalancer: str,
     target_group: str,
+    grid_pos: GridPos,
     *args,
     **kwargs
 ) -> Graph:
@@ -330,6 +331,7 @@ def generate_req_count_graph(
         seriesOverrides=seriesOverrides,
         transparent=TRANSPARENT,
         editable=EDITABLE,
+        gridPos=grid_pos,
     ).auto_ref_ids()
 
 
@@ -338,6 +340,7 @@ def generate_res_count_graph(
     cloudwatch_data_source: str,
     loaadbalancer: str,
     target_group: str,
+    grid_pos: GridPos,
     *args,
     **kwargs
 ) -> Graph:
@@ -407,6 +410,7 @@ def generate_res_count_graph(
         seriesOverrides=seriesOverrides,
         transparent=TRANSPARENT,
         editable=EDITABLE,
+        gridPos=grid_pos,
     ).auto_ref_ids()
 
 def generate_deployment_graph(
@@ -641,11 +645,13 @@ def generate_ecs_alb_service_dashboard(
             gridPos=GridPos(1, 24, 0, 18)
         ),
         generate_cpu_utilization_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,12, 0, 19), *args, **kwargs),
-        generate_mem_utilization_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,12, 12, 19), notifications=notifications, *args, **kwargs)
-    # RowPanel(title="Utilization", panels=[
-    #   generate_cpu_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
-    #   generate_mem_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
-    # ]),
+        generate_mem_utilization_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,12, 12, 19), notifications=notifications, *args, **kwargs),
+        RowPanel(
+            title="Requests and Responses",
+            gridPos=GridPos(1, 24, 0, 27)
+        ),
+      generate_req_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 0, 28), *args, **kwargs),
+      generate_res_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 12, 28), *args, **kwargs)
     # RowPanel(title="Requests and Responses", panels=[
     #   generate_req_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
     #   generate_res_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
