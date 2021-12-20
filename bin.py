@@ -12,7 +12,7 @@ from lib.elasticsearch import (
     generate_elasticsearch_dashboard as elasticsearch_dispatcher,
 )
 from lib.rds import generate_rds_dashboard as rds_dispatcher
-from lib.ecs import generate_ecs_service_dashboard as ecs_service_dispatcher
+from lib.ecs import generate_ecs_alb_service_dashboard as ecs_alb_service_dispatcher
 
 import argparse
 import base64
@@ -75,13 +75,13 @@ def parse_options():  # pragma: no cover
         "--cache_cluster_id", type=str, help="Cache Cluster Id", required=True
     )
 
-    ecs_service = subparsers.add_parser("ecs-service", help="Create dashboard for AWS ECS Service")
-    ecs_service.add_argument("--loadbalancer", type=str, help="Loadbalancer", required=True, dest="loaadbalancer")
-    ecs_service.add_argument("--target-group", type=str, help="Target Group", required=True, dest="target_group")
-    ecs_service.add_argument("--cluster-name", type=str, help="Cluster Name", required=True, dest="cluster_name")
-    ecs_service.add_argument("--max", type=int, help="Maximum number of containers", required=True)
-    ecs_service.add_argument("--min", type=int, help="Minimum number of containers", required=True)
-    ecs_service.add_argument("--memory", type=int, help="Memory or MemoryReservation in MB", required=True)
+    ecs_alb_service = subparsers.add_parser("ecs-alb-service", help="Create dashboard for AWS ECS Service")
+    ecs_alb_service.add_argument("--loadbalancer", type=str, help="Loadbalancer", required=True, dest="loaadbalancer")
+    ecs_alb_service.add_argument("--target-group", type=str, help="Target Group", required=True, dest="target_group")
+    ecs_alb_service.add_argument("--cluster-name", type=str, help="Cluster Name", required=True, dest="cluster_name")
+    ecs_alb_service.add_argument("--max", type=int, help="Maximum number of containers", required=True)
+    ecs_alb_service.add_argument("--min", type=int, help="Minimum number of containers", required=True)
+    ecs_alb_service.add_argument("--memory", type=int, help="Memory or MemoryReservation in MB", required=True)
 
     es = subparsers.add_parser("elasticsearch", help="Create dashboard for AWS ES")
     es.add_argument("--client_id", type=str, help="Client id", required=True)
@@ -150,7 +150,7 @@ def dispatcher():
         "elasticache-redis": elasticache_redis_dispatcher,
         "elasticsearch": elasticsearch_dispatcher,
         "rds": rds_dispatcher,
-        "ecs-service": ecs_service_dispatcher,
+        "ecs-alb-service": ecs_alb_service_dispatcher,
     }
 
 

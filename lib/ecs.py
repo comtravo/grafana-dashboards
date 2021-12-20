@@ -8,11 +8,13 @@ from grafanalib.core import (
     Dashboard,
     Graph,
     GreaterThan,
+    GridPos,
     Logs,
     OP_AND,
     Row,
     RowPanel,
     RTYPE_MAX,
+    single_y_axis,
     Stat,
     Target,
     TimeRange,
@@ -30,6 +32,7 @@ from lib.commons import (
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.elasticsearch import ElasticsearchTarget
+from grafanalib.formatunits import MEGA_BYTES, PERCENT_FORMAT
 from lib import colors
 
 from typing import List
@@ -113,6 +116,8 @@ def generate_cpu_utilization_graph(
     Generate lambda graph
     """
 
+    y_axes = single_y_axis(format=PERCENT_FORMAT)
+
     targets = [
         CloudwatchMetricsTarget(
             alias=MINIMUM_ALIAS,
@@ -163,6 +168,7 @@ def generate_cpu_utilization_graph(
         dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
+        yAxes=y_axes,
         transparent=TRANSPARENT,
         editable=EDITABLE,
     ).auto_ref_ids()
@@ -180,6 +186,7 @@ def generate_mem_utilization_graph(
     Generate lambda graph
     """
 
+    y_axes = single_y_axis(format=MEGA_BYTES)
     targets = [
         CloudwatchMetricsTarget(
             alias=MINIMUM_ALIAS,
@@ -212,20 +219,20 @@ def generate_mem_utilization_graph(
               "ClusterName": cluster_name
               },
         ),
-        # CloudwatchMetricsTarget(
-        #     alias="Memory reserved",
-        #     namespace=CONTAINER_INSIGHTS_NAMESPACE,
-        #     statistics=["Maximum"],
-        #     metricName="MemoryReserved",
-        #     dimensions={
-        #       "ServiceName": name,
-        #       "ClusterName": cluster_name
-        #       },
-        # ),
+        CloudwatchMetricsTarget(
+            alias="Memory reserved",
+            namespace=CONTAINER_INSIGHTS_NAMESPACE,
+            statistics=["Maximum"],
+            metricName="MemoryReserved",
+            dimensions={
+              "ServiceName": name,
+              "ClusterName": cluster_name
+              },
+        ),
     ]
 
     seriesOverrides = [
-        # {"alias": "Memory reserved", "color": colors.RED, "fill": 0},
+        {"alias": "Memory reserved", "color": colors.RED, "fill": 0},
         {"alias": MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
         {"alias": AVERAGE_ALIAS, "color": "#FADE2A", "fill": 0},
         {
@@ -259,6 +266,7 @@ def generate_mem_utilization_graph(
         title="Memory utilization",
         dataSource=cloudwatch_data_source,
         targets=targets,
+        yAxes=y_axes,
         seriesOverrides=seriesOverrides,
         transparent=TRANSPARENT,
         editable=EDITABLE,
@@ -429,26 +437,36 @@ def generate_deployment_graph(
     )
 
 
-def generate_5xx_logs_panel(name: str, elasticsearch_data_source: str) -> Logs:
+def generate_5xx_logs_panel(name: str, elasticsearch_data_source: str, *args, **kwargs) -> Logs:
     """
     Generate Logs panel
     """
     targets = [
         ElasticsearchTarget(
             query="tag: \"{}\" AND log.res.statusCode: [500 TO *] AND NOT log.msg: \"\"".format(name),
+            metricAggs=[
+            {
+                "id": "1",
+                "settings": {
+                    "limit": "10000"
+                },
+                "type": "logs"
+            }
+          ]
         ),
     ]
 
     return Logs(
-        title="5XX Logs",
+        title="5XX",
         dataSource=elasticsearch_data_source,
         targets=targets,
         wrapLogMessages=False,
         prettifyLogMessage=False,
         enableLogDetails=True,
+        dedupStrategy="exact"
     )
 
-def generate_ecs_service_dashboard(
+def generate_ecs_alb_service_dashboard(
     name: str,
     cloudwatch_data_source: str,
     notifications: List[str],
@@ -474,7 +492,10 @@ def generate_ecs_service_dashboard(
     Row(title="Requests and Responses",showTitle=True, collapse=False, panels=[
       generate_req_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
       generate_res_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
-    ])
+    ]),
+    # Row(title="Error logs",showTitle=True, collapse=False, panels=[
+    #   generate_5xx_logs_panel(name=name, *args, **kwargs),
+    # ])
   ]
   return Dashboard(
       title="{} {}".format("ECS Service:", name),
