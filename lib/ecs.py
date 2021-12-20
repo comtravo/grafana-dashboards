@@ -450,7 +450,7 @@ def generate_deployment_graph(
     )
 
 
-def generate_5xx_logs_panel(name: str, elasticsearch_data_source: str, grid_pos: GridPos, *args, **kwargs) -> Logs:
+def generate_error_logs_panel(name: str, elasticsearch_data_source: str, grid_pos: GridPos, *args, **kwargs) -> Logs:
     """
     Generate Logs panel
     """
@@ -657,7 +657,7 @@ def generate_ecs_alb_service_dashboard(
             title="Logs",
             gridPos=GridPos(1, 24, 0, 36)
         ),
-        generate_5xx_logs_panel(name=name, grid_pos=GridPos(12, 24, 0, 37), *args, **kwargs),
+        generate_error_logs_panel(name=name, grid_pos=GridPos(12, 24, 0, 37), *args, **kwargs),
   ]
   return Dashboard(
       title="{} {}".format("ECS Service:", name),
