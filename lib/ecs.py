@@ -10,6 +10,7 @@ from grafanalib.core import (
     GreaterThan,
     GridPos,
     Logs,
+    LowerThan,
     OP_AND,
     Row,
     RowPanel,
@@ -103,7 +104,7 @@ def generate_running_count_stats_panel(
           "color": "blue"
         }
       ],
-      gridPos=GridPos(8, 12, 0, 0)
+      gridPos=GridPos(8, 12, 0, 1)
     )
 
 def generate_cpu_utilization_graph(
@@ -435,7 +436,7 @@ def generate_deployment_graph(
         editable=EDITABLE,
         axisPlacement="hidden",
         tooltipMode="none",
-        gridPos=GridPos(8, 12, 13, 0),
+        gridPos=GridPos(8, 12, 12, 1),
     )
 
 
@@ -468,8 +469,7 @@ def generate_5xx_logs_panel(name: str, elasticsearch_data_source: str, *args, **
         dedupStrategy="exact"
     )
 
-def generate_running_count_graph(name: str, cluster_name: str, min: int, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
-    # y_axes = single_y_axis(format=MEGA_BYTES)
+def generate_running_count_graph(name: str, cluster_name: str, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
     targets = [
         CloudwatchMetricsTarget(
             alias=AVERAGE_ALIAS,
@@ -485,23 +485,23 @@ def generate_running_count_graph(name: str, cluster_name: str, min: int, max: in
     ]
 
     alert = None
-    # if notifications:
-    #     alert = Alert(
-    #         name="{} Memory utilization Errors".format(name),
-    #         message="{} is having Memory utilization errors".format(name),
-    #         executionErrorState="alerting",
-    #         alertConditions=[
-    #             AlertCondition(
-    #                 Target(refId=ALERT_REF_ID),
-    #                 timeRange=TimeRange("30m", "now"),
-    #                 evaluator=GreaterThan(memory),
-    #                 reducerType=RTYPE_MAX,
-    #                 operator=OP_AND,
-    #             )
-    #         ],
-    #         gracePeriod="1m",
-    #         notifications=notifications,
-    #     )
+    if notifications:
+        alert = Alert(
+            name="{} Running count of containers nearing the max".format(name),
+            message="{} is having Running count of containers nearing the max".format(name),
+            executionErrorState="alerting",
+            alertConditions=[
+                AlertCondition(
+                    Target(refId=ALERT_REF_ID),
+                    timeRange=TimeRange("15m", "now"),
+                    evaluator=GreaterThan(0.9 * max), # 90% of max
+                    reducerType=RTYPE_MAX,
+                    operator=OP_AND,
+                )
+            ],
+            gracePeriod="1m",
+            notifications=notifications,
+        )
 
     return Graph(
         title="Running Tasks",
@@ -513,10 +513,101 @@ def generate_running_count_graph(name: str, cluster_name: str, min: int, max: in
         gridPos=grid_pos,
     ).auto_ref_ids()
 
+def generate_desired_count_graph(name: str, cluster_name: str, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=AVERAGE_ALIAS,
+            namespace=CONTAINER_INSIGHTS_NAMESPACE,
+            statistics=["Maximum"],
+            metricName="DesiredTaskCount",
+            dimensions={
+              "ServiceName": name,
+              "ClusterName": cluster_name
+              },
+            refId=ALERT_REF_ID,
+        ),
+    ]
+
+    alert = None
+    if notifications:
+        alert = Alert(
+            name="{} Desired count of containers nearing the max".format(name),
+            message="{} is having Desired count of containers nearing the max".format(name),
+            executionErrorState="alerting",
+            alertConditions=[
+                AlertCondition(
+                    Target(refId=ALERT_REF_ID),
+                    timeRange=TimeRange("15m", "now"),
+                    evaluator=GreaterThan(0.9 * max), # 90% of max
+                    reducerType=RTYPE_MAX,
+                    operator=OP_AND,
+                )
+            ],
+            gracePeriod="1m",
+            notifications=notifications,
+        )
+
+    return Graph(
+        title="Desired Tasks",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        alert=alert,
+        gridPos=grid_pos,
+    ).auto_ref_ids()
+
+
+def generate_pending_count_graph(name: str, cluster_name: str, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=AVERAGE_ALIAS,
+            namespace=CONTAINER_INSIGHTS_NAMESPACE,
+            statistics=["Maximum"],
+            metricName="PendingTaskCount",
+            dimensions={
+              "ServiceName": name,
+              "ClusterName": cluster_name
+              },
+            refId=ALERT_REF_ID,
+        ),
+    ]
+
+    alert = None
+    if notifications:
+        alert = Alert(
+            name="{} Pending count of containers is greater than zero".format(name),
+            message="{} is having Pending count of containers is greater than zero".format(name),
+            executionErrorState="alerting",
+            alertConditions=[
+                AlertCondition(
+                    Target(refId=ALERT_REF_ID),
+                    timeRange=TimeRange("15m", "now"),
+                    evaluator=GreaterThan(0),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_AND,
+                )
+            ],
+            gracePeriod="1m",
+            notifications=notifications,
+        )
+
+    return Graph(
+        title="Pending Tasks",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        alert=alert,
+        gridPos=grid_pos,
+    ).auto_ref_ids()
+
 
 def generate_count_graphs(name: str, cluster_name: str, min: int, max: int, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs):
     return [
-        generate_running_count_graph(name=name, cluster_name=cluster_name, min=min, max=max, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,8,0,0), notifications=notifications),
+        generate_running_count_graph(name=name, cluster_name=cluster_name, max=max, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,8,0,10), notifications=notifications),
+        generate_desired_count_graph(name=name, cluster_name=cluster_name, max=max, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,8,8,10), notifications=notifications),
+        generate_pending_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,8,16,10), notifications=notifications),
     ]
 
 def generate_ecs_alb_service_dashboard(
@@ -536,13 +627,17 @@ def generate_ecs_alb_service_dashboard(
   panels = [
         RowPanel(
             title="Summary",
-            gridPos=GridPos(8, 24, 0, 0)
+            gridPos=GridPos(1, 24, 0, 0),
+            # panels=[
+            #     running_count_stats_panel,
+            #     deployment_graph,
+            # ]
         ),
         running_count_stats_panel,
         deployment_graph,
         RowPanel(
             title="Capacity",
-            gridPos=GridPos(8, 24, 0, 0)
+            gridPos=GridPos(1, 24, 0, 9)
         ),
       *generate_count_graphs(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
     # RowPanel(
