@@ -472,7 +472,7 @@ def generate_5xx_logs_panel(name: str, elasticsearch_data_source: str, *args, **
 def generate_running_count_graph(name: str, cluster_name: str, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
     targets = [
         CloudwatchMetricsTarget(
-            alias=AVERAGE_ALIAS,
+            alias="Containers",
             namespace=CONTAINER_INSIGHTS_NAMESPACE,
             statistics=["Maximum"],
             metricName="RunningTaskCount",
@@ -516,7 +516,7 @@ def generate_running_count_graph(name: str, cluster_name: str, max: int, cloudwa
 def generate_desired_count_graph(name: str, cluster_name: str, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
     targets = [
         CloudwatchMetricsTarget(
-            alias=AVERAGE_ALIAS,
+            alias="Containers",
             namespace=CONTAINER_INSIGHTS_NAMESPACE,
             statistics=["Maximum"],
             metricName="DesiredTaskCount",
@@ -561,7 +561,7 @@ def generate_desired_count_graph(name: str, cluster_name: str, max: int, cloudwa
 def generate_pending_count_graph(name: str, cluster_name: str, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
     targets = [
         CloudwatchMetricsTarget(
-            alias=AVERAGE_ALIAS,
+            alias="Containers",
             namespace=CONTAINER_INSIGHTS_NAMESPACE,
             statistics=["Maximum"],
             metricName="PendingTaskCount",
