@@ -49,6 +49,7 @@ def generate_running_count_stats_panel(
     name: str,
     cloudwatch_data_source: str,
     cluster_name: str,
+    grid_pos: GridPos,
     *args,
     **kwargs
 ) -> Stat:
@@ -104,18 +105,19 @@ def generate_running_count_stats_panel(
           "color": "blue"
         }
       ],
-      gridPos=GridPos(8, 12, 0, 1)
+      gridPos=grid_pos
     )
 
 def generate_cpu_utilization_graph(
     name: str,
     cloudwatch_data_source: str,
     cluster_name: str,
+    grid_pos: GridPos,
     *args,
     **kwargs
 ) -> Graph:
     """
-    Generate lambda graph
+    Generate CPU graph
     """
 
     y_axes = single_y_axis(format=PERCENT_FORMAT)
@@ -173,6 +175,7 @@ def generate_cpu_utilization_graph(
         yAxes=y_axes,
         transparent=TRANSPARENT,
         editable=EDITABLE,
+        gridPos=grid_pos,
     ).auto_ref_ids()
 
 def generate_mem_utilization_graph(
@@ -181,11 +184,12 @@ def generate_mem_utilization_graph(
     cluster_name: str,
     memory: str,
     notifications: List[str],
+    grid_pos:GridPos,
     *args,
     **kwargs
 ) -> Graph:
     """
-    Generate lambda graph
+    Generate Mem graph
     """
 
     y_axes = single_y_axis(format=MEGA_BYTES)
@@ -273,6 +277,7 @@ def generate_mem_utilization_graph(
         transparent=TRANSPARENT,
         editable=EDITABLE,
         alert=alert,
+        gridPos=grid_pos,
     ).auto_ref_ids()
 
 def generate_req_count_graph(
@@ -408,6 +413,7 @@ def generate_deployment_graph(
     name: str,
     cloudwatch_data_source: str,
     cluster_name: str,
+    grid_pos: GridPos,
     *args,
     **kwargs
 ) -> TimeSeries:
@@ -436,7 +442,7 @@ def generate_deployment_graph(
         editable=EDITABLE,
         axisPlacement="hidden",
         tooltipMode="none",
-        gridPos=GridPos(8, 12, 12, 1),
+        gridPos=grid_pos,
     )
 
 
@@ -603,15 +609,9 @@ def generate_pending_count_graph(name: str, cluster_name: str, cloudwatch_data_s
     ).auto_ref_ids()
 
 
-def generate_count_graphs(name: str, cluster_name: str, min: int, max: int, cloudwatch_data_source: str, notifications: List[str], *args, **kwargs):
-    return [
-        generate_running_count_graph(name=name, cluster_name=cluster_name, max=max, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,8,0,10), notifications=notifications),
-        generate_desired_count_graph(name=name, cluster_name=cluster_name, max=max, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,8,8,10), notifications=notifications),
-        generate_pending_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,8,16,10), notifications=notifications),
-    ]
-
 def generate_ecs_alb_service_dashboard(
     name: str,
+    cluster_name: str,
     cloudwatch_data_source: str,
     notifications: List[str],
     environment: str,
@@ -622,34 +622,26 @@ def generate_ecs_alb_service_dashboard(
   """
   tags = ["ecs", "ecs-service", "containers", "service", environment]
 
-  running_count_stats_panel = generate_running_count_stats_panel(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
-  deployment_graph = generate_deployment_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
   panels = [
         RowPanel(
             title="Summary",
             gridPos=GridPos(1, 24, 0, 0),
-            # panels=[
-            #     running_count_stats_panel,
-            #     deployment_graph,
-            # ]
         ),
-        running_count_stats_panel,
-        deployment_graph,
+        generate_running_count_stats_panel(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 0, 1), notifications=notifications, *args, **kwargs),
+        generate_deployment_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 12, 1), *args, **kwargs),
         RowPanel(
             title="Capacity",
             gridPos=GridPos(1, 24, 0, 9)
         ),
-      *generate_count_graphs(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
-    # RowPanel(
-    #     title="Deployments - 2",
-    #     gridPos=GridPos(8, 24, 0, 0)
-    # ),
-    #   running_count_graph,
-    #   deployment_graph,
-    # RowPanel(title="Deployments", panels=[
-    #   running_count_graph,
-    #   deployment_graph
-    # ]),
+        generate_running_count_graph(name=name, cluster_name=cluster_name, max=max, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,8,0,10), notifications=notifications),
+        generate_desired_count_graph(name=name, cluster_name=cluster_name, max=max, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,8,8,10), notifications=notifications),
+        generate_pending_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,8,16,10), notifications=notifications),
+        RowPanel(
+            title="Utilization",
+            gridPos=GridPos(1, 24, 0, 18)
+        ),
+        generate_cpu_utilization_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,12, 0, 19), *args, **kwargs),
+        generate_mem_utilization_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,12, 12, 19), notifications=notifications, *args, **kwargs)
     # RowPanel(title="Utilization", panels=[
     #   generate_cpu_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
     #   generate_mem_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
