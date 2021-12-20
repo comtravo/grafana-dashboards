@@ -450,13 +450,13 @@ def generate_deployment_graph(
     )
 
 
-def generate_5xx_logs_panel(name: str, elasticsearch_data_source: str, *args, **kwargs) -> Logs:
+def generate_5xx_logs_panel(name: str, elasticsearch_data_source: str, grid_pos: GridPos, *args, **kwargs) -> Logs:
     """
     Generate Logs panel
     """
     targets = [
         ElasticsearchTarget(
-            query="tag: \"{}\" AND log.res.statusCode: [500 TO *] AND NOT log.msg: \"\"".format(name),
+            query="tag: \"{}\" AND log.level: [50 TO *] AND NOT log.msg: \"\"".format(name),
             metricAggs=[
             {
                 "id": "1",
@@ -470,13 +470,14 @@ def generate_5xx_logs_panel(name: str, elasticsearch_data_source: str, *args, **
     ]
 
     return Logs(
-        title="5XX",
+        title="Error Logs",
         dataSource=elasticsearch_data_source,
         targets=targets,
         wrapLogMessages=False,
         prettifyLogMessage=False,
         enableLogDetails=True,
-        dedupStrategy="exact"
+        dedupStrategy="exact",
+        gridPos=grid_pos,
     )
 
 def generate_running_count_graph(name: str, cluster_name: str, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
@@ -650,11 +651,13 @@ def generate_ecs_alb_service_dashboard(
             title="Requests and Responses",
             gridPos=GridPos(1, 24, 0, 27)
         ),
-      generate_req_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 0, 28), *args, **kwargs),
-      generate_res_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 12, 28), *args, **kwargs)
-    # RowPanel(title="Error logs", panels=[
-    #   generate_5xx_logs_panel(name=name, *args, **kwargs),
-    # ])
+        generate_req_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 0, 28), *args, **kwargs),
+        generate_res_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 12, 28), *args, **kwargs),
+        RowPanel(
+            title="Logs",
+            gridPos=GridPos(1, 24, 0, 36)
+        ),
+        generate_5xx_logs_panel(name=name, grid_pos=GridPos(12, 24, 0, 37), *args, **kwargs),
   ]
   return Dashboard(
       title="{} {}".format("ECS Service:", name),
