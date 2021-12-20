@@ -652,31 +652,10 @@ def generate_ecs_alb_service_dashboard(
         ),
       generate_req_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 0, 28), *args, **kwargs),
       generate_res_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 12, 28), *args, **kwargs)
-    # RowPanel(title="Requests and Responses", panels=[
-    #   generate_req_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
-    #   generate_res_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
-    # ]),
     # RowPanel(title="Error logs", panels=[
     #   generate_5xx_logs_panel(name=name, *args, **kwargs),
     # ])
   ]
-#   rows = [
-#     Row(title="Deployments",showTitle=True, collapse=False, panels=[
-#       running_count_graph,
-#       deployment_graph
-#     ]),
-#     Row(title="Utilization",showTitle=True, collapse=False, panels=[
-#       generate_cpu_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
-#       generate_mem_utilization_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, notifications=notifications, *args, **kwargs)
-#     ]),
-#     Row(title="Requests and Responses",showTitle=True, collapse=False, panels=[
-#       generate_req_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs),
-#       generate_res_count_graph(name=name, cloudwatch_data_source=cloudwatch_data_source, *args, **kwargs)
-#     ]),
-#     # Row(title="Error logs",showTitle=True, collapse=False, panels=[
-#     #   generate_5xx_logs_panel(name=name, *args, **kwargs),
-#     # ])
-#   ]
   return Dashboard(
       title="{} {}".format("ECS Service:", name),
       editable=EDITABLE,
