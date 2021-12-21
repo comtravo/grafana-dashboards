@@ -656,5 +656,4 @@ def generate_ecs_alb_service_dashboard(
       timezone=TIMEZONE,
       sharedCrosshair=SHARED_CROSSHAIR,
       panels=panels,
-    #   rows=rows,
   ).auto_panel_ids()
