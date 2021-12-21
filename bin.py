@@ -37,6 +37,9 @@ def parse_options():  # pragma: no cover
         "--es", type=str, help="Elasticsearch datasource name", dest="elasticsearch_data_source"
     )
     parser.add_argument(
+        "--kibana", type=str, help="Kibana URL", dest="kibana_url"
+    )
+    parser.add_argument(
         "--lambda_insights_namespace",
         type=str,
         default="LambdaInsights",

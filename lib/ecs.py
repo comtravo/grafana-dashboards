@@ -10,14 +10,13 @@ from grafanalib.core import (
     GreaterThan,
     GridPos,
     Logs,
-    LowerThan,
     OP_AND,
-    Row,
     RowPanel,
     RTYPE_MAX,
     single_y_axis,
     Stat,
     Target,
+    Text,
     TimeRange,
     TimeSeries,
 )
@@ -272,6 +271,7 @@ def generate_mem_utilization_graph(
         editable=EDITABLE,
         alert=alert,
         gridPos=grid_pos,
+        alertThreshold=ALERT_THRESHOLD
     ).auto_ref_ids()
 
 def generate_req_count_graph(
@@ -436,13 +436,38 @@ def generate_deployment_graph(
     )
 
 
-def generate_error_logs_panel(name: str, elasticsearch_data_source: str, grid_pos: GridPos, *args, **kwargs) -> Logs:
+def get_elasticsearch_query(name: str) -> str:
+    """
+    Get elasticsearch query
+    """
+
+    return "tag: \"{}\" AND log.level: [50 TO *] AND NOT log.msg: \"\"".format(name)
+
+
+def generate_helpful_resources_panel(name: str, grid_pos: GridPos, kibana_url: str) -> Text:
+
+    content = """
+# Helpful resources
+
+## Elasticsearch
+
+<a href="{}" target="_blank">Kibana URL</a>\n
+Elasticsearch query to find all error logs: `{}`
+    """.format(kibana_url, get_elasticsearch_query(name))
+    return Text(
+        title="Helpful resources",
+        transparent=TRANSPARENT,
+        content=content,
+        mode="markdown",
+        gridPos=grid_pos)
+
+def generate_error_logs_panel(name: str, elasticsearch_data_source: str, grid_pos: GridPos) -> Logs:
     """
     Generate Logs panel
     """
     targets = [
         ElasticsearchTarget(
-            query="tag: \"{}\" AND log.level: [50 TO *] AND NOT log.msg: \"\"".format(name),
+            query=get_elasticsearch_query(name),
             metricAggs=[
             {
                 "id": "1",
@@ -509,6 +534,7 @@ def generate_running_count_graph(name: str, cluster_name: str, max: int, cloudwa
         editable=EDITABLE,
         alert=alert,
         gridPos=grid_pos,
+        alertThreshold=ALERT_THRESHOLD
     ).auto_ref_ids()
 
 def generate_desired_count_graph(name: str, cluster_name: str, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos):
@@ -553,6 +579,7 @@ def generate_desired_count_graph(name: str, cluster_name: str, max: int, cloudwa
         editable=EDITABLE,
         alert=alert,
         gridPos=grid_pos,
+        alertThreshold=ALERT_THRESHOLD
     ).auto_ref_ids()
 
 
@@ -598,6 +625,7 @@ def generate_pending_count_graph(name: str, cluster_name: str, cloudwatch_data_s
         editable=EDITABLE,
         alert=alert,
         gridPos=grid_pos,
+        alertThreshold=ALERT_THRESHOLD
     ).auto_ref_ids()
 
 
@@ -610,6 +638,8 @@ def generate_ecs_alb_service_dashboard(
     memory: int,
     loadbalancer: str,
     target_group: str,
+    elasticsearch_data_source: str,
+    kibana_url: str,
     *args,
     **kwargs
 ):
@@ -647,7 +677,8 @@ def generate_ecs_alb_service_dashboard(
             title="Logs",
             gridPos=GridPos(1, 24, 0, 36)
         ),
-        generate_error_logs_panel(name=name, grid_pos=GridPos(24, 24, 0, 37), *args, **kwargs),
+        generate_helpful_resources_panel(name=name, grid_pos=GridPos(8, 24, 0, 37), kibana_url=kibana_url),
+        generate_error_logs_panel(name=name, grid_pos=GridPos(24, 24, 0, 45), elasticsearch_data_source=elasticsearch_data_source),
   ]
   return Dashboard(
       title="{} {}".format("ECS Service:", name),
