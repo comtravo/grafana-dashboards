@@ -31,14 +31,18 @@ def parse_options():  # pragma: no cover
         "--environment", type=str, required=True, help="Environment name"
     )
     parser.add_argument(
-        "--cw", type=str, help="Cloudwatch datasource name", dest="cloudwatch_data_source"
+        "--cw",
+        type=str,
+        help="Cloudwatch datasource name",
+        dest="cloudwatch_data_source",
     )
     parser.add_argument(
-        "--es", type=str, help="Elasticsearch datasource name", dest="elasticsearch_data_source"
+        "--es",
+        type=str,
+        help="Elasticsearch datasource name",
+        dest="elasticsearch_data_source",
     )
-    parser.add_argument(
-        "--kibana", type=str, help="Kibana URL", dest="kibana_url"
-    )
+    parser.add_argument("--kibana", type=str, help="Kibana URL", dest="kibana_url")
     parser.add_argument(
         "--lambda_insights_namespace",
         type=str,
@@ -75,13 +79,39 @@ def parse_options():  # pragma: no cover
         "--cache_cluster_id", type=str, help="Cache Cluster Id", required=True
     )
 
-    ecs_alb_service = subparsers.add_parser("ecs-alb-service", help="Create dashboard for AWS ECS Service")
-    ecs_alb_service.add_argument("--loadbalancer", type=str, help="Loadbalancer", required=True, dest="loadbalancer")
-    ecs_alb_service.add_argument("--target-group", type=str, help="Target Group", required=True, dest="target_group")
-    ecs_alb_service.add_argument("--cluster-name", type=str, help="Cluster Name", required=True, dest="cluster_name")
-    ecs_alb_service.add_argument("--max", type=int, help="Maximum number of containers", required=True)
-    ecs_alb_service.add_argument("--min", type=int, help="Minimum number of containers", required=True)
-    ecs_alb_service.add_argument("--memory", type=int, help="Memory or MemoryReservation in MB", required=True)
+    ecs_alb_service = subparsers.add_parser(
+        "ecs-alb-service", help="Create dashboard for AWS ECS Service"
+    )
+    ecs_alb_service.add_argument(
+        "--loadbalancer",
+        type=str,
+        help="Loadbalancer",
+        required=True,
+        dest="loadbalancer",
+    )
+    ecs_alb_service.add_argument(
+        "--target-group",
+        type=str,
+        help="Target Group",
+        required=True,
+        dest="target_group",
+    )
+    ecs_alb_service.add_argument(
+        "--cluster-name",
+        type=str,
+        help="Cluster Name",
+        required=True,
+        dest="cluster_name",
+    )
+    ecs_alb_service.add_argument(
+        "--max", type=int, help="Maximum number of containers", required=True
+    )
+    ecs_alb_service.add_argument(
+        "--min", type=int, help="Minimum number of containers", required=True
+    )
+    ecs_alb_service.add_argument(
+        "--memory", type=int, help="Memory or MemoryReservation in MB", required=True
+    )
 
     es = subparsers.add_parser("elasticsearch", help="Create dashboard for AWS ES")
     es.add_argument("--client_id", type=str, help="Client id", required=True)
