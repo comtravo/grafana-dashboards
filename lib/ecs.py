@@ -647,7 +647,7 @@ def generate_ecs_alb_service_dashboard(
             title="Logs",
             gridPos=GridPos(1, 24, 0, 36)
         ),
-        generate_error_logs_panel(name=name, grid_pos=GridPos(12, 24, 0, 37), *args, **kwargs),
+        generate_error_logs_panel(name=name, grid_pos=GridPos(24, 24, 0, 37), *args, **kwargs),
   ]
   return Dashboard(
       title="{} {}".format("ECS Service:", name),
