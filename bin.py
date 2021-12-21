@@ -31,13 +31,10 @@ def parse_options():  # pragma: no cover
         "--environment", type=str, required=True, help="Environment name"
     )
     parser.add_argument(
-        "--cloudwatch_data_source", type=str, help="Cloudwatch datasource name"
+        "--cw", type=str, help="Cloudwatch datasource name", dest="cloudwatch_data_source"
     )
     parser.add_argument(
-        "--elasticsearch_data_source", type=str, help="Elasticsearch datasource name"
-    )
-    parser.add_argument(
-        "--influxdb_data_source", type=str, help="influxDB datasource name"
+        "--es", type=str, help="Elasticsearch datasource name", dest="elasticsearch_data_source"
     )
     parser.add_argument(
         "--lambda_insights_namespace",
@@ -76,7 +73,7 @@ def parse_options():  # pragma: no cover
     )
 
     ecs_alb_service = subparsers.add_parser("ecs-alb-service", help="Create dashboard for AWS ECS Service")
-    ecs_alb_service.add_argument("--loadbalancer", type=str, help="Loadbalancer", required=True, dest="loaadbalancer")
+    ecs_alb_service.add_argument("--loadbalancer", type=str, help="Loadbalancer", required=True, dest="loadbalancer")
     ecs_alb_service.add_argument("--target-group", type=str, help="Target Group", required=True, dest="target_group")
     ecs_alb_service.add_argument("--cluster-name", type=str, help="Cluster Name", required=True, dest="cluster_name")
     ecs_alb_service.add_argument("--max", type=int, help="Maximum number of containers", required=True)

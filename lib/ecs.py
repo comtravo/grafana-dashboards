@@ -50,8 +50,6 @@ def generate_running_count_stats_panel(
     cloudwatch_data_source: str,
     cluster_name: str,
     grid_pos: GridPos,
-    *args,
-    **kwargs
 ) -> Stat:
     """
     Generate lambda graph
@@ -113,8 +111,6 @@ def generate_cpu_utilization_graph(
     cloudwatch_data_source: str,
     cluster_name: str,
     grid_pos: GridPos,
-    *args,
-    **kwargs
 ) -> Graph:
     """
     Generate CPU graph
@@ -185,8 +181,6 @@ def generate_mem_utilization_graph(
     memory: str,
     notifications: List[str],
     grid_pos:GridPos,
-    *args,
-    **kwargs
 ) -> Graph:
     """
     Generate Mem graph
@@ -239,11 +233,11 @@ def generate_mem_utilization_graph(
 
     seriesOverrides = [
         {"alias": "Memory reserved", "color": colors.RED, "fill": 0},
-        {"alias": MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
-        {"alias": AVERAGE_ALIAS, "color": "#FADE2A", "fill": 0},
+        {"alias": MINIMUM_ALIAS, "color": colors.GREEN, "lines": False},
+        {"alias": AVERAGE_ALIAS, "color": colors.YELLOW, "fill": 0},
         {
             "alias": MAXIMUM_ALIAS,
-            "color": "rgb(77, 159, 179)",
+            "color": colors.GREEN,
             "fillBelowTo": MINIMUM_ALIAS,
             "lines": False,
         },
@@ -258,7 +252,7 @@ def generate_mem_utilization_graph(
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
-                    timeRange=TimeRange("30m", "now"),
+                    timeRange=TimeRange("15m", "now"),
                     evaluator=GreaterThan(memory),
                     reducerType=RTYPE_MAX,
                     operator=OP_AND,
@@ -281,13 +275,10 @@ def generate_mem_utilization_graph(
     ).auto_ref_ids()
 
 def generate_req_count_graph(
-    name: str,
     cloudwatch_data_source: str,
-    loaadbalancer: str,
+    loadbalancer: str,
     target_group: str,
     grid_pos: GridPos,
-    *args,
-    **kwargs
 ) -> Graph:
     """
     Generate req graph
@@ -303,7 +294,7 @@ def generate_req_count_graph(
             statistics=["Sum"],
             metricName="RequestCount",
             dimensions={
-              "LoadBalancer": loaadbalancer,
+              "LoadBalancer": loadbalancer,
               "TargetGroup": target_group
               },
         ),
@@ -313,7 +304,7 @@ def generate_req_count_graph(
             statistics=["Sum"],
             metricName="RequestCountPerTarget",
             dimensions={
-              "LoadBalancer": loaadbalancer,
+              "LoadBalancer": loadbalancer,
               "TargetGroup": target_group
               },
         ),
@@ -336,13 +327,10 @@ def generate_req_count_graph(
 
 
 def generate_res_count_graph(
-    name: str,
     cloudwatch_data_source: str,
-    loaadbalancer: str,
+    loadbalancer: str,
     target_group: str,
     grid_pos: GridPos,
-    *args,
-    **kwargs
 ) -> Graph:
     """
     Generate res graph
@@ -360,7 +348,7 @@ def generate_res_count_graph(
             statistics=["Sum"],
             metricName="HTTPCode_Target_2XX_Count",
             dimensions={
-              "LoadBalancer": loaadbalancer,
+              "LoadBalancer": loadbalancer,
               "TargetGroup": target_group
               },
         ),
@@ -370,7 +358,7 @@ def generate_res_count_graph(
             statistics=["Sum"],
             metricName="HTTPCode_Target_3XX_Count",
             dimensions={
-              "LoadBalancer": loaadbalancer,
+              "LoadBalancer": loadbalancer,
               "TargetGroup": target_group
               },
         ),
@@ -380,7 +368,7 @@ def generate_res_count_graph(
             statistics=["Sum"],
             metricName="HTTPCode_Target_4XX_Count",
             dimensions={
-              "LoadBalancer": loaadbalancer,
+              "LoadBalancer": loadbalancer,
               "TargetGroup": target_group
               },
         ),
@@ -390,7 +378,7 @@ def generate_res_count_graph(
             statistics=["Sum"],
             metricName="HTTPCode_Target_5XX_Count",
             dimensions={
-              "LoadBalancer": loaadbalancer,
+              "LoadBalancer": loadbalancer,
               "TargetGroup": target_group
               },
         ),
@@ -418,8 +406,6 @@ def generate_deployment_graph(
     cloudwatch_data_source: str,
     cluster_name: str,
     grid_pos: GridPos,
-    *args,
-    **kwargs
 ) -> TimeSeries:
     """
     Generate deployment graph
@@ -478,9 +464,10 @@ def generate_error_logs_panel(name: str, elasticsearch_data_source: str, grid_po
         enableLogDetails=True,
         dedupStrategy="exact",
         gridPos=grid_pos,
+        transparent=TRANSPARENT,
     )
 
-def generate_running_count_graph(name: str, cluster_name: str, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
+def generate_running_count_graph(name: str, cluster_name: str, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos):
     targets = [
         CloudwatchMetricsTarget(
             alias="Containers",
@@ -524,7 +511,7 @@ def generate_running_count_graph(name: str, cluster_name: str, max: int, cloudwa
         gridPos=grid_pos,
     ).auto_ref_ids()
 
-def generate_desired_count_graph(name: str, cluster_name: str, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
+def generate_desired_count_graph(name: str, cluster_name: str, max: int, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos):
     targets = [
         CloudwatchMetricsTarget(
             alias="Containers",
@@ -569,7 +556,7 @@ def generate_desired_count_graph(name: str, cluster_name: str, max: int, cloudwa
     ).auto_ref_ids()
 
 
-def generate_pending_count_graph(name: str, cluster_name: str, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos, *args, **kwargs):
+def generate_pending_count_graph(name: str, cluster_name: str, cloudwatch_data_source: str, notifications: List[str], grid_pos: GridPos):
     targets = [
         CloudwatchMetricsTarget(
             alias="Containers",
@@ -587,8 +574,8 @@ def generate_pending_count_graph(name: str, cluster_name: str, cloudwatch_data_s
     alert = None
     if notifications:
         alert = Alert(
-            name="{} Pending count of containers is greater than zero".format(name),
-            message="{} is having Pending count of containers is greater than zero".format(name),
+            name="Unable to schedule containers for {}".format(name),
+            message="Unable to schedule containers for {}".format(name),
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -620,6 +607,9 @@ def generate_ecs_alb_service_dashboard(
     cloudwatch_data_source: str,
     notifications: List[str],
     environment: str,
+    memory: int,
+    loadbalancer: str,
+    target_group: str,
     *args,
     **kwargs
 ):
@@ -632,8 +622,8 @@ def generate_ecs_alb_service_dashboard(
             title="Summary",
             gridPos=GridPos(1, 24, 0, 0),
         ),
-        generate_running_count_stats_panel(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 0, 1), notifications=notifications, *args, **kwargs),
-        generate_deployment_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 12, 1), *args, **kwargs),
+        generate_running_count_stats_panel(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 0, 1)),
+        generate_deployment_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 12, 1)),
         RowPanel(
             title="Capacity",
             gridPos=GridPos(1, 24, 0, 9)
@@ -645,14 +635,14 @@ def generate_ecs_alb_service_dashboard(
             title="Utilization",
             gridPos=GridPos(1, 24, 0, 18)
         ),
-        generate_cpu_utilization_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,12, 0, 19), *args, **kwargs),
-        generate_mem_utilization_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,12, 12, 19), notifications=notifications, *args, **kwargs),
+        generate_cpu_utilization_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,12, 0, 19)),
+        generate_mem_utilization_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8,12, 12, 19), notifications=notifications, memory=memory),
         RowPanel(
             title="Requests and Responses",
             gridPos=GridPos(1, 24, 0, 27)
         ),
-        generate_req_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 0, 28), *args, **kwargs),
-        generate_res_count_graph(name=name, cluster_name=cluster_name, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 12, 28), *args, **kwargs),
+        generate_req_count_graph(loadbalancer=loadbalancer, target_group=target_group, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 0, 28)),
+        generate_res_count_graph(loadbalancer=loadbalancer, target_group=target_group, cloudwatch_data_source=cloudwatch_data_source, grid_pos=GridPos(8, 12, 12, 28)),
         RowPanel(
             title="Logs",
             gridPos=GridPos(1, 24, 0, 36)
