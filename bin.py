@@ -39,6 +39,9 @@ def parse_options():  # pragma: no cover
     parser.add_argument(
         "--influxdb_data_source", type=str, help="influxDB datasource name"
     )
+    parser.add_argument(
+        "--es", type=str, help="ES datasource name", dest="elasticsearch_data_source"
+    )
     parser.add_argument("--kibana", type=str, help="Kibana URL", dest="kibana_url")
     parser.add_argument(
         "--lambda_insights_namespace",
@@ -102,9 +105,6 @@ def parse_options():  # pragma: no cover
     )
     ecs_alb_service.add_argument(
         "--max", type=int, help="Maximum number of containers", required=True
-    )
-    ecs_alb_service.add_argument(
-        "--min", type=int, help="Minimum number of containers", required=True
     )
     ecs_alb_service.add_argument(
         "--memory", type=int, help="Memory or MemoryReservation in MB", required=True
