@@ -52,7 +52,7 @@ def generate_running_count_stats_panel(
     grid_pos: GridPos,
 ) -> Stat:
     """
-    Generate lambda graph
+    Generate running count stats panel
     """
 
     targets = [
@@ -81,7 +81,7 @@ def generate_running_count_stats_panel(
     ]
 
     return Stat(
-        title="Task count",
+        title="Task Count",
         dataSource=cloudwatch_data_source,
         targets=targets,
         transparent=TRANSPARENT,
@@ -127,23 +127,22 @@ def generate_cpu_utilization_graph(
             statistics=["Maximum"],
             metricName="CPUUtilization",
             dimensions={"ServiceName": name, "ClusterName": cluster_name},
-            refId=ALERT_REF_ID,
         ),
     ]
 
     seriesOverrides = [
-        {"alias": MINIMUM_ALIAS, "color": "#C8F2C2", "lines": False},
-        {"alias": AVERAGE_ALIAS, "color": "#FADE2A", "fill": 0},
+        {"alias": MINIMUM_ALIAS, "color": colors.GREEN, "lines": False},
+        {"alias": AVERAGE_ALIAS, "color": colors.YELLOW, "fill": 0},
         {
             "alias": MAXIMUM_ALIAS,
-            "color": "rgb(77, 159, 179)",
+            "color": colors.YELLOW,
             "fillBelowTo": MINIMUM_ALIAS,
             "lines": False,
         },
     ]
 
     return Graph(
-        title="CPU utilization percentage",
+        title="CPU Utilization Percentage",
         dataSource=cloudwatch_data_source,
         targets=targets,
         seriesOverrides=seriesOverrides,
@@ -231,7 +230,7 @@ def generate_mem_utilization_graph(
         )
 
     return Graph(
-        title="Memory utilization",
+        title="Memory Utilization",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,

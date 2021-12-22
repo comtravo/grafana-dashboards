@@ -1,6 +1,5 @@
 from grafanalib.core import (
     Alert,
-    AlertCondition,
     Dashboard,
     Graph,
     Target,
@@ -13,8 +12,6 @@ from lib.api_gateways import (
     generate_api_gateway_requests_graph,
     generate_api_gateways_dashboard,
 )
-
-import re
 
 
 class TestAPIGatewayDashboards:
