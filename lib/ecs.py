@@ -135,7 +135,7 @@ def generate_cpu_utilization_graph(
         {"alias": AVERAGE_ALIAS, "color": colors.YELLOW, "fill": 0},
         {
             "alias": MAXIMUM_ALIAS,
-            "color": colors.YELLOW,
+            "color": colors.GREEN,
             "fillBelowTo": MINIMUM_ALIAS,
             "lines": False,
         },
@@ -150,7 +150,7 @@ def generate_cpu_utilization_graph(
         transparent=TRANSPARENT,
         editable=EDITABLE,
         gridPos=grid_pos,
-    ).auto_ref_ids()
+    )
 
 
 def generate_mem_utilization_graph(
