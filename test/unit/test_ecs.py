@@ -29,6 +29,7 @@ from lib.ecs import (
     generate_cpu_utilization_graph,
     generate_mem_utilization_graph,
     generate_req_count_graph,
+    generate_res_count_graph,
 )
 
 
@@ -398,3 +399,52 @@ class TestECSDashboards:
         panel.title.should.eql("Requests")
         panel.dataSource.should.eql(cloudwatch_data_source)
         panel.targets.should.have.length_of(2)
+
+    def test_should_generate_res_count_graph(self):
+        cloudwatch_data_source = "prod"
+        loadbalancer = "loadbalancer-1"
+        target_group = "target-group-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+
+        panel = generate_res_count_graph(
+            cloudwatch_data_source=cloudwatch_data_source,
+            grid_pos=grid_pos,
+            loadbalancer=loadbalancer,
+            target_group=target_group,
+        )
+        panel.should.be.a(Graph)
+        panel.title.should.eql("Responses")
+        panel.gridPos.should.eql(grid_pos)
+        panel.dataSource.should.eql(cloudwatch_data_source)
+        panel.targets.should.have.length_of(4)
+        panel.targets.should.eql([
+            CloudwatchMetricsTarget(
+                alias="2xx",
+                namespace="AWS/ApplicationELB",
+                statistics=["Sum"],
+                metricName="HTTPCode_Target_2XX_Count",
+                dimensions={"LoadBalancer": loadbalancer, "TargetGroup": target_group},
+            ),
+            CloudwatchMetricsTarget(
+                alias="3xx",
+                namespace="AWS/ApplicationELB",
+                statistics=["Sum"],
+                metricName="HTTPCode_Target_3XX_Count",
+                dimensions={"LoadBalancer": loadbalancer, "TargetGroup": target_group},
+            ),
+            CloudwatchMetricsTarget(
+                alias="4xx",
+                namespace="AWS/ApplicationELB",
+                statistics=["Sum"],
+                metricName="HTTPCode_Target_4XX_Count",
+                dimensions={"LoadBalancer": loadbalancer, "TargetGroup": target_group},
+            ),
+            CloudwatchMetricsTarget(
+                alias="5xx",
+                namespace="AWS/ApplicationELB",
+                statistics=["Sum"],
+                metricName="HTTPCode_Target_5XX_Count",
+                dimensions={"LoadBalancer": loadbalancer, "TargetGroup": target_group},
+                refId="A",
+            ),
+        ])

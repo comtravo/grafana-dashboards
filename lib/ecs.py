@@ -344,6 +344,7 @@ def generate_res_count_graph(
             statistics=["Sum"],
             metricName="HTTPCode_Target_5XX_Count",
             dimensions={"LoadBalancer": loadbalancer, "TargetGroup": target_group},
+            refId=ALERT_REF_ID,
         ),
     ]
 
@@ -362,7 +363,7 @@ def generate_res_count_graph(
         transparent=TRANSPARENT,
         editable=EDITABLE,
         gridPos=grid_pos,
-    ).auto_ref_ids()
+    )
 
 
 def generate_deployment_graph(
