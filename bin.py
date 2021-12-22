@@ -37,10 +37,7 @@ def parse_options():  # pragma: no cover
         dest="cloudwatch_data_source",
     )
     parser.add_argument(
-        "--es",
-        type=str,
-        help="Elasticsearch datasource name",
-        dest="elasticsearch_data_source",
+        "--influxdb_data_source", type=str, help="influxDB datasource name"
     )
     parser.add_argument("--kibana", type=str, help="Kibana URL", dest="kibana_url")
     parser.add_argument(
