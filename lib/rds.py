@@ -3,48 +3,47 @@
 """
 
 from typing import List
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
+    OP_AND,
+    PERCENT_FORMAT,
+    RTYPE_MAX,
+    SHORT_FORMAT,
     Alert,
     AlertCondition,
     Dashboard,
     Graph,
     GreaterThan,
     LowerThan,
-    OP_AND,
-    PERCENT_FORMAT,
-    RTYPE_MAX,
-    single_y_axis,
-    SHORT_FORMAT,
-    TimeRange,
     Row,
     Target,
+    TimeRange,
     YAxes,
     YAxis,
+    single_y_axis,
 )
 from grafanalib.formatunits import BYTES, BYTES_SEC, SECONDS
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib import colors
 from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_REF_ID,
     EDITABLE,
-    get_documentation_link,
-    get_series_overrides,
     RAW_QUERY,
     RETENTION_POLICY,
     SHARED_CROSSHAIR,
     TIMEZONE,
     TRANSPARENT,
+    get_documentation_link,
+    get_series_overrides,
 )
 from lib.templating import get_release_templating
 
 NAMESPACE = "AWS/RDS"
 
 
-def generate_rds_cpu_graph(
-    name: str, cloudwatch_data_source: str, notifications: List[str]
-):
+def generate_rds_cpu_graph(name: str, cloudwatch_data_source: str, notifications: List[str]):
     """
     Generate rds graph
     """
@@ -492,7 +491,7 @@ def generate_rds_dashboard(
     cloudwatch_data_source: str,
     engine: str,
     notifications: List[str],
-    **kwargs
+    **kwargs,
 ):
 
     tags = [environment, engine, "rds", "database"]

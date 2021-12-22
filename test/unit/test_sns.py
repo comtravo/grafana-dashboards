@@ -1,5 +1,6 @@
-from grafanalib.core import Alert, AlertCondition, Graph, Target
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.core import Alert, AlertCondition, Graph, Target
+
 from lib.sns import create_sns_graph
 
 
@@ -39,23 +40,19 @@ class TestCreateSNSGraph:
         actual_sns_graph.should.have.property("lines").with_value.equal(False)
 
         actual_sns_graph.should.have.property("alert").a(Alert)
-        actual_sns_graph.alert.should.have.property(
-            "executionErrorState"
-        ).which.should.be.equal("alerting")
-        actual_sns_graph.alert.should.have.property(
-            "noDataState"
-        ).which.should.be.equal("no_data")
-        actual_sns_graph.alert.should.have.property(
-            "notifications"
-        ).which.should.be.equal(expected_notifications)
-        actual_sns_graph.alert.should.have.property(
-            "alertConditions"
-        ).which.should.have.length_of(1)
+        actual_sns_graph.alert.should.have.property("executionErrorState").which.should.be.equal(
+            "alerting"
+        )
+        actual_sns_graph.alert.should.have.property("noDataState").which.should.be.equal("no_data")
+        actual_sns_graph.alert.should.have.property("notifications").which.should.be.equal(
+            expected_notifications
+        )
+        actual_sns_graph.alert.should.have.property("alertConditions").which.should.have.length_of(
+            1
+        )
         actual_sns_graph.alert.alertConditions[0].should.be.a(AlertCondition)
         actual_sns_graph.alert.alertConditions[0].should.have.property("target")
-        actual_sns_graph.alert.alertConditions[0].target.should.be.equal(
-            Target(refId="A")
-        )
+        actual_sns_graph.alert.alertConditions[0].target.should.be.equal(Target(refId="A"))
 
         actual_sns_graph.should.have.property("targets").length_of(3)
 
@@ -91,9 +88,7 @@ class TestCreateSNSGraph:
     def test_should_generate_correct_object_when_arn_of_sns_topic_is_passed(self):
 
         expected_data_source = "prod"
-        sns_topic_arn = (
-            "arn:aws:sns:eu-west-1:1234567890:lambda-elasticsearch-booking-alpha"
-        )
+        sns_topic_arn = "arn:aws:sns:eu-west-1:1234567890:lambda-elasticsearch-booking-alpha"
         expected_topic_name = "lambda-elasticsearch-booking-alpha"
         expected_title = "SNS: lambda-elasticsearch-booking-alpha"
 

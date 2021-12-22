@@ -3,41 +3,36 @@
 """
 
 from typing import List
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
-    Alert,
-    AlertCondition,
-    Dashboard,
-    LowerThan,
-    Graph,
-    GreaterThan,
     MILLISECONDS_FORMAT,
     OP_OR,
     PERCENT_FORMAT,
-    Repeat,
-    Row,
     RTYPE_MAX,
     SHORT_FORMAT,
+    Alert,
+    AlertCondition,
+    Dashboard,
+    Graph,
+    GreaterThan,
+    LowerThan,
+    Repeat,
+    Row,
     Target,
     Template,
     Templating,
     TimeRange,
-    single_y_axis,
     YAxes,
     YAxis,
+    single_y_axis,
 )
-from grafanalib.formatunits import MEGA_BYTES, BYTES
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.formatunits import BYTES, MEGA_BYTES
 
-from lib.annotations import get_release_annotations
-from lib.templating import get_release_templating
 from lib import colors
-from lib.commons import (
-    ALERT_REF_ID,
-    EDITABLE,
-    SHARED_CROSSHAIR,
-    TIMEZONE,
-    TRANSPARENT,
-)
+from lib.annotations import get_release_annotations
+from lib.commons import ALERT_REF_ID, EDITABLE, SHARED_CROSSHAIR, TIMEZONE, TRANSPARENT
+from lib.templating import get_release_templating
 
 ELASTICACHE_MEASUREMENT = "cloudwatch_aws_elasticache"
 NAMESPACE = "AWS/ElastiCache"
@@ -556,7 +551,7 @@ def generate_elasticache_redis_dashboard(
     environment: str,
     notifications: List[str],
     *args,
-    **kwargs
+    **kwargs,
 ):
     """Generate ElastiCache Redis dashboard"""
     tags = ["elasticache", "redis", environment]

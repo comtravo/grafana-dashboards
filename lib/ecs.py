@@ -2,7 +2,12 @@
   https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-metrics.html
 """
 
+from typing import List
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
+    OP_AND,
+    RTYPE_MAX,
     Alert,
     AlertCondition,
     AlertList,
@@ -11,17 +16,18 @@ from grafanalib.core import (
     GreaterThan,
     GridPos,
     Logs,
-    OP_AND,
     RowPanel,
-    RTYPE_MAX,
-    single_y_axis,
     Stat,
     Target,
     Text,
     TimeRange,
     TimeSeries,
+    single_y_axis,
 )
+from grafanalib.elasticsearch import ElasticsearchTarget
+from grafanalib.formatunits import MEGA_BYTES, PERCENT_FORMAT
 
+from lib import colors
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
@@ -30,13 +36,6 @@ from lib.commons import (
     TIMEZONE,
     TRANSPARENT,
 )
-
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
-from grafanalib.elasticsearch import ElasticsearchTarget
-from grafanalib.formatunits import MEGA_BYTES, PERCENT_FORMAT
-from lib import colors
-
-from typing import List
 
 ECS_NAMESPACE = "AWS/ECS"
 CONTAINER_INSIGHTS_NAMESPACE = "ECS/ContainerInsights"
@@ -428,9 +427,7 @@ def get_elasticsearch_query(name: str) -> str:
     return 'tag: "{}" AND log.level: [50 TO *] AND NOT log.msg: ""'.format(name)
 
 
-def generate_helpful_resources_panel(
-    name: str, grid_pos: GridPos, kibana_url: str
-) -> Text:
+def generate_helpful_resources_panel(name: str, grid_pos: GridPos, kibana_url: str) -> Text:
 
     content = """
 # Helpful resources
@@ -451,9 +448,7 @@ Elasticsearch query to find all error logs: `{}`
     )
 
 
-def generate_error_logs_panel(
-    name: str, elasticsearch_data_source: str, grid_pos: GridPos
-) -> Logs:
+def generate_error_logs_panel(name: str, elasticsearch_data_source: str, grid_pos: GridPos) -> Logs:
     """
     Generate Logs panel
     """
@@ -500,9 +495,7 @@ def generate_running_count_graph(
     if notifications:
         alert = Alert(
             name="{} Running count of containers nearing the max".format(name),
-            message="{} is having Running count of containers nearing the max".format(
-                name
-            ),
+            message="{} is having Running count of containers nearing the max".format(name),
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -552,9 +545,7 @@ def generate_desired_count_graph(
     if notifications:
         alert = Alert(
             name="{} Desired count of containers nearing the max".format(name),
-            message="{} is having Desired count of containers nearing the max".format(
-                name
-            ),
+            message="{} is having Desired count of containers nearing the max".format(name),
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -643,7 +634,7 @@ def generate_ecs_alb_service_dashboard(
     kibana_url: str,
     max: int,
     *args,
-    **kwargs
+    **kwargs,
 ):
     """Generate ECS Service dashboard"""
     tags = ["ecs", "ecs-service", "containers", "service", environment]

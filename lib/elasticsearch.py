@@ -3,33 +3,33 @@
 """
 
 from typing import List
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
+    OP_OR,
+    PERCENT_FORMAT,
+    RTYPE_MAX,
+    SHORT_FORMAT,
     Alert,
     AlertCondition,
     Dashboard,
-    LowerThan,
     Graph,
     GreaterThan,
-    OP_OR,
-    PERCENT_FORMAT,
+    LowerThan,
     Repeat,
     Row,
-    RTYPE_MAX,
-    SHORT_FORMAT,
     Target,
     Template,
     Templating,
     TimeRange,
-    single_y_axis,
     YAxes,
     YAxis,
+    single_y_axis,
 )
 from grafanalib.formatunits import MEGA_BYTES
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
-from lib.annotations import get_release_annotations
-from lib.templating import get_release_templating
 from lib import colors
+from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_REF_ID,
     EDITABLE,
@@ -39,6 +39,7 @@ from lib.commons import (
     TIMEZONE,
     TRANSPARENT,
 )
+from lib.templating import get_release_templating
 
 ES_MEASUREMENT = "cloudwatch_aws_es"
 NAMESPACE = "AWS/ES"
@@ -633,7 +634,7 @@ def generate_elasticsearch_dashboard(
     environment: str,
     notifications: List[str],
     *args,
-    **kwargs
+    **kwargs,
 ):
     """Generate Elasticsearch dashboard"""
     tags = ["elasticsearch", environment]

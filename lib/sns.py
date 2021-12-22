@@ -1,23 +1,27 @@
+import re
+from typing import List
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
+    MILLISECONDS_FORMAT,
+    OP_OR,
+    RTYPE_MAX,
+    SHORT_FORMAT,
     Alert,
     AlertCondition,
     Dashboard,
     Graph,
     GreaterThan,
     LowerThan,
-    MILLISECONDS_FORMAT,
-    OP_OR,
-    RTYPE_MAX,
-    single_y_axis,
-    SHORT_FORMAT,
-    TimeRange,
     Row,
     Target,
+    TimeRange,
     YAxes,
     YAxis,
+    single_y_axis,
 )
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
+from lib import colors
 from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_REF_ID,
@@ -30,10 +34,6 @@ from lib.commons import (
     TRANSPARENT,
 )
 from lib.templating import get_release_templating
-from lib import colors
-from typing import List
-
-import re
 
 NAMESPACE = "AWS/SNS"
 PERIOD = "5m"
@@ -97,9 +97,7 @@ def create_sns_graph(name: str, cloudwatch_data_source: str, notifications: List
     if notifications:
         alert = Alert(
             name="{} alerts".format(name),
-            message="{} seems to have no subscriptions or failed deliveries".format(
-                name
-            ),
+            message="{} seems to have no subscriptions or failed deliveries".format(name),
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(

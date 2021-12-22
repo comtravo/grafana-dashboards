@@ -1,26 +1,25 @@
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
-    Alert,
-    Graph,
-    Template,
-    Templating,
-    LowerThan,
     OP_OR,
     RTYPE_MAX,
+    Alert,
+    Graph,
+    LowerThan,
+    Template,
+    Templating,
 )
-
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.elasticache_redis import (
     generate_elasticache_redis_connections_graph,
-    generate_elasticache_redis_cpu_usage_graph,
     generate_elasticache_redis_cpu_credit_usage_graph,
-    generate_elasticache_redis_latency_graph,
+    generate_elasticache_redis_cpu_usage_graph,
+    generate_elasticache_redis_dashboard,
     generate_elasticache_redis_db_memory_usage_and_evicitons_graph,
-    generate_elasticache_redis_swap_and_memory_usage_graph,
+    generate_elasticache_redis_latency_graph,
     generate_elasticache_redis_network_in_graph,
     generate_elasticache_redis_network_out_graph,
     generate_elasticache_redis_replication_graph,
-    generate_elasticache_redis_dashboard,
+    generate_elasticache_redis_swap_and_memory_usage_graph,
 )
 
 
@@ -31,11 +30,9 @@ class TestElasticCacheRedisDashboard:
 
         cache_cluster_id = "1234567890"
         cloudwatch_data_source = "cw"
-        generated_graph = (
-            generate_elasticache_redis_db_memory_usage_and_evicitons_graph(
-                cache_cluster_id=cache_cluster_id,
-                cloudwatch_data_source=cloudwatch_data_source,
-            )
+        generated_graph = generate_elasticache_redis_db_memory_usage_and_evicitons_graph(
+            cache_cluster_id=cache_cluster_id,
+            cloudwatch_data_source=cloudwatch_data_source,
         )
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"DB memory usage and Evictions")
@@ -48,9 +45,7 @@ class TestElasticCacheRedisDashboard:
             target.statistics.should.equal(["Maximum"])
             target.dimensions.should.equal({"CacheClusterId": cache_cluster_id})
 
-        generated_graph.targets[0].metricName.should.equal(
-            "DatabaseMemoryUsagePercentage"
-        )
+        generated_graph.targets[0].metricName.should.equal("DatabaseMemoryUsagePercentage")
         generated_graph.targets[1].metricName.should.equal("Evictions")
 
     def test_should_generate_elasticache_redis_memory_and_swap_usage_graph(self):
@@ -90,9 +85,7 @@ class TestElasticCacheRedisDashboard:
         generated_graph.targets[0].should.be.a(CloudwatchMetricsTarget)
         generated_graph.targets[0].namespace.should.equal("AWS/ElastiCache")
         generated_graph.targets[0].period.should.equal("1m")
-        generated_graph.targets[0].dimensions.should.equal(
-            {"CacheClusterId": cache_cluster_id}
-        )
+        generated_graph.targets[0].dimensions.should.equal({"CacheClusterId": cache_cluster_id})
         generated_graph.targets[0].metricName.should.equal("EngineCPUUtilization")
         generated_graph.targets[0].statistics.should.equal(["Maximum"])
 
@@ -137,9 +130,7 @@ class TestElasticCacheRedisDashboard:
         generated_graph.alert.frequency.should.equal("2m")
         generated_graph.alert.gracePeriod.should.equal("2m")
         generated_graph.alert.notifications.should.equal(notifications)
-        generated_graph.alert.alertConditions[0].evaluator.should.be.equal(
-            LowerThan(250)
-        )
+        generated_graph.alert.alertConditions[0].evaluator.should.be.equal(LowerThan(250))
         generated_graph.alert.alertConditions[0].reducerType.should.be.equal(RTYPE_MAX)
         generated_graph.alert.alertConditions[0].operator.should.be.equal(OP_OR)
 
@@ -159,9 +150,7 @@ class TestElasticCacheRedisDashboard:
         generated_graph.targets[0].should.be.a(CloudwatchMetricsTarget)
         generated_graph.targets[0].period.should.equal("1m")
         generated_graph.targets[0].statistics.should.equal(["Maximum"])
-        generated_graph.targets[0].dimensions.should.equal(
-            {"CacheClusterId": cache_cluster_id}
-        )
+        generated_graph.targets[0].dimensions.should.equal({"CacheClusterId": cache_cluster_id})
         generated_graph.targets[0].metricName.should.equal("NetworkBytesIn")
 
     def test_should_generate_elasticache_redis_network_out_graph(self):
@@ -180,9 +169,7 @@ class TestElasticCacheRedisDashboard:
         generated_graph.targets[0].should.be.a(CloudwatchMetricsTarget)
         generated_graph.targets[0].period.should.equal("1m")
         generated_graph.targets[0].statistics.should.equal(["Maximum"])
-        generated_graph.targets[0].dimensions.should.equal(
-            {"CacheClusterId": cache_cluster_id}
-        )
+        generated_graph.targets[0].dimensions.should.equal({"CacheClusterId": cache_cluster_id})
         generated_graph.targets[0].metricName.should.equal("NetworkBytesOut")
 
     def test_should_generate_elasticache_redis_connections_graph(self):
@@ -201,9 +188,7 @@ class TestElasticCacheRedisDashboard:
         generated_graph.targets[0].should.be.a(CloudwatchMetricsTarget)
         generated_graph.targets[0].period.should.equal("1m")
         generated_graph.targets[0].statistics.should.equal(["Maximum"])
-        generated_graph.targets[0].dimensions.should.equal(
-            {"CacheClusterId": cache_cluster_id}
-        )
+        generated_graph.targets[0].dimensions.should.equal({"CacheClusterId": cache_cluster_id})
         generated_graph.targets[0].metricName.should.equal("CurrConnections")
 
     def test_should_generate_elasticache_redis_replication_graph(self):
@@ -244,9 +229,7 @@ class TestElasticCacheRedisDashboard:
         generated_graph.targets[0].should.be.a(CloudwatchMetricsTarget)
         generated_graph.targets[0].period.should.equal("1m")
         generated_graph.targets[0].statistics.should.equal(["Maximum"])
-        generated_graph.targets[0].dimensions.should.equal(
-            {"CacheClusterId": cache_cluster_id}
-        )
+        generated_graph.targets[0].dimensions.should.equal({"CacheClusterId": cache_cluster_id})
         generated_graph.targets[0].metricName.should.equal("StringBasedCmdsLatency")
 
     def test_should_generate_elasticsearch_dashboard(self):

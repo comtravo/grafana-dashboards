@@ -1,26 +1,17 @@
-from grafanalib.core import (
-    Alert,
-    Graph,
-    Template,
-    Templating,
-)
-
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.core import Alert, Graph, Template, Templating
 
-from lib.elasticsearch import (
+from lib.elasticsearch import (  # generate_elasticsearch_storage_alert_graph,; generate_elasticsearch_jvm_memory_pressure_alert_graph,; generate_elasticsearch_alerts_dashboard,
+    generate_elasticsearch_automated_snapshot_failure_alert_graph,
     generate_elasticsearch_cpu_graph,
-    generate_elasticsearch_jvm_memory_pressure_graph,
+    generate_elasticsearch_dashboard,
     generate_elasticsearch_documents_graph,
-    generate_elasticsearch_storage_graph,
+    generate_elasticsearch_jvm_memory_pressure_graph,
+    generate_elasticsearch_nodes_alert_graph,
     generate_elasticsearch_requests_graph,
     generate_elasticsearch_status_red_alert_graph,
-    generate_elasticsearch_nodes_alert_graph,
-    # generate_elasticsearch_storage_alert_graph,
+    generate_elasticsearch_storage_graph,
     generate_elasticsearch_writes_blocked_alert_graph,
-    generate_elasticsearch_automated_snapshot_failure_alert_graph,
-    # generate_elasticsearch_jvm_memory_pressure_alert_graph,
-    generate_elasticsearch_dashboard,
-    # generate_elasticsearch_alerts_dashboard,
 )
 
 
@@ -266,9 +257,7 @@ class TestElasticsearchDashboards:
             notifications=notifications,
         )
         generated_graph.should.be.a(Graph)
-        generated_graph.title.should.match(
-            r"Elasticsearch automated snapshot failure alerts"
-        )
+        generated_graph.title.should.match(r"Elasticsearch automated snapshot failure alerts")
         generated_graph.dataSource.should.match(cloudwatch_data_source)
         generated_graph.targets.should.have.length_of(1)
         generated_graph.targets[0].should.be.a(CloudwatchMetricsTarget)

@@ -2,26 +2,29 @@
     https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics.html
 """
 
+from typing import List
+
+from grafanalib.cloudwatch import CloudwatchLogsInsightsTarget, CloudwatchMetricsTarget
 from grafanalib.core import (
+    MILLISECONDS_FORMAT,
+    OP_AND,
+    RTYPE_MAX,
+    SHORT_FORMAT,
     Alert,
     AlertCondition,
     Dashboard,
     Graph,
     GreaterThan,
     Logs,
-    MILLISECONDS_FORMAT,
-    OP_AND,
-    RTYPE_MAX,
-    single_y_axis,
-    SHORT_FORMAT,
-    TimeRange,
     Row,
     Target,
+    TimeRange,
     YAxes,
     YAxis,
+    single_y_axis,
 )
-from grafanalib.cloudwatch import CloudwatchMetricsTarget, CloudwatchLogsInsightsTarget
 
+from lib import colors
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
@@ -31,9 +34,6 @@ from lib.commons import (
     TRANSPARENT,
 )
 from lib.sns import create_sns_graph
-from lib import colors
-
-from typing import List
 
 NAMESPACE = "AWS/Lambda"
 LAMBDA_DASHBOARD_PREFIX = "Lambda: "
@@ -94,7 +94,7 @@ def lambda_generate_memory_utilization_percentage_graph(
     lambda_insights_namespace: str,
     notifications: List[str],
     *args,
-    **kwargs
+    **kwargs,
 ) -> Graph:
     """
     Generate lambda graph
@@ -177,11 +177,7 @@ def lambda_generate_memory_utilization_percentage_graph(
 
 
 def lambda_generate_memory_utilization_graph(
-    name: str,
-    cloudwatch_data_source: str,
-    lambda_insights_namespace: str,
-    *args,
-    **kwargs
+    name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, *args, **kwargs
 ) -> Graph:
     """
     Generate lambda graph
@@ -422,7 +418,7 @@ def create_lambda_only_dashboard(
     notifications: List[str],
     environment: str,
     *args,
-    **kwargs
+    **kwargs,
 ):
     """Create a dashboard with just the lambda"""
 
@@ -553,7 +549,7 @@ def lambda_sqs_dashboard(
     environment: str,
     fifo: bool,
     *args,
-    **kwargs
+    **kwargs,
 ):
     """Create a dashboard with Lambda and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment]
@@ -630,7 +626,7 @@ def lambda_sns_sqs_dashboard(
     topics: List[str],
     fifo: bool,
     *args,
-    **kwargs
+    **kwargs,
 ):
     """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
     tags = ["lambda", "sqs", environment, "sns"]

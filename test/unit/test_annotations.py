@@ -1,4 +1,5 @@
 from grafanalib.core import Annotations
+
 from lib.annotations import get_release_annotations
 
 
@@ -16,9 +17,7 @@ class TestGetReleaseAnnotations:
 
         expected_data_source = "prod"
 
-        release_annotations_object = get_release_annotations(
-            data_source=expected_data_source
-        )
+        release_annotations_object = get_release_annotations(data_source=expected_data_source)
         release_annotations_object.should.be.a(Annotations)
         release_annotations_object.to_json_data()["list"].should.have.length_of(3)
 

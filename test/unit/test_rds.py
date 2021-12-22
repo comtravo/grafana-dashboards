@@ -1,10 +1,5 @@
-from grafanalib.core import (
-    Alert,
-    Dashboard,
-    Graph,
-    Template,
-    Templating,
-)
+from grafanalib.core import Alert, Dashboard, Graph, Template, Templating
+
 from lib.rds import generate_rds_dashboard
 
 

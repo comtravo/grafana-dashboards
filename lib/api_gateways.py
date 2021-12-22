@@ -1,20 +1,24 @@
+import re
+from typing import List
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
+    OP_AND,
+    RTYPE_MAX,
+    SHORT_FORMAT,
     Alert,
     AlertCondition,
     Dashboard,
     Graph,
     GreaterThan,
-    OP_AND,
-    RTYPE_MAX,
-    SHORT_FORMAT,
-    TimeRange,
     Row,
     Target,
+    TimeRange,
     YAxes,
     YAxis,
 )
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
+from lib import colors
 from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_REF_ID,
@@ -24,20 +28,14 @@ from lib.commons import (
     TIMEZONE,
     TRANSPARENT,
 )
-
-from lib.templating import get_release_templating
 from lib.lambdas import (
-    lambda_generate_invocations_graph,
     lambda_generate_duration_graph,
-    lambda_generate_memory_utilization_percentage_graph,
-    lambda_generate_memory_utilization_graph,
+    lambda_generate_invocations_graph,
     lambda_generate_logs_panel,
+    lambda_generate_memory_utilization_graph,
+    lambda_generate_memory_utilization_percentage_graph,
 )
-from lib import colors
-
-from typing import List
-
-import re
+from lib.templating import get_release_templating
 
 # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-metrics-and-dimensions.html
 API_GATEWAY_INVOCATION_METRIC_GROUP_BY = "1m"
@@ -144,7 +142,7 @@ def generate_api_gateways_dashboard(
     environment: str,
     lambdas: List[str],
     *args,
-    **kwargs
+    **kwargs,
 ):
     tags = ["api-gateway", environment]
 
@@ -155,9 +153,7 @@ def generate_api_gateways_dashboard(
         name, cloudwatch_data_source, notifications
     )
 
-    rows = [
-        Row(title="API Gateway Metrics", showTitle=True, panels=[api_gateway_graph])
-    ]
+    rows = [Row(title="API Gateway Metrics", showTitle=True, panels=[api_gateway_graph])]
 
     if lambdas:
         for l in lambdas:

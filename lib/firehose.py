@@ -3,20 +3,19 @@
 """
 
 from grafanalib.core import (
+    SHORT_FORMAT,
     Dashboard,
     Graph,
     Repeat,
     Row,
-    SHORT_FORMAT,
     Template,
     Templating,
     single_y_axis,
 )
 from grafanalib.influxdb import InfluxDBTarget
 
-from lib.annotations import get_release_annotations
-from lib.templating import get_release_template
 from lib import colors
+from lib.annotations import get_release_annotations
 from lib.commons import (
     EDITABLE,
     RAW_QUERY,
@@ -25,6 +24,7 @@ from lib.commons import (
     TIMEZONE,
     TRANSPARENT,
 )
+from lib.templating import get_release_template
 
 FIREHOSE_MEASUREMENT = "cloudwatch_aws_firehose"
 FIREHOSE_INCOMING_RECORDS_ALIAS = "Incoming records"

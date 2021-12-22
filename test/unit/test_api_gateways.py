@@ -1,12 +1,5 @@
-from grafanalib.core import (
-    Alert,
-    Dashboard,
-    Graph,
-    Target,
-    Annotations,
-    Templating,
-)
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.core import Alert, Annotations, Dashboard, Graph, Target, Templating
 
 from lib.api_gateways import (
     generate_api_gateway_requests_graph,

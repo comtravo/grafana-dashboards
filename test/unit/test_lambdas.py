@@ -1,20 +1,21 @@
+from grafanalib.cloudwatch import CloudwatchLogsInsightsTarget, CloudwatchMetricsTarget
 from grafanalib.core import Alert, AlertCondition, Dashboard, Graph, Panel, Target
-from grafanalib.cloudwatch import CloudwatchMetricsTarget, CloudwatchLogsInsightsTarget
+
 from lib.lambdas import (
-    dispatcher,
-    lambda_generate_duration_graph,
-    lambda_generate_invocations_graph,
-    lambda_generate_memory_utilization_percentage_graph,
-    lambda_generate_memory_utilization_graph,
-    lambda_generate_logs_panel,
-    lambda_cron_dashboard,
-    lambda_events_dashboard,
-    lambda_cognito_dashboard,
-    lambda_logs_dashboard,
     create_lambda_sqs_dlq_graph,
     create_lambda_sqs_graph,
-    lambda_sqs_dashboard,
+    dispatcher,
+    lambda_cognito_dashboard,
+    lambda_cron_dashboard,
+    lambda_events_dashboard,
+    lambda_generate_duration_graph,
+    lambda_generate_invocations_graph,
+    lambda_generate_logs_panel,
+    lambda_generate_memory_utilization_graph,
+    lambda_generate_memory_utilization_percentage_graph,
+    lambda_logs_dashboard,
     lambda_sns_sqs_dashboard,
+    lambda_sqs_dashboard,
 )
 
 
@@ -168,9 +169,7 @@ class TestGraphs:
         generated_lambda_graph.alert.noDataState.should.eql("no_data")
         generated_lambda_graph.alert.alertConditions.should.have.length_of(1)
         generated_lambda_graph.alert.alertConditions[0].should.be.a(AlertCondition)
-        generated_lambda_graph.alert.alertConditions[0].target.should.eql(
-            Target(refId="A")
-        )
+        generated_lambda_graph.alert.alertConditions[0].target.should.eql(Target(refId="A"))
         generated_lambda_graph.targets.should.contain(expected_alert_query)
 
     def test_should_generate_lambda_memory_utilization_percentage_graph(self):
@@ -249,9 +248,7 @@ class TestGraphs:
         generated_lambda_graph.alert.noDataState.should.eql("no_data")
         generated_lambda_graph.alert.alertConditions.should.have.length_of(1)
         generated_lambda_graph.alert.alertConditions[0].should.be.a(AlertCondition)
-        generated_lambda_graph.alert.alertConditions[0].target.should.eql(
-            Target(refId="A")
-        )
+        generated_lambda_graph.alert.alertConditions[0].target.should.eql(Target(refId="A"))
         generated_lambda_graph.targets.should.contain(expected_alert_query)
 
     def test_should_generate_lambda_memory_utilization_percentage_graph(self):
@@ -484,9 +481,7 @@ class TestGraphs:
         generated_dashboard = lambda_sqs_dashboard(**call_args)
         generated_dashboard.should.be.a(Dashboard)
         generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
-        sorted(generated_dashboard.tags).should.eql(
-            sorted(["lambda", environment, "sqs"])
-        )
+        sorted(generated_dashboard.tags).should.eql(sorted(["lambda", environment, "sqs"]))
         generated_dashboard.rows.should.be.length_of(5)
         generated_dashboard.rows[0].title.should.eql("Invocations")
         generated_dashboard.rows[0].panels.should.be.length_of(2)
@@ -516,9 +511,7 @@ class TestGraphs:
         generated_dashboard = lambda_sqs_dashboard(**call_args)
         generated_dashboard.should.be.a(Dashboard)
         generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
-        sorted(generated_dashboard.tags).should.eql(
-            sorted(["lambda", environment, "sqs", "fifo"])
-        )
+        sorted(generated_dashboard.tags).should.eql(sorted(["lambda", environment, "sqs", "fifo"]))
         generated_dashboard.rows.should.be.length_of(5)
         generated_dashboard.rows[0].title.should.eql("Invocations")
         generated_dashboard.rows[0].panels.should.be.length_of(2)
@@ -550,9 +543,7 @@ class TestGraphs:
         generated_dashboard = lambda_sns_sqs_dashboard(**call_args)
         generated_dashboard.should.be.a(Dashboard)
         generated_dashboard.title.should.eql("Lambda: {}".format(lambda_name))
-        sorted(generated_dashboard.tags).should.eql(
-            sorted(["lambda", environment, "sqs", "sns"])
-        )
+        sorted(generated_dashboard.tags).should.eql(sorted(["lambda", environment, "sqs", "sns"]))
         generated_dashboard.rows.should.be.length_of(6)
         generated_dashboard.rows[0].panels.should.be.length_of(len(topics))
         generated_dashboard.rows[0].title.should.eql("SNS Topics")

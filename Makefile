@@ -21,7 +21,8 @@ init:
 	@pip3 install -r requirements.txt
 
 fmt-py:
-	@black .
+	@black -t py39 -l 100 .
+	@isort .
 
 fmt-go:
 	@terraform fmt -recursive
@@ -30,7 +31,8 @@ fmt-go:
 fmt: fmt-go fmt-py
 
 lint-py:
-	@black --check .
+	@black --check -t py39 -l 100 .
+	@isort . --check --diff
 
 lint-go:
 	@terraform fmt -check -recursive -diff=true
