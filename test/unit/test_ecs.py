@@ -25,6 +25,7 @@ from lib.ecs import (
     generate_deployment_graph,
     generate_running_count_graph,
     generate_desired_count_graph,
+    generate_pending_count_graph,
     generate_cpu_utilization_graph,
     generate_mem_utilization_graph,
     generate_req_count_graph,
@@ -224,6 +225,64 @@ class TestECSDashboards:
                 Target(refId="A"),
                 timeRange=TimeRange("15m", "now"),
                 evaluator=GreaterThan(900),
+                reducerType=RTYPE_MAX,
+                operator=OP_AND,
+            )
+        )
+
+    def test_should_generate_pending_count_graph(self):
+        name = "service-1"
+        cloudwatch_data_source = "prod"
+        cluster_name = "cluster-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+        notifications = []
+
+        panel = generate_pending_count_graph(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            cluster_name=cluster_name,
+            grid_pos=grid_pos,
+            notifications=notifications,
+        )
+
+        panel.should.be.a(Graph)
+        panel.title.should.eql("Pending Tasks")
+        panel.dataSource.should.eql(cloudwatch_data_source)
+        panel.targets.should.have.length_of(1)
+        panel.targets[0].should.eql(
+            CloudwatchMetricsTarget(
+                alias="Containers",
+                namespace="ECS/ContainerInsights",
+                statistics=["Maximum"],
+                metricName="PendingTaskCount",
+                dimensions={"ServiceName": name, "ClusterName": cluster_name},
+                refId="A",
+            )
+        )
+        panel.gridPos.should.eql(grid_pos)
+
+    def test_should_generate_pending_count_with_alerts_graph(self):
+        name = "service-1"
+        cloudwatch_data_source = "prod"
+        cluster_name = "cluster-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+        notifications = ["foo", "bar"]
+
+        panel = generate_pending_count_graph(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            cluster_name=cluster_name,
+            grid_pos=grid_pos,
+            notifications=notifications,
+        )
+
+        panel.alert.should.be.a(Alert)
+        panel.alert.alertConditions.should.have.length_of(1)
+        panel.alert.alertConditions[0].should.eql(
+            AlertCondition(
+                Target(refId="A"),
+                timeRange=TimeRange("15m", "now"),
+                evaluator=GreaterThan(0),
                 reducerType=RTYPE_MAX,
                 operator=OP_AND,
             )
