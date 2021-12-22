@@ -5,6 +5,7 @@
 from grafanalib.core import (
     Alert,
     AlertCondition,
+    AlertList,
     Dashboard,
     Graph,
     GreaterThan,
@@ -93,6 +94,15 @@ def generate_running_count_stats_panel(
         gridPos=grid_pos,
     )
 
+# def generate_alert_list_panel(name: str, grid_pos: GridPos):
+#     return AlertList(
+#         title="Alerts: {}".format(name),
+#         gridPos=grid_pos,
+#         description="Alerts for service {}".format(name),
+#         transparent=TRANSPARENT,
+#         onlyAlertsOnDashboard=True,
+#         show=True
+#     )
 
 def generate_cpu_utilization_graph(
     name: str,
@@ -629,7 +639,14 @@ def generate_ecs_alb_service_dashboard(
             cloudwatch_data_source=cloudwatch_data_source,
             grid_pos=GridPos(8, 12, 12, 1),
         ),
-        RowPanel(title="Capacity", gridPos=GridPos(1, 24, 0, 9)),
+        # generate_alert_list_panel(
+        #     name=name,
+        #     grid_pos=GridPos(8, 8, 16, 1),
+        # ),
+        RowPanel(
+            title="Capacity",
+            gridPos=GridPos(1, 24, 0, 9)
+        ),
         generate_running_count_graph(
             name=name,
             cluster_name=cluster_name,
