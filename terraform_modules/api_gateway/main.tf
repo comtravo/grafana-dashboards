@@ -29,7 +29,7 @@ data "external" "dashboard" {
     "--environment",
     var.grafana_configuration.environment,
     local.notification_args,
-    "--cloudwatch_data_source",
+    "--cw",
     var.grafana_configuration.cloudwatch_data_source,
     "api-gateway",
     local.lambda_args
