@@ -29,13 +29,7 @@ from grafanalib.core import (
 from grafanalib.formatunits import MEGA_BYTES
 
 from lib import colors
-from lib.commons import (
-    ALERT_REF_ID,
-    EDITABLE,
-    SHARED_CROSSHAIR,
-    TIMEZONE,
-    TRANSPARENT,
-)
+from lib.commons import ALERT_REF_ID, EDITABLE, SHARED_CROSSHAIR, TIMEZONE, TRANSPARENT
 
 ES_MEASUREMENT = "cloudwatch_aws_es"
 NAMESPACE = "AWS/ES"

@@ -2,14 +2,7 @@
     https://docs.aws.amazon.com/firehose/latest/dev/monitoring-with-cloudwatch-metrics.html
 """
 
-from grafanalib.core import (
-    SHORT_FORMAT,
-    Dashboard,
-    Graph,
-    Row,
-    Template,
-    single_y_axis,
-)
+from grafanalib.core import SHORT_FORMAT, Dashboard, Graph, Row, Template, single_y_axis
 from grafanalib.influxdb import InfluxDBTarget
 
 from lib import colors
@@ -21,7 +14,6 @@ from lib.commons import (
     TIMEZONE,
     TRANSPARENT,
 )
-from lib.templating import get_release_template
 
 FIREHOSE_MEASUREMENT = "cloudwatch_aws_firehose"
 FIREHOSE_INCOMING_RECORDS_ALIAS = "Incoming records"

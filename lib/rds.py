@@ -35,7 +35,6 @@ from lib.commons import (
     get_documentation_link,
     get_series_overrides,
 )
-from lib.templating import get_release_templating
 
 NAMESPACE = "AWS/RDS"
 

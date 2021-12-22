@@ -22,13 +22,7 @@ from grafanalib.core import (
 )
 
 from lib import colors
-from lib.commons import (
-    ALERT_REF_ID,
-    ALERT_THRESHOLD,
-    EDITABLE,
-    TRANSPARENT,
-)
-from lib.templating import get_release_templating
+from lib.commons import ALERT_REF_ID, ALERT_THRESHOLD, EDITABLE, TRANSPARENT
 
 NAMESPACE = "AWS/SNS"
 PERIOD = "5m"

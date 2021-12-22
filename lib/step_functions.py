@@ -33,7 +33,6 @@ from lib.lambdas import (
     lambda_generate_memory_utilization_graph,
     lambda_generate_memory_utilization_percentage_graph,
 )
-from lib.templating import get_release_templating
 
 # https://docs.aws.amazon.com/step-functions/latest/dg/procedure-cw-metrics.html
 

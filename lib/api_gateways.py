@@ -34,7 +34,6 @@ from lib.lambdas import (
     lambda_generate_memory_utilization_graph,
     lambda_generate_memory_utilization_percentage_graph,
 )
-from lib.templating import get_release_templating
 
 # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-metrics-and-dimensions.html
 API_GATEWAY_INVOCATION_METRIC_GROUP_BY = "1m"
