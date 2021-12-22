@@ -1,0 +1,21 @@
+apiVersion: 1
+datasources:
+- name: es
+  type: elasticsearch
+  url: "https://vpc-ct-logging-pufl3griot5w7i3e2q6fpibln4.eu-west-1.es.amazonaws.com"
+  database: '[prod-docker-ecs-logs-]YYYY.MM.DD'
+  esVersion: "7.7.0"
+  interval: "Daily"
+  logLevelField: "log.levelname"
+  logMessageField: "log.err.message"
+  sigV4Auth: true
+  sigV4Region: eu-west-1
+  sigV4AuthType: default
+  timeField: '@timestamp'
+  xpack: false
+  isDefault: false
+  jsonData:
+    dataLinks:
+      - field: '@timestamp'
+        url: "https://logging.comtravo.com/_plugin/kibana/app/kibana#/discover"
+

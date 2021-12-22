@@ -1,12 +1,17 @@
 variable "grafana_configuration" {
   description = "Configuration for creating Grafana dashboards and alerts"
   type = object({
-    name                   = string
-    environment            = string
-    cloudwatch_data_source = string
-    folder                 = string
-    engine                 = string
-    notifications          = list(string)
+    name                      = string
+    environment               = string
+    cloudwatch_data_source    = string
+    elasticsearch_data_source = string
+    notifications             = list(string)
+    folder                    = string
+    cluster_name              = string
+    max                       = number
+    memory                    = number
+    loadbalancer              = string
+    target_group              = string
   })
 }
 
@@ -22,20 +27,21 @@ locals {
 data "external" "dashboard" {
   count = var.enable ? 1 : 0
   program = flatten([
-    "python3",
-    "${path.module}/../../bin.py",
-    "--name",
-    var.grafana_configuration.name,
-    "--environment",
-    var.grafana_configuration.environment,
+    "python3", "${path.module}/../../bin.py",
+    "--name", var.grafana_configuration.name,
+    "--environment", var.grafana_configuration.environment,
     local.notification_args,
-    "--cw",
-    var.grafana_configuration.cloudwatch_data_source,
-    "rds",
-    "--engine",
-    var.grafana_configuration.engine
+    "--cw", var.grafana_configuration.cloudwatch_data_source,
+    "--es", var.grafana_configuration.elasticsearch_data_source,
+    "ecs-alb-service",
+    "--cluster-name", var.grafana_configuration.cluster_name,
+    "--max", var.grafana_configuration.max,
+    "--memory", var.grafana_configuration.memory,
+    "--loadbalancer", var.grafana_configuration.loadbalancer,
+    "--target-group", var.grafana_configuration.target_group,
   ])
 }
+
 
 resource "grafana_dashboard" "this" {
   count       = var.enable ? 1 : 0

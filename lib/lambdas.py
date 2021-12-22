@@ -22,7 +22,6 @@ from grafanalib.core import (
 )
 from grafanalib.cloudwatch import CloudwatchMetricsTarget, CloudwatchLogsInsightsTarget
 
-from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
@@ -32,7 +31,6 @@ from lib.commons import (
     TRANSPARENT,
 )
 from lib.sns import create_sns_graph
-from lib.templating import get_release_templating
 from lib import colors
 
 from typing import List
