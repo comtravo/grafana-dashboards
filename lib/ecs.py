@@ -94,6 +94,7 @@ def generate_running_count_stats_panel(
         gridPos=grid_pos,
     )
 
+
 # def generate_alert_list_panel(name: str, grid_pos: GridPos):
 #     return AlertList(
 #         title="Alerts: {}".format(name),
@@ -103,6 +104,7 @@ def generate_running_count_stats_panel(
 #         onlyAlertsOnDashboard=True,
 #         show=True
 #     )
+
 
 def generate_cpu_utilization_graph(
     name: str,
@@ -643,10 +645,7 @@ def generate_ecs_alb_service_dashboard(
         #     name=name,
         #     grid_pos=GridPos(8, 8, 16, 1),
         # ),
-        RowPanel(
-            title="Capacity",
-            gridPos=GridPos(1, 24, 0, 9)
-        ),
+        RowPanel(title="Capacity", gridPos=GridPos(1, 24, 0, 9)),
         generate_running_count_graph(
             name=name,
             cluster_name=cluster_name,

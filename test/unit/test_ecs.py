@@ -23,6 +23,8 @@ from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from lib.ecs import (
     generate_running_count_stats_panel,
     generate_deployment_graph,
+    generate_running_count_graph,
+    generate_desired_count_graph,
     generate_cpu_utilization_graph,
     generate_mem_utilization_graph,
     generate_req_count_graph,
@@ -37,28 +39,28 @@ class TestECSDashboards:
         grid_pos = GridPos(1, 2, 3, 4)
 
         expected_targets = [
-          CloudwatchMetricsTarget(
-              alias="Desired",
-              namespace="ECS/ContainerInsights",
-              statistics=["Maximum"],
-              metricName="DesiredTaskCount",
-              dimensions={"ServiceName": name, "ClusterName": cluster_name},
-          ),
-          CloudwatchMetricsTarget(
-              alias="Pending",
-              namespace="ECS/ContainerInsights",
-              statistics=["Maximum"],
-              metricName="PendingTaskCount",
-              dimensions={"ServiceName": name, "ClusterName": cluster_name},
-          ),
-          CloudwatchMetricsTarget(
-              alias="Running",
-              namespace="ECS/ContainerInsights",
-              statistics=["Maximum"],
-              metricName="RunningTaskCount",
-              dimensions={"ServiceName": name, "ClusterName": cluster_name},
-              refId="A",
-          ),
+            CloudwatchMetricsTarget(
+                alias="Desired",
+                namespace="ECS/ContainerInsights",
+                statistics=["Maximum"],
+                metricName="DesiredTaskCount",
+                dimensions={"ServiceName": name, "ClusterName": cluster_name},
+            ),
+            CloudwatchMetricsTarget(
+                alias="Pending",
+                namespace="ECS/ContainerInsights",
+                statistics=["Maximum"],
+                metricName="PendingTaskCount",
+                dimensions={"ServiceName": name, "ClusterName": cluster_name},
+            ),
+            CloudwatchMetricsTarget(
+                alias="Running",
+                namespace="ECS/ContainerInsights",
+                statistics=["Maximum"],
+                metricName="RunningTaskCount",
+                dimensions={"ServiceName": name, "ClusterName": cluster_name},
+                refId="A",
+            ),
         ]
 
         panel = generate_running_count_stats_panel(
@@ -92,15 +94,140 @@ class TestECSDashboards:
         panel.title.should.eql("Deployments")
         panel.dataSource.should.eql(cloudwatch_data_source)
         panel.targets.should.have.length_of(1)
-        panel.targets[0].should.eql(CloudwatchMetricsTarget(
-            alias="Deployment",
-            namespace="ECS/ContainerInsights",
-            statistics=["Maximum"],
-            metricName="DeploymentCount",
-            dimensions={"ServiceName": name, "ClusterName": cluster_name},
-        ))
+        panel.targets[0].should.eql(
+            CloudwatchMetricsTarget(
+                alias="Deployment",
+                namespace="ECS/ContainerInsights",
+                statistics=["Maximum"],
+                metricName="DeploymentCount",
+                dimensions={"ServiceName": name, "ClusterName": cluster_name},
+            )
+        )
         panel.gridPos.should.eql(grid_pos)
 
+    def test_should_generate_running_count_graph(self):
+        name = "service-1"
+        cloudwatch_data_source = "prod"
+        cluster_name = "cluster-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+        max = 1000
+        notifications = []
+
+        panel = generate_running_count_graph(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            cluster_name=cluster_name,
+            grid_pos=grid_pos,
+            max=max,
+            notifications=notifications,
+        )
+
+        panel.should.be.a(Graph)
+        panel.title.should.eql("Running Tasks")
+        panel.dataSource.should.eql(cloudwatch_data_source)
+        panel.targets.should.have.length_of(1)
+        panel.targets[0].should.eql(
+            CloudwatchMetricsTarget(
+                alias="Containers",
+                namespace="ECS/ContainerInsights",
+                statistics=["Maximum"],
+                metricName="RunningTaskCount",
+                dimensions={"ServiceName": name, "ClusterName": cluster_name},
+                refId="A",
+            )
+        )
+        panel.gridPos.should.eql(grid_pos)
+
+    def test_should_generate_running_count_with_alerts_graph(self):
+        name = "service-1"
+        cloudwatch_data_source = "prod"
+        cluster_name = "cluster-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+        max = 1000
+        notifications = ["foo", "bar"]
+
+        panel = generate_running_count_graph(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            cluster_name=cluster_name,
+            grid_pos=grid_pos,
+            max=max,
+            notifications=notifications,
+        )
+
+        panel.alert.should.be.a(Alert)
+        panel.alert.alertConditions.should.have.length_of(1)
+        panel.alert.alertConditions[0].should.eql(
+            AlertCondition(
+                Target(refId="A"),
+                timeRange=TimeRange("15m", "now"),
+                evaluator=GreaterThan(900),
+                reducerType=RTYPE_MAX,
+                operator=OP_AND,
+            )
+        )
+
+    def test_should_generate_desired_count_graph(self):
+        name = "service-1"
+        cloudwatch_data_source = "prod"
+        cluster_name = "cluster-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+        max = 1000
+        notifications = []
+
+        panel = generate_desired_count_graph(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            cluster_name=cluster_name,
+            grid_pos=grid_pos,
+            max=max,
+            notifications=notifications,
+        )
+
+        panel.should.be.a(Graph)
+        panel.title.should.eql("Desired Tasks")
+        panel.dataSource.should.eql(cloudwatch_data_source)
+        panel.targets.should.have.length_of(1)
+        panel.targets[0].should.eql(
+            CloudwatchMetricsTarget(
+                alias="Containers",
+                namespace="ECS/ContainerInsights",
+                statistics=["Maximum"],
+                metricName="DesiredTaskCount",
+                dimensions={"ServiceName": name, "ClusterName": cluster_name},
+                refId="A",
+            )
+        )
+        panel.gridPos.should.eql(grid_pos)
+
+    def test_should_generate_desired_count_with_alerts_graph(self):
+        name = "service-1"
+        cloudwatch_data_source = "prod"
+        cluster_name = "cluster-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+        max = 1000
+        notifications = ["foo", "bar"]
+
+        panel = generate_desired_count_graph(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            cluster_name=cluster_name,
+            grid_pos=grid_pos,
+            max=max,
+            notifications=notifications,
+        )
+
+        panel.alert.should.be.a(Alert)
+        panel.alert.alertConditions.should.have.length_of(1)
+        panel.alert.alertConditions[0].should.eql(
+            AlertCondition(
+                Target(refId="A"),
+                timeRange=TimeRange("15m", "now"),
+                evaluator=GreaterThan(900),
+                reducerType=RTYPE_MAX,
+                operator=OP_AND,
+            )
+        )
 
     def test_should_generate_cpu_utilization_graph(self):
         name = "service-1"
@@ -115,28 +242,28 @@ class TestECSDashboards:
         )
 
         expected_targets = [
-        CloudwatchMetricsTarget(
-            alias="Min",
-            namespace="AWS/ECS",
-            statistics=["Minimum"],
-            metricName="CPUUtilization",
-            dimensions={"ServiceName": name, "ClusterName": cluster_name},
-        ),
-        CloudwatchMetricsTarget(
-            alias="Avg",
-            namespace="AWS/ECS",
-            statistics=["Average"],
-            metricName="CPUUtilization",
-            dimensions={"ServiceName": name, "ClusterName": cluster_name},
-        ),
-        CloudwatchMetricsTarget(
-            alias="Max",
-            namespace="AWS/ECS",
-            statistics=["Maximum"],
-            metricName="CPUUtilization",
-            dimensions={"ServiceName": name, "ClusterName": cluster_name},
-        ),
-    ]
+            CloudwatchMetricsTarget(
+                alias="Min",
+                namespace="AWS/ECS",
+                statistics=["Minimum"],
+                metricName="CPUUtilization",
+                dimensions={"ServiceName": name, "ClusterName": cluster_name},
+            ),
+            CloudwatchMetricsTarget(
+                alias="Avg",
+                namespace="AWS/ECS",
+                statistics=["Average"],
+                metricName="CPUUtilization",
+                dimensions={"ServiceName": name, "ClusterName": cluster_name},
+            ),
+            CloudwatchMetricsTarget(
+                alias="Max",
+                namespace="AWS/ECS",
+                statistics=["Maximum"],
+                metricName="CPUUtilization",
+                dimensions={"ServiceName": name, "ClusterName": cluster_name},
+            ),
+        ]
         panel.should.be.a(Graph)
         panel.title.should.eql("CPU Utilization Percentage")
         panel.dataSource.should.eql(cloudwatch_data_source)
@@ -150,7 +277,7 @@ class TestECSDashboards:
         cluster_name = "cluster-1"
         grid_pos = GridPos(1, 2, 3, 4)
         memory = 1024
-        notifications=[]
+        notifications = []
 
         panel = generate_mem_utilization_graph(
             name=name,
@@ -172,14 +299,14 @@ class TestECSDashboards:
         cluster_name = "cluster-1"
         grid_pos = GridPos(1, 2, 3, 4)
         memory = 1024
-        notifications=["foo", "bar", "baz"]
+        notifications = ["foo", "bar", "baz"]
 
         expected_alert_condition = AlertCondition(
-          Target(refId="A"),
-          timeRange=TimeRange("15m", "now"),
-          evaluator=GreaterThan(memory),
-          reducerType=RTYPE_MAX,
-          operator=OP_AND,
+            Target(refId="A"),
+            timeRange=TimeRange("15m", "now"),
+            evaluator=GreaterThan(memory),
+            reducerType=RTYPE_MAX,
+            operator=OP_AND,
         )
 
         panel = generate_mem_utilization_graph(
