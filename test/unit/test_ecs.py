@@ -6,7 +6,7 @@ from grafanalib.core import (
     Graph,
     GreaterThan,
     GridPos,
-    # Logs,
+    Logs,
     OP_AND,
     # OP_OR,
     # RowPanel,
@@ -20,6 +20,7 @@ from grafanalib.core import (
 )
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.elasticsearch import ElasticsearchTarget
 
 from lib.ecs import (
     generate_running_count_stats_panel,
@@ -31,6 +32,7 @@ from lib.ecs import (
     generate_mem_utilization_graph,
     generate_req_count_graph,
     generate_res_count_graph,
+    generate_error_logs_panel,
 )
 
 
@@ -497,4 +499,23 @@ class TestECSDashboards:
                     operator=OP_AND,
                 ),
             ]
+        )
+
+    def test_should_generate_error_logs_panel(self):
+        name = "service-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+        elasticsearch_data_source = "es"
+
+        panel = generate_error_logs_panel(
+            name=name,
+            grid_pos=grid_pos,
+            elasticsearch_data_source=elasticsearch_data_source,
+        )
+        panel.should.be.a(Logs)
+        panel.title.should.eql("Error Logs")
+        panel.gridPos.should.eql(grid_pos)
+        panel.dataSource.should.eql(elasticsearch_data_source)
+        panel.targets.should.have.length_of(1)
+        panel.targets[0].query.should.eql(
+            'tag: "{}" AND log.level: [50 TO *] AND NOT log.msg: ""'.format(name)
         )
