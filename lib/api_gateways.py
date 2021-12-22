@@ -19,7 +19,6 @@ from grafanalib.core import (
 )
 
 from lib import colors
-from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,

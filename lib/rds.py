@@ -26,12 +26,9 @@ from grafanalib.core import (
 from grafanalib.formatunits import BYTES, BYTES_SEC, SECONDS
 
 from lib import colors
-from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_REF_ID,
     EDITABLE,
-    RAW_QUERY,
-    RETENTION_POLICY,
     SHARED_CROSSHAIR,
     TIMEZONE,
     TRANSPARENT,
@@ -550,8 +547,6 @@ def generate_rds_dashboard(
     return Dashboard(
         title="RDS: {}".format(name),
         editable=EDITABLE,
-        annotations=get_release_annotations(influxdb_data_source),
-        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,

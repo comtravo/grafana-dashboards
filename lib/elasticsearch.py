@@ -29,17 +29,13 @@ from grafanalib.core import (
 from grafanalib.formatunits import MEGA_BYTES
 
 from lib import colors
-from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_REF_ID,
     EDITABLE,
-    RAW_QUERY,
-    RETENTION_POLICY,
     SHARED_CROSSHAIR,
     TIMEZONE,
     TRANSPARENT,
 )
-from lib.templating import get_release_templating
 
 ES_MEASUREMENT = "cloudwatch_aws_es"
 NAMESPACE = "AWS/ES"
@@ -721,8 +717,6 @@ def generate_elasticsearch_dashboard(
     return Dashboard(
         title="Elasticsearch: {}".format(name),
         editable=EDITABLE,
-        annotations=get_release_annotations(influxdb_data_source),
-        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,

@@ -15,24 +15,18 @@ from grafanalib.core import (
     AlertCondition,
     Dashboard,
     Graph,
-    GreaterThan,
     LowerThan,
-    Repeat,
     Row,
     Target,
-    Template,
-    Templating,
     TimeRange,
     YAxes,
     YAxis,
     single_y_axis,
 )
-from grafanalib.formatunits import BYTES, MEGA_BYTES
+from grafanalib.formatunits import BYTES
 
 from lib import colors
-from lib.annotations import get_release_annotations
 from lib.commons import ALERT_REF_ID, EDITABLE, SHARED_CROSSHAIR, TIMEZONE, TRANSPARENT
-from lib.templating import get_release_templating
 
 ELASTICACHE_MEASUREMENT = "cloudwatch_aws_elasticache"
 NAMESPACE = "AWS/ElastiCache"
@@ -614,8 +608,6 @@ def generate_elasticache_redis_dashboard(
     return Dashboard(
         title="ElastiCache Redis: {}".format(name),
         editable=EDITABLE,
-        annotations=get_release_annotations(influxdb_data_source),
-        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,

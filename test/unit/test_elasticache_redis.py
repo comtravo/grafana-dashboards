@@ -251,9 +251,6 @@ class TestElasticCacheRedisDashboard:
         )
 
         generated_dashboard.title.should.equal("ElastiCache Redis: foo")
-        generated_dashboard.templating.should.be.a(Templating)
-        generated_dashboard.templating.list.should.have.length_of(1)
-        generated_dashboard.templating.list[0].should.be.a(Template)
         generated_dashboard.tags.should.have.length_of(3)
         generated_dashboard.rows.should.have.length_of(3)
         generated_dashboard.links.should.have.length_of(1)

@@ -6,16 +6,13 @@ from grafanalib.core import (
     SHORT_FORMAT,
     Dashboard,
     Graph,
-    Repeat,
     Row,
     Template,
-    Templating,
     single_y_axis,
 )
 from grafanalib.influxdb import InfluxDBTarget
 
 from lib import colors
-from lib.annotations import get_release_annotations
 from lib.commons import (
     EDITABLE,
     RAW_QUERY,
@@ -115,14 +112,6 @@ def generate_firehose_dashboard(
     """Generate Firehose dashboard"""
     tags = ["firehose", environment]
 
-    templating = Templating(
-        [
-            get_firehose_template(data_source=influxdb_data_source),
-            get_release_template(data_source=influxdb_data_source),
-        ]
-    )
-
-    repeat = Repeat(direction="v", variable="$firehose")
     rows = [
         Row(
             panels=[generate_firehose_graph(influxdb_data_source=influxdb_data_source)],
@@ -135,8 +124,6 @@ def generate_firehose_dashboard(
     return Dashboard(
         title="Firehose",
         editable=EDITABLE,
-        annotations=get_release_annotations(data_source=influxdb_data_source),
-        templating=templating,
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
