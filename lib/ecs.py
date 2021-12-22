@@ -302,10 +302,12 @@ def generate_req_count_graph(
 
 
 def generate_res_count_graph(
+    name: str,
     cloudwatch_data_source: str,
     loadbalancer: str,
     target_group: str,
     grid_pos: GridPos,
+    notifications: List[str],
 ) -> Graph:
     """
     Generate res graph
@@ -355,6 +357,25 @@ def generate_res_count_graph(
         {"alias": xx5_alias, "color": colors.RED, "fill": 0},
     ]
 
+    alert = None
+    if notifications:
+        alert = Alert(
+            name="{} has 5XX errors".format(name),
+            message="{} has 5XX errors".format(name),
+            executionErrorState="alerting",
+            alertConditions=[
+                AlertCondition(
+                    Target(refId=ALERT_REF_ID),
+                    timeRange=TimeRange("15m", "now"),
+                    evaluator=GreaterThan(0),
+                    reducerType=RTYPE_MAX,
+                    operator=OP_AND,
+                )
+            ],
+            gracePeriod="1m",
+            notifications=notifications,
+        )
+
     return Graph(
         title="Responses",
         dataSource=cloudwatch_data_source,
@@ -363,6 +384,7 @@ def generate_res_count_graph(
         transparent=TRANSPARENT,
         editable=EDITABLE,
         gridPos=grid_pos,
+        alert=alert,
     )
 
 
@@ -697,6 +719,7 @@ def generate_ecs_alb_service_dashboard(
             target_group=target_group,
             cloudwatch_data_source=cloudwatch_data_source,
             grid_pos=GridPos(8, 12, 12, 28),
+            notifications=notifications,
         ),
         RowPanel(title="Logs", gridPos=GridPos(1, 24, 0, 36)),
         generate_helpful_resources_panel(
