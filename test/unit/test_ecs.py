@@ -2,7 +2,7 @@ from os import name
 from grafanalib.core import (
     Alert,
     AlertCondition,
-    # Dashboard,
+    Dashboard,
     Graph,
     GreaterThan,
     GridPos,
@@ -33,6 +33,7 @@ from lib.ecs import (
     generate_req_count_graph,
     generate_res_count_graph,
     generate_error_logs_panel,
+    generate_ecs_alb_service_dashboard,
 )
 
 
@@ -519,3 +520,33 @@ class TestECSDashboards:
         panel.targets[0].query.should.eql(
             'tag: "{}" AND log.level: [50 TO *] AND NOT log.msg: ""'.format(name)
         )
+
+    def test_should_generate_ecs_alb_service_dashboard(self):
+        name = "service-1"
+        cluster_name = "cluster-1"
+        cloudwatch_data_source = "cwm"
+        elasticsearch_data_source = "es"
+        notifications = ["foo", "bar", "baz"]
+        environment = "prod"
+        memory = 512
+        max = 1000
+        loadbalancer = "loadbalancer-1"
+        target_group = "target-group-1"
+        kibana_url = "http://kibana.example.com"
+
+        dashboard = generate_ecs_alb_service_dashboard(
+            name=name,
+            cluster_name=cluster_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
+            environment=environment,
+            memory=memory,
+            loadbalancer=loadbalancer,
+            target_group=target_group,
+            kibana_url=kibana_url,
+            max=max,
+            elasticsearch_data_source=elasticsearch_data_source,
+        )
+        dashboard.should.be.a(Dashboard)
+        dashboard.title.should.eql("ECS Service: {}".format(name))
+        dashboard.panels.should.have.length_of(16)

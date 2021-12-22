@@ -641,6 +641,7 @@ def generate_ecs_alb_service_dashboard(
     target_group: str,
     elasticsearch_data_source: str,
     kibana_url: str,
+    max: int,
     *args,
     **kwargs
 ):
@@ -715,6 +716,7 @@ def generate_ecs_alb_service_dashboard(
             grid_pos=GridPos(8, 12, 0, 28),
         ),
         generate_res_count_graph(
+            name=name,
             loadbalancer=loadbalancer,
             target_group=target_group,
             cloudwatch_data_source=cloudwatch_data_source,
