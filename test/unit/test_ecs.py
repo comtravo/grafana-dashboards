@@ -545,7 +545,6 @@ class TestECSDashboards:
         elasticsearch_data_source = "es"
         notifications = ["foo", "bar", "baz"]
         environment = "prod"
-        memory = 512
         max = 1000
         loadbalancer = "loadbalancer-1"
         target_group = "target-group-1"
@@ -557,7 +556,6 @@ class TestECSDashboards:
             cloudwatch_data_source=cloudwatch_data_source,
             notifications=notifications,
             environment=environment,
-            memory=memory,
             loadbalancer=loadbalancer,
             target_group=target_group,
             kibana_url=kibana_url,
