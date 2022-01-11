@@ -232,6 +232,7 @@ def generate_mem_utilization_graph(
         alertThreshold=ALERT_THRESHOLD,
     ).auto_ref_ids()
 
+
 def generate_mem_utilization_percentage_graph(
     name: str,
     cloudwatch_data_source: str,
@@ -311,6 +312,7 @@ def generate_mem_utilization_percentage_graph(
         gridPos=grid_pos,
         alertThreshold=ALERT_THRESHOLD,
     ).auto_ref_ids()
+
 
 def generate_req_count_graph(
     cloudwatch_data_source: str,
