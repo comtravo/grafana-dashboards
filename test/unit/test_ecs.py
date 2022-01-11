@@ -554,7 +554,6 @@ class TestECSDashboards:
             cloudwatch_data_source=cloudwatch_data_source,
             notifications=notifications,
             environment=environment,
-
             loadbalancer=loadbalancer,
             target_group=target_group,
             kibana_url=kibana_url,
