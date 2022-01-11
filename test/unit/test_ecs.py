@@ -341,19 +341,17 @@ class TestECSDashboards:
         cloudwatch_data_source = "prod"
         cluster_name = "cluster-1"
         grid_pos = GridPos(1, 2, 3, 4)
-        notifications = []
 
         panel = generate_mem_utilization_graph(
             name=name,
             cloudwatch_data_source=cloudwatch_data_source,
             cluster_name=cluster_name,
             grid_pos=grid_pos,
-            notifications=notifications,
         )
         panel.should.be.a(Graph)
         panel.title.should.eql("Memory Utilization")
         panel.dataSource.should.eql(cloudwatch_data_source)
-        panel.targets.should.have.length_of(4)
+        panel.targets.should.have.length_of(3)
         panel.gridPos.should.eql(grid_pos)
 
     def test_should_generate_mem_utilization_percentage_graph(self):
@@ -373,7 +371,7 @@ class TestECSDashboards:
         panel.should.be.a(Graph)
         panel.title.should.eql("Memory Utilization Percentage")
         panel.dataSource.should.eql(cloudwatch_data_source)
-        panel.targets.should.have.length_of(4)
+        panel.targets.should.have.length_of(3)
         panel.gridPos.should.eql(grid_pos)
 
     def test_should_generate_mem_utilization_percentage_with_alerts_graph(self):
@@ -556,6 +554,7 @@ class TestECSDashboards:
             cloudwatch_data_source=cloudwatch_data_source,
             notifications=notifications,
             environment=environment,
+
             loadbalancer=loadbalancer,
             target_group=target_group,
             kibana_url=kibana_url,
@@ -564,4 +563,4 @@ class TestECSDashboards:
         )
         dashboard.should.be.a(Dashboard)
         dashboard.title.should.eql("ECS Service: {}".format(name))
-        dashboard.panels.should.have.length_of(16)
+        dashboard.panels.should.have.length_of(17)
