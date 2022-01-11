@@ -351,7 +351,7 @@ class TestECSDashboards:
         panel.should.be.a(Graph)
         panel.title.should.eql("Memory Utilization")
         panel.dataSource.should.eql(cloudwatch_data_source)
-        panel.targets.should.have.length_of(3)
+        panel.targets.should.have.length_of(4)
         panel.gridPos.should.eql(grid_pos)
 
     def test_should_generate_mem_utilization_percentage_graph(self):
