@@ -248,14 +248,14 @@ def generate_mem_utilization_percentage_graph(
     targets = [
         CloudwatchMetricsTarget(
             alias=MINIMUM_ALIAS,
-            namespace=CONTAINER_INSIGHTS_NAMESPACE,
+            namespace=ECS_NAMESPACE,
             statistics=["Minimum"],
             metricName="MemoryUtilization",
             dimensions={"ServiceName": name, "ClusterName": cluster_name},
         ),
         CloudwatchMetricsTarget(
             alias=AVERAGE_ALIAS,
-            namespace=CONTAINER_INSIGHTS_NAMESPACE,
+            namespace=ECS_NAMESPACE,
             statistics=["Average"],
             metricName="MemoryUtilization",
             dimensions={"ServiceName": name, "ClusterName": cluster_name},
@@ -263,7 +263,7 @@ def generate_mem_utilization_percentage_graph(
         ),
         CloudwatchMetricsTarget(
             alias=MAXIMUM_ALIAS,
-            namespace=CONTAINER_INSIGHTS_NAMESPACE,
+            namespace=ECS_NAMESPACE,
             statistics=["Maximum"],
             metricName="MemoryUtilization",
             dimensions={"ServiceName": name, "ClusterName": cluster_name},
