@@ -244,7 +244,8 @@ def generate_mem_utilization_percentage_graph(
     Generate Mem Percentage graph
     """
 
-    y_axes = single_y_axis(format=MEGA_BYTES)
+    y_axes = single_y_axis(format=PERCENT_FORMAT)
+
     targets = [
         CloudwatchMetricsTarget(
             alias=MINIMUM_ALIAS,

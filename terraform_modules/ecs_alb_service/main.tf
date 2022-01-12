@@ -9,7 +9,6 @@ variable "grafana_configuration" {
     folder                    = string
     cluster_name              = string
     max                       = number
-    memory                    = number
     loadbalancer              = string
     target_group              = string
   })
