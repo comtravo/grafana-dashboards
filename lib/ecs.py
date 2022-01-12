@@ -488,19 +488,15 @@ def get_elasticsearch_query(name: str) -> str:
     return 'tag: "{}" AND log.level: [50 TO *] AND NOT log.msg: ""'.format(name)
 
 
-def generate_helpful_resources_panel(
-    name: str, grid_pos: GridPos, kibana_url: str
-) -> Text:
+def generate_helpful_resources_panel(name: str, grid_pos: GridPos) -> Text:
 
     content = """
 # Helpful resources
 
 ## Elasticsearch
-
-<a href="{}" target="_blank">Kibana URL</a>\n
 Elasticsearch query to find all error logs: `{}`
     """.format(
-        kibana_url, get_elasticsearch_query(name)
+        get_elasticsearch_query(name)
     )
     return Text(
         title="Helpful resources",
@@ -699,7 +695,6 @@ def generate_ecs_alb_service_dashboard(
     loadbalancer: str,
     target_group: str,
     elasticsearch_data_source: str,
-    kibana_url: str,
     max: int,
     *args,
     **kwargs
@@ -788,9 +783,7 @@ def generate_ecs_alb_service_dashboard(
             notifications=notifications,
         ),
         RowPanel(title="Logs", gridPos=GridPos(1, 24, 0, 36)),
-        generate_helpful_resources_panel(
-            name=name, grid_pos=GridPos(8, 24, 0, 37), kibana_url=kibana_url
-        ),
+        generate_helpful_resources_panel(name=name, grid_pos=GridPos(8, 24, 0, 37)),
         generate_error_logs_panel(
             name=name,
             grid_pos=GridPos(24, 24, 0, 45),

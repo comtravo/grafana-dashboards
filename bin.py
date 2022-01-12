@@ -42,7 +42,6 @@ def parse_options():  # pragma: no cover
     parser.add_argument(
         "--es", type=str, help="ES datasource name", dest="elasticsearch_data_source"
     )
-    parser.add_argument("--kibana", type=str, help="Kibana URL", dest="kibana_url")
     parser.add_argument(
         "--lambda_insights_namespace",
         type=str,
