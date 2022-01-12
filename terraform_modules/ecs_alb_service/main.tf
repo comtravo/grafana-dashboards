@@ -9,7 +9,6 @@ variable "grafana_configuration" {
     folder                    = string
     cluster_name              = string
     max                       = number
-    memory                    = number
     loadbalancer              = string
     target_group              = string
   })
@@ -36,7 +35,6 @@ data "external" "dashboard" {
     "ecs-alb-service",
     "--cluster-name", var.grafana_configuration.cluster_name,
     "--max", var.grafana_configuration.max,
-    "--memory", var.grafana_configuration.memory,
     "--loadbalancer", var.grafana_configuration.loadbalancer,
     "--target-group", var.grafana_configuration.target_group,
   ])

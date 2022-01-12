@@ -169,8 +169,6 @@ def generate_mem_utilization_graph(
     name: str,
     cloudwatch_data_source: str,
     cluster_name: str,
-    memory: str,
-    notifications: List[str],
     grid_pos: GridPos,
 ) -> Graph:
     """
@@ -222,6 +220,68 @@ def generate_mem_utilization_graph(
         },
     ]
 
+    return Graph(
+        title="Memory Utilization",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        yAxes=y_axes,
+        seriesOverrides=seriesOverrides,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        gridPos=grid_pos,
+        alertThreshold=ALERT_THRESHOLD,
+    ).auto_ref_ids()
+
+
+def generate_mem_utilization_percentage_graph(
+    name: str,
+    cloudwatch_data_source: str,
+    cluster_name: str,
+    notifications: List[str],
+    grid_pos: GridPos,
+) -> Graph:
+    """
+    Generate Mem Percentage graph
+    """
+
+    y_axes = single_y_axis(format=PERCENT_FORMAT)
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=MINIMUM_ALIAS,
+            namespace=ECS_NAMESPACE,
+            statistics=["Minimum"],
+            metricName="MemoryUtilization",
+            dimensions={"ServiceName": name, "ClusterName": cluster_name},
+        ),
+        CloudwatchMetricsTarget(
+            alias=AVERAGE_ALIAS,
+            namespace=ECS_NAMESPACE,
+            statistics=["Average"],
+            metricName="MemoryUtilization",
+            dimensions={"ServiceName": name, "ClusterName": cluster_name},
+            refId=ALERT_REF_ID,
+        ),
+        CloudwatchMetricsTarget(
+            alias=MAXIMUM_ALIAS,
+            namespace=ECS_NAMESPACE,
+            statistics=["Maximum"],
+            metricName="MemoryUtilization",
+            dimensions={"ServiceName": name, "ClusterName": cluster_name},
+        ),
+    ]
+
+    seriesOverrides = [
+        {"alias": MINIMUM_ALIAS, "color": colors.GREEN, "lines": False},
+        {"alias": AVERAGE_ALIAS, "color": colors.YELLOW, "fill": 0},
+        {
+            "alias": MAXIMUM_ALIAS,
+            "color": colors.GREEN,
+            "fillBelowTo": MINIMUM_ALIAS,
+            "lines": False,
+        },
+    ]
+
     alert = None
     if notifications:
         alert = Alert(
@@ -232,7 +292,7 @@ def generate_mem_utilization_graph(
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
                     timeRange=TimeRange("15m", "now"),
-                    evaluator=GreaterThan(memory),
+                    evaluator=GreaterThan(85),
                     reducerType=RTYPE_MAX,
                     operator=OP_AND,
                 )
@@ -242,7 +302,7 @@ def generate_mem_utilization_graph(
         )
 
     return Graph(
-        title="Memory Utilization",
+        title="Memory Utilization Percentage",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
@@ -636,7 +696,6 @@ def generate_ecs_alb_service_dashboard(
     cloudwatch_data_source: str,
     notifications: List[str],
     environment: str,
-    memory: int,
     loadbalancer: str,
     target_group: str,
     elasticsearch_data_source: str,
@@ -698,15 +757,20 @@ def generate_ecs_alb_service_dashboard(
             name=name,
             cluster_name=cluster_name,
             cloudwatch_data_source=cloudwatch_data_source,
-            grid_pos=GridPos(8, 12, 0, 19),
+            grid_pos=GridPos(8, 8, 0, 19),
         ),
         generate_mem_utilization_graph(
             name=name,
             cluster_name=cluster_name,
             cloudwatch_data_source=cloudwatch_data_source,
-            grid_pos=GridPos(8, 12, 12, 19),
+            grid_pos=GridPos(8, 8, 8, 19),
+        ),
+        generate_mem_utilization_percentage_graph(
+            name=name,
+            cluster_name=cluster_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            grid_pos=GridPos(8, 8, 16, 19),
             notifications=notifications,
-            memory=memory,
         ),
         RowPanel(title="Requests and Responses", gridPos=GridPos(1, 24, 0, 27)),
         generate_req_count_graph(

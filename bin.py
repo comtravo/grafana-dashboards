@@ -106,9 +106,6 @@ def parse_options():  # pragma: no cover
     ecs_alb_service.add_argument(
         "--max", type=int, help="Maximum number of containers", required=True
     )
-    ecs_alb_service.add_argument(
-        "--memory", type=int, help="Memory or MemoryReservation in MB", required=True
-    )
 
     es = subparsers.add_parser("elasticsearch", help="Create dashboard for AWS ES")
     es.add_argument("--client_id", type=str, help="Client id", required=True)

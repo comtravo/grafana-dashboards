@@ -58,7 +58,6 @@ module "dashboard" {
     folder                    = null
     cluster_name              = "cluster-1"
     max                       = 100
-    memory                    = 1024
     loadbalancer              = "foo"
     target_group              = "bar"
   }
