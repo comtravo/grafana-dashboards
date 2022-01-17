@@ -664,13 +664,13 @@ def generate_pending_count_graph(
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
-                    timeRange=TimeRange("15m", "now"),
+                    timeRange=TimeRange("5m", "now"),
                     evaluator=GreaterThan(0),
                     reducerType=RTYPE_MAX,
                     operator=OP_AND,
                 )
             ],
-            gracePeriod="1m",
+            gracePeriod="15m",
             notifications=notifications,
         )
 

@@ -283,11 +283,12 @@ class TestECSDashboards:
         )
 
         panel.alert.should.be.a(Alert)
+        panel.alert.gracePeriod.should.eql("15m")
         panel.alert.alertConditions.should.have.length_of(1)
         panel.alert.alertConditions[0].should.eql(
             AlertCondition(
                 Target(refId="A"),
-                timeRange=TimeRange("15m", "now"),
+                timeRange=TimeRange("5m", "now"),
                 evaluator=GreaterThan(0),
                 reducerType=RTYPE_MAX,
                 operator=OP_AND,
