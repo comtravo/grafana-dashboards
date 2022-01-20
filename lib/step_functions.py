@@ -315,7 +315,7 @@ def generate_sfn_dashboard(
             lambda_metrics_row = Row(
                 title="{} Lambda Metrics".format(l),
                 showTitle=True,
-                collapse=True,
+                collapse=False,
                 panels=[
                     lambda_generate_invocations_graph(
                         l, cloudwatch_data_source, notifications=[]
