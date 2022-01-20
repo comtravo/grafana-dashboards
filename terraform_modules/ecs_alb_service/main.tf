@@ -22,7 +22,7 @@ variable "enable" {
 
 locals {
   elasticsearch_data_source_args = var.grafana_configuration.elasticsearch_data_source == null ? [] : ["--es", var.grafana_configuration.elasticsearch_data_source]
-  lucene_query_args              = var.grafana_configuration.lucene_query == null ? [] : ["--lucene-query", var.grafana_configuration.elasticsearch_data_source]
+  lucene_query_args              = var.grafana_configuration.lucene_query == null ? [] : ["--lucene-query", var.grafana_configuration.lucene_query]
   notification_args              = try(length(var.grafana_configuration.notifications), 0) > 0 ? flatten(["--notifications", var.grafana_configuration.notifications]) : []
 }
 
