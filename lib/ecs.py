@@ -95,17 +95,6 @@ def generate_running_count_stats_panel(
     )
 
 
-# def generate_alert_list_panel(name: str, grid_pos: GridPos):
-#     return AlertList(
-#         title="Alerts: {}".format(name),
-#         gridPos=grid_pos,
-#         description="Alerts for service {}".format(name),
-#         transparent=TRANSPARENT,
-#         onlyAlertsOnDashboard=True,
-#         show=True
-#     )
-
-
 def generate_cpu_utilization_graph(
     name: str,
     cloudwatch_data_source: str,

@@ -31,8 +31,6 @@ from lib.commons import (
     ALERT_REF_ID,
     DEFAULT_REFRESH,
     EDITABLE,
-    RAW_QUERY,
-    RETENTION_POLICY,
     SHARED_CROSSHAIR,
     TIMEZONE,
     TRANSPARENT,

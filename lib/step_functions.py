@@ -16,7 +16,6 @@ from grafanalib.core import (
 )
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
-from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_THRESHOLD,
     DEFAULT_REFRESH,
