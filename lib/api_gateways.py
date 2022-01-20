@@ -19,6 +19,7 @@ from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
+    DEFAULT_REFRESH,
     EDITABLE,
     SHARED_CROSSHAIR,
     TIMEZONE,
@@ -199,5 +200,6 @@ def generate_api_gateways_dashboard(
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
+        refresh=DEFAULT_REFRESH,
         rows=rows,
     ).auto_panel_ids()

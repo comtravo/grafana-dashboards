@@ -12,13 +12,10 @@ from grafanalib.core import (
     GreaterThan,
     OP_OR,
     PERCENT_FORMAT,
-    Repeat,
     Row,
     RTYPE_MAX,
     SHORT_FORMAT,
     Target,
-    Template,
-    Templating,
     TimeRange,
     single_y_axis,
     YAxes,
@@ -32,6 +29,7 @@ from lib.templating import get_release_templating
 from lib import colors
 from lib.commons import (
     ALERT_REF_ID,
+    DEFAULT_REFRESH,
     EDITABLE,
     RAW_QUERY,
     RETENTION_POLICY,
@@ -727,4 +725,5 @@ def generate_elasticsearch_dashboard(
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=rows,
         links=[DOCUMENTATION_LINK],
+        refresh=DEFAULT_REFRESH,
     ).auto_panel_ids()

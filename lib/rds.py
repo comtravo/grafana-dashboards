@@ -18,8 +18,6 @@ from grafanalib.core import (
     TimeRange,
     Row,
     Target,
-    YAxes,
-    YAxis,
 )
 from grafanalib.formatunits import BYTES, BYTES_SEC, SECONDS
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
@@ -28,11 +26,10 @@ from lib import colors
 from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_REF_ID,
+    DEFAULT_REFRESH,
     EDITABLE,
     get_documentation_link,
     get_series_overrides,
-    RAW_QUERY,
-    RETENTION_POLICY,
     SHARED_CROSSHAIR,
     TIMEZONE,
     TRANSPARENT,
@@ -562,4 +559,5 @@ def generate_rds_dashboard(
                 "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MonitoringOverview.html"
             )
         ],
+        refresh=DEFAULT_REFRESH,
     ).auto_panel_ids()

@@ -6,6 +6,7 @@ EDITABLE = False
 TRANSPARENT = True
 RAW_QUERY = True
 RETENTION_POLICY = "autogen"
+DEFAULT_REFRESH = "1m"
 
 
 def get_documentation_link(url: str):

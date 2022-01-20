@@ -5,7 +5,6 @@
 from grafanalib.core import (
     Alert,
     AlertCondition,
-    AlertList,
     Dashboard,
     Graph,
     GreaterThan,
@@ -25,6 +24,7 @@ from grafanalib.core import (
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
+    DEFAULT_REFRESH,
     EDITABLE,
     SHARED_CROSSHAIR,
     TIMEZONE,
@@ -793,4 +793,5 @@ def generate_ecs_alb_service_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         panels=panels,
+        refresh=DEFAULT_REFRESH,
     ).auto_panel_ids()
