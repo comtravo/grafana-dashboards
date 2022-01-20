@@ -21,6 +21,7 @@ module "dashboard" {
     environment               = "prod"
     cloudwatch_data_source    = "cloudwatch"
     elasticsearch_data_source = "es"
+    lucene_query              = "tag: ${var.name} AND log.level: [50 TO *]"
     notifications             = ["slack"]
     folder                    = grafana_folder.this.id
     cluster_name              = "cluster-1"

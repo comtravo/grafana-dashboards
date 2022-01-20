@@ -563,7 +563,7 @@ class TestECSDashboards:
         es_query = 'tag: "booking-api" AND log.level: [50 TO *]'
 
         panel = generate_error_logs_panel(
-            es_query=es_query,
+            lucene_query=es_query,
             grid_pos=grid_pos,
             elasticsearch_data_source=elasticsearch_data_source,
         )
@@ -598,7 +598,7 @@ class TestECSDashboards:
             kibana_url=kibana_url,
             max=max,
             elasticsearch_data_source=elasticsearch_data_source,
-            es_query=es_query,
+            lucene_query=es_query,
         )
         dashboard.should.be.a(Dashboard)
         dashboard.title.should.eql("ECS Service: {}".format(name))
@@ -628,7 +628,7 @@ class TestECSDashboards:
             kibana_url=kibana_url,
             max=max,
             elasticsearch_data_source=None,
-            es_query=None,
+            lucene_query=None,
         )
         dashboard.should.be.a(Dashboard)
         dashboard.title.should.eql("ECS Service: {}".format(name))
@@ -658,7 +658,7 @@ class TestECSDashboards:
             kibana_url=kibana_url,
             max=max,
             elasticsearch_data_source="foo",
-            es_query=None,
+            lucene_query=None,
         )
         dashboard.should.be.a(Dashboard)
         dashboard.title.should.eql("ECS Service: {}".format(name))

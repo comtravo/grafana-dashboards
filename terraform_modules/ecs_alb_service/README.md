@@ -1,6 +1,8 @@
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
 
 ## Providers
 
@@ -17,7 +19,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [grafana_dashboard.this](https://registry.terraform.io/providers/hashicorp/grafana/latest/docs/resources/dashboard) | resource |
+| [grafana_dashboard.this](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/dashboard) | resource |
 | [external_external.dashboard](https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/external) | data source |
 
 ## Inputs
@@ -25,7 +27,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_enable"></a> [enable](#input\_enable) | true to enable the module | `bool` | `false` | no |
-| <a name="input_grafana_configuration"></a> [grafana\_configuration](#input\_grafana\_configuration) | Configuration for creating Grafana dashboards and alerts | <pre>object({<br>    name                      = string<br>    environment               = string<br>    cloudwatch_data_source    = string<br>    elasticsearch_data_source = string<br>    cluster_name              = string<br>    notifications             = list(string)<br>    folder                    = string<br>    max                       = number<br>    memory                    = number<br>    loadbalancer              = string<br>    target_group              = string<br>  })</pre> | n/a | yes |
+| <a name="input_grafana_configuration"></a> [grafana\_configuration](#input\_grafana\_configuration) | Configuration for creating Grafana dashboards and alerts | <pre>object({<br>    name                      = string<br>    environment               = string<br>    cloudwatch_data_source    = string<br>    elasticsearch_data_source = string<br>    lucene_query              = string<br>    notifications             = list(string)<br>    folder                    = string<br>    cluster_name              = string<br>    max                       = number<br>    loadbalancer              = string<br>    target_group              = string<br>  })</pre> | n/a | yes |
 
 ## Outputs
 

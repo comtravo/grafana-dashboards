@@ -480,7 +480,7 @@ def generate_deployment_graph(
     )
 
 
-def generate_helpful_resources_panel(es_query: str, grid_pos: GridPos) -> Text:
+def generate_helpful_resources_panel(lucene_query: str, grid_pos: GridPos) -> Text:
 
     content = """
 # Helpful resources
@@ -488,7 +488,7 @@ def generate_helpful_resources_panel(es_query: str, grid_pos: GridPos) -> Text:
 ## Elasticsearch
 Elasticsearch query to find all error logs: `{}`
     """.format(
-        es_query
+        lucene_query
     )
     return Text(
         title="Helpful resources",
@@ -500,14 +500,14 @@ Elasticsearch query to find all error logs: `{}`
 
 
 def generate_error_logs_panel(
-    elasticsearch_data_source: str, es_query, grid_pos: GridPos
+    elasticsearch_data_source: str, lucene_query, grid_pos: GridPos
 ) -> Logs:
     """
     Generate Logs panel
     """
     targets = [
         ElasticsearchTarget(
-            query=es_query,
+            query=lucene_query,
             metricAggs=[{"id": "1", "settings": {"limit": "10000"}, "type": "logs"}],
         ),
     ]
@@ -687,7 +687,7 @@ def generate_ecs_alb_service_dashboard(
     loadbalancer: str,
     target_group: str,
     elasticsearch_data_source: str,
-    es_query: str,
+    lucene_query: str,
     max: int,
     *args,
     **kwargs
@@ -773,16 +773,16 @@ def generate_ecs_alb_service_dashboard(
         ),
     ]
 
-    if elasticsearch_data_source and es_query:
+    if elasticsearch_data_source and lucene_query:
         panels += [
             RowPanel(title="Logs", gridPos=GridPos(1, 24, 0, 36)),
             generate_helpful_resources_panel(
-                es_query=es_query, grid_pos=GridPos(8, 24, 0, 37)
+                lucene_query=lucene_query, grid_pos=GridPos(8, 24, 0, 37)
             ),
             generate_error_logs_panel(
                 grid_pos=GridPos(24, 24, 0, 45),
                 elasticsearch_data_source=elasticsearch_data_source,
-                es_query=es_query,
+                lucene_query=lucene_query,
             ),
         ]
 
