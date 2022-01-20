@@ -560,9 +560,10 @@ class TestECSDashboards:
         name = "service-1"
         grid_pos = GridPos(1, 2, 3, 4)
         elasticsearch_data_source = "es"
+        es_query = 'tag: "booking-api" AND log.level: [50 TO *]'
 
         panel = generate_error_logs_panel(
-            name=name,
+            es_query=es_query,
             grid_pos=grid_pos,
             elasticsearch_data_source=elasticsearch_data_source,
         )
@@ -571,15 +572,14 @@ class TestECSDashboards:
         panel.gridPos.should.eql(grid_pos)
         panel.dataSource.should.eql(elasticsearch_data_source)
         panel.targets.should.have.length_of(1)
-        panel.targets[0].query.should.eql(
-            'tag: "{}" AND log.level: [50 TO *] AND NOT log.msg: ""'.format(name)
-        )
+        panel.targets[0].query.should.eql(es_query)
 
     def test_should_generate_ecs_alb_service_dashboard(self):
         name = "service-1"
         cluster_name = "cluster-1"
         cloudwatch_data_source = "cwm"
         elasticsearch_data_source = "es"
+        es_query = 'tag: "booking-api" AND log.level: [50 TO *]'
         notifications = ["foo", "bar", "baz"]
         environment = "prod"
         max = 1000
@@ -598,6 +598,7 @@ class TestECSDashboards:
             kibana_url=kibana_url,
             max=max,
             elasticsearch_data_source=elasticsearch_data_source,
+            es_query=es_query,
         )
         dashboard.should.be.a(Dashboard)
         dashboard.title.should.eql("ECS Service: {}".format(name))
@@ -627,6 +628,37 @@ class TestECSDashboards:
             kibana_url=kibana_url,
             max=max,
             elasticsearch_data_source=None,
+            es_query=None,
+        )
+        dashboard.should.be.a(Dashboard)
+        dashboard.title.should.eql("ECS Service: {}".format(name))
+        dashboard.panels.should.have.length_of(14)
+
+    def test_should_generate_ecs_alb_service_dashboard_without_logs_when_es_query_is_missing(
+        self,
+    ):
+        name = "service-1"
+        cluster_name = "cluster-1"
+        cloudwatch_data_source = "cwm"
+        notifications = ["foo", "bar", "baz"]
+        environment = "prod"
+        max = 1000
+        loadbalancer = "loadbalancer-1"
+        target_group = "target-group-1"
+        kibana_url = "http://kibana.example.com"
+
+        dashboard = generate_ecs_alb_service_dashboard(
+            name=name,
+            cluster_name=cluster_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
+            environment=environment,
+            loadbalancer=loadbalancer,
+            target_group=target_group,
+            kibana_url=kibana_url,
+            max=max,
+            elasticsearch_data_source="foo",
+            es_query=None,
         )
         dashboard.should.be.a(Dashboard)
         dashboard.title.should.eql("ECS Service: {}".format(name))

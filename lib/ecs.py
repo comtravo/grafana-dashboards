@@ -480,15 +480,7 @@ def generate_deployment_graph(
     )
 
 
-def get_elasticsearch_query(name: str) -> str:
-    """
-    Get elasticsearch query
-    """
-
-    return 'tag: "{}" AND log.level: [50 TO *] AND NOT log.msg: ""'.format(name)
-
-
-def generate_helpful_resources_panel(name: str, grid_pos: GridPos) -> Text:
+def generate_helpful_resources_panel(es_query: str, grid_pos: GridPos) -> Text:
 
     content = """
 # Helpful resources
@@ -496,7 +488,7 @@ def generate_helpful_resources_panel(name: str, grid_pos: GridPos) -> Text:
 ## Elasticsearch
 Elasticsearch query to find all error logs: `{}`
     """.format(
-        get_elasticsearch_query(name)
+        es_query
     )
     return Text(
         title="Helpful resources",
@@ -508,14 +500,14 @@ Elasticsearch query to find all error logs: `{}`
 
 
 def generate_error_logs_panel(
-    name: str, elasticsearch_data_source: str, grid_pos: GridPos
+    elasticsearch_data_source: str, es_query, grid_pos: GridPos
 ) -> Logs:
     """
     Generate Logs panel
     """
     targets = [
         ElasticsearchTarget(
-            query=get_elasticsearch_query(name),
+            query=es_query,
             metricAggs=[{"id": "1", "settings": {"limit": "10000"}, "type": "logs"}],
         ),
     ]
@@ -695,6 +687,7 @@ def generate_ecs_alb_service_dashboard(
     loadbalancer: str,
     target_group: str,
     elasticsearch_data_source: str,
+    es_query: str,
     max: int,
     *args,
     **kwargs
@@ -780,14 +773,16 @@ def generate_ecs_alb_service_dashboard(
         ),
     ]
 
-    if elasticsearch_data_source:
+    if elasticsearch_data_source and es_query:
         panels += [
             RowPanel(title="Logs", gridPos=GridPos(1, 24, 0, 36)),
-            generate_helpful_resources_panel(name=name, grid_pos=GridPos(8, 24, 0, 37)),
+            generate_helpful_resources_panel(
+                es_query=es_query, grid_pos=GridPos(8, 24, 0, 37)
+            ),
             generate_error_logs_panel(
-                name=name,
                 grid_pos=GridPos(24, 24, 0, 45),
                 elasticsearch_data_source=elasticsearch_data_source,
+                es_query=es_query,
             ),
         ]
 
