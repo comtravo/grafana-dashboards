@@ -5,7 +5,6 @@
 from grafanalib.core import (
     Alert,
     AlertCondition,
-    AlertList,
     Dashboard,
     Graph,
     GreaterThan,
@@ -25,6 +24,7 @@ from grafanalib.core import (
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
+    DEFAULT_REFRESH,
     EDITABLE,
     SHARED_CROSSHAIR,
     TIMEZONE,
@@ -93,17 +93,6 @@ def generate_running_count_stats_panel(
         thresholds=[{"color": "blue"}],
         gridPos=grid_pos,
     )
-
-
-# def generate_alert_list_panel(name: str, grid_pos: GridPos):
-#     return AlertList(
-#         title="Alerts: {}".format(name),
-#         gridPos=grid_pos,
-#         description="Alerts for service {}".format(name),
-#         transparent=TRANSPARENT,
-#         onlyAlertsOnDashboard=True,
-#         show=True
-#     )
 
 
 def generate_cpu_utilization_graph(
@@ -793,4 +782,5 @@ def generate_ecs_alb_service_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         panels=panels,
+        refresh=DEFAULT_REFRESH,
     ).auto_panel_ids()

@@ -25,6 +25,7 @@ from grafanalib.cloudwatch import CloudwatchMetricsTarget, CloudwatchLogsInsight
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
+    DEFAULT_REFRESH,
     EDITABLE,
     SHARED_CROSSHAIR,
     TIMEZONE,
@@ -710,4 +711,5 @@ def lambda_sns_sqs_dashboard(
                 panels=[dead_letter_sqs_graph],
             ),
         ],
+        refresh=DEFAULT_REFRESH,
     ).auto_panel_ids()

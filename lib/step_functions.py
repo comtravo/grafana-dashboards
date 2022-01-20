@@ -16,9 +16,9 @@ from grafanalib.core import (
 )
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
-from lib.annotations import get_release_annotations
 from lib.commons import (
     ALERT_THRESHOLD,
+    DEFAULT_REFRESH,
     EDITABLE,
     SHARED_CROSSHAIR,
     TIMEZONE,
@@ -315,7 +315,7 @@ def generate_sfn_dashboard(
             lambda_metrics_row = Row(
                 title="{} Lambda Metrics".format(l),
                 showTitle=True,
-                collapse=True,
+                collapse=False,
                 panels=[
                     lambda_generate_invocations_graph(
                         l, cloudwatch_data_source, notifications=[]
@@ -351,4 +351,5 @@ def generate_sfn_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=rows,
+        refresh=DEFAULT_REFRESH,
     ).auto_panel_ids()
