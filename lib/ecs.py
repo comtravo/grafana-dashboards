@@ -325,8 +325,8 @@ def generate_req_count_graph(
     Generate req graph
     """
 
-    request_count_alias = "RequestCount"
-    request_count_per_target_alias = "RequestCountPerTarget"
+    request_count_alias = "RequestCount Per Service"
+    request_count_per_target_alias = "RequestCount Per Container"
 
     targets = [
         CloudwatchMetricsTarget(
@@ -553,7 +553,7 @@ def generate_running_count_graph(
     ]
 
     alert = None
-    if notifications:
+    if notifications and max > 1:
         alert = Alert(
             name="{} Running count of containers nearing the max".format(name),
             message="{} is having Running count of containers nearing the max".format(
@@ -605,7 +605,7 @@ def generate_desired_count_graph(
     ]
 
     alert = None
-    if notifications:
+    if notifications and max > 1:
         alert = Alert(
             name="{} Desired count of containers nearing the max".format(name),
             message="{} is having Desired count of containers nearing the max".format(

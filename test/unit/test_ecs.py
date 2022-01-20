@@ -174,6 +174,25 @@ class TestECSDashboards:
             )
         )
 
+    def test_should_generate_running_count_without_alerts_graph_when_max_is_1(self):
+        name = "service-1"
+        cloudwatch_data_source = "prod"
+        cluster_name = "cluster-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+        max = 1
+        notifications = ["foo", "bar"]
+
+        panel = generate_running_count_graph(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            cluster_name=cluster_name,
+            grid_pos=grid_pos,
+            max=max,
+            notifications=notifications,
+        )
+
+        panel.alert.should.eql(None)
+
     def test_should_generate_desired_count_graph(self):
         name = "service-1"
         cloudwatch_data_source = "prod"
@@ -235,6 +254,25 @@ class TestECSDashboards:
                 operator=OP_AND,
             )
         )
+
+    def test_should_generate_desired_count_without_alerts_graph_when_desired_is_1(self):
+        name = "service-1"
+        cloudwatch_data_source = "prod"
+        cluster_name = "cluster-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+        max = 1
+        notifications = ["foo", "bar"]
+
+        panel = generate_desired_count_graph(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            cluster_name=cluster_name,
+            grid_pos=grid_pos,
+            max=max,
+            notifications=notifications,
+        )
+
+        panel.alert.should.eql(None)
 
     def test_should_generate_pending_count_graph(self):
         name = "service-1"
