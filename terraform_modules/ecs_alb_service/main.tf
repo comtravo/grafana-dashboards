@@ -20,7 +20,8 @@ variable "enable" {
 }
 
 locals {
-  notification_args = try(length(var.grafana_configuration.notifications), 0) > 0 ? flatten(["--notifications", var.grafana_configuration.notifications]) : []
+  elasticsearch_data_source_args = var.grafana_configuration.elasticsearch_data_source == null ? [] : ["--es", var.grafana_configuration.elasticsearch_data_source]
+  notification_args              = try(length(var.grafana_configuration.notifications), 0) > 0 ? flatten(["--notifications", var.grafana_configuration.notifications]) : []
 }
 
 data "external" "dashboard" {
@@ -31,7 +32,7 @@ data "external" "dashboard" {
     "--environment", var.grafana_configuration.environment,
     local.notification_args,
     "--cw", var.grafana_configuration.cloudwatch_data_source,
-    "--es", var.grafana_configuration.elasticsearch_data_source,
+    local.elasticsearch_data_source_args,
     "ecs-alb-service",
     "--cluster-name", var.grafana_configuration.cluster_name,
     "--max", var.grafana_configuration.max,

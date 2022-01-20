@@ -53,6 +53,19 @@ func TestECSALBService_alert(t *testing.T) {
 	TerraformApplyAndValidateOutputs(t, terraformOptions)
 }
 
+func TestECSALBService_noESDataSource(t *testing.T) {
+
+	t.Parallel()
+	dashboardName := fmt.Sprintf("apig-%s", random.UniqueId())
+	exampleDir := "../../examples/ecs_alb_service_dashboards/ecs_alb_service_no_es_datasource/"
+
+	terraformOptions := SetupExample(t, dashboardName, exampleDir)
+	t.Logf("Terraform module inputs: %+v", *terraformOptions)
+	defer terraform.Destroy(t, terraformOptions)
+
+	TerraformApplyAndValidateOutputs(t, terraformOptions)
+}
+
 func TestECSALBService_folder(t *testing.T) {
 
 	t.Parallel()

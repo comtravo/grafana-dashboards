@@ -719,10 +719,6 @@ def generate_ecs_alb_service_dashboard(
             cloudwatch_data_source=cloudwatch_data_source,
             grid_pos=GridPos(8, 12, 12, 1),
         ),
-        # generate_alert_list_panel(
-        #     name=name,
-        #     grid_pos=GridPos(8, 8, 16, 1),
-        # ),
         RowPanel(title="Capacity", gridPos=GridPos(1, 24, 0, 9)),
         generate_running_count_graph(
             name=name,
@@ -782,14 +778,19 @@ def generate_ecs_alb_service_dashboard(
             grid_pos=GridPos(8, 12, 12, 28),
             notifications=notifications,
         ),
-        RowPanel(title="Logs", gridPos=GridPos(1, 24, 0, 36)),
-        generate_helpful_resources_panel(name=name, grid_pos=GridPos(8, 24, 0, 37)),
-        generate_error_logs_panel(
-            name=name,
-            grid_pos=GridPos(24, 24, 0, 45),
-            elasticsearch_data_source=elasticsearch_data_source,
-        ),
     ]
+
+    if elasticsearch_data_source:
+        panels += [
+            RowPanel(title="Logs", gridPos=GridPos(1, 24, 0, 36)),
+            generate_helpful_resources_panel(name=name, grid_pos=GridPos(8, 24, 0, 37)),
+            generate_error_logs_panel(
+                name=name,
+                grid_pos=GridPos(24, 24, 0, 45),
+                elasticsearch_data_source=elasticsearch_data_source,
+            ),
+        ]
+
     return Dashboard(
         title="{} {}".format("ECS Service:", name),
         editable=EDITABLE,
