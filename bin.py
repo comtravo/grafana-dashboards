@@ -43,6 +43,9 @@ def parse_options():  # pragma: no cover
         "--es", type=str, help="ES datasource name", dest="elasticsearch_data_source"
     )
     parser.add_argument(
+        "--lucene-query", type=str, help="ES datasource name", dest="lucene_query"
+    )
+    parser.add_argument(
         "--lambda_insights_namespace",
         type=str,
         default="LambdaInsights",

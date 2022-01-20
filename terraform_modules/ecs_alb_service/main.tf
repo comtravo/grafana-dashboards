@@ -5,6 +5,7 @@ variable "grafana_configuration" {
     environment               = string
     cloudwatch_data_source    = string
     elasticsearch_data_source = string
+    lucene_query              = string
     notifications             = list(string)
     folder                    = string
     cluster_name              = string
@@ -21,6 +22,7 @@ variable "enable" {
 
 locals {
   elasticsearch_data_source_args = var.grafana_configuration.elasticsearch_data_source == null ? [] : ["--es", var.grafana_configuration.elasticsearch_data_source]
+  lucene_query_args              = var.grafana_configuration.lucene_query == null ? [] : ["--lucene-query", var.grafana_configuration.elasticsearch_data_source]
   notification_args              = try(length(var.grafana_configuration.notifications), 0) > 0 ? flatten(["--notifications", var.grafana_configuration.notifications]) : []
 }
 
@@ -33,6 +35,7 @@ data "external" "dashboard" {
     local.notification_args,
     "--cw", var.grafana_configuration.cloudwatch_data_source,
     local.elasticsearch_data_source_args,
+    local.lucene_query_args,
     "ecs-alb-service",
     "--cluster-name", var.grafana_configuration.cluster_name,
     "--max", var.grafana_configuration.max,
