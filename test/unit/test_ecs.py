@@ -602,3 +602,32 @@ class TestECSDashboards:
         dashboard.should.be.a(Dashboard)
         dashboard.title.should.eql("ECS Service: {}".format(name))
         dashboard.panels.should.have.length_of(17)
+
+    def test_should_generate_ecs_alb_service_dashboard_without_logs_when_es_datasource_is_missing(
+        self,
+    ):
+        name = "service-1"
+        cluster_name = "cluster-1"
+        cloudwatch_data_source = "cwm"
+        notifications = ["foo", "bar", "baz"]
+        environment = "prod"
+        max = 1000
+        loadbalancer = "loadbalancer-1"
+        target_group = "target-group-1"
+        kibana_url = "http://kibana.example.com"
+
+        dashboard = generate_ecs_alb_service_dashboard(
+            name=name,
+            cluster_name=cluster_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
+            environment=environment,
+            loadbalancer=loadbalancer,
+            target_group=target_group,
+            kibana_url=kibana_url,
+            max=max,
+            elasticsearch_data_source=None,
+        )
+        dashboard.should.be.a(Dashboard)
+        dashboard.title.should.eql("ECS Service: {}".format(name))
+        dashboard.panels.should.have.length_of(14)
