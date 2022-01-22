@@ -20,17 +20,20 @@ down:
 init:
 	@pip3 install -r requirements.txt
 
-fmt-py:
+fix-py:
 	@black .
+	@isort .
 
-fmt-go:
+fix-go:
 	@terraform fmt -recursive
 	@find . -name '*.go' | xargs gofmt -w -s
 
-fmt: fmt-go fmt-py
+fix: fix-go fix-py
 
 lint-py:
 	@black --check .
+	@isort . --check --diff
+	@flake8 **/*.py
 
 lint-go:
 	@terraform fmt -check -recursive -diff=true

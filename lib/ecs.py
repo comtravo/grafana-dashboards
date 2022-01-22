@@ -2,7 +2,12 @@
   https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-metrics.html
 """
 
+from typing import List
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
+    OP_AND,
+    RTYPE_MAX,
     Alert,
     AlertCondition,
     Dashboard,
@@ -10,17 +15,18 @@ from grafanalib.core import (
     GreaterThan,
     GridPos,
     Logs,
-    OP_AND,
     RowPanel,
-    RTYPE_MAX,
-    single_y_axis,
     Stat,
     Target,
     Text,
     TimeRange,
     TimeSeries,
+    single_y_axis,
 )
+from grafanalib.elasticsearch import ElasticsearchTarget
+from grafanalib.formatunits import MEGA_BYTES, PERCENT_FORMAT
 
+from lib import colors
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
@@ -30,13 +36,6 @@ from lib.commons import (
     TIMEZONE,
     TRANSPARENT,
 )
-
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
-from grafanalib.elasticsearch import ElasticsearchTarget
-from grafanalib.formatunits import MEGA_BYTES, PERCENT_FORMAT
-from lib import colors
-
-from typing import List
 
 ECS_NAMESPACE = "AWS/ECS"
 CONTAINER_INSIGHTS_NAMESPACE = "ECS/ContainerInsights"
@@ -679,7 +678,7 @@ def generate_ecs_alb_service_dashboard(
     lucene_query: str,
     max: int,
     *args,
-    **kwargs
+    **kwargs,
 ):
     """Generate ECS Service dashboard"""
     tags = ["ecs", "ecs-service", "containers", "service", environment]

@@ -2,20 +2,9 @@
     https://docs.aws.amazon.com/firehose/latest/dev/monitoring-with-cloudwatch-metrics.html
 """
 
-from grafanalib.core import (
-    Dashboard,
-    Graph,
-    Repeat,
-    Row,
-    SHORT_FORMAT,
-    Template,
-    Templating,
-    single_y_axis,
-)
+from grafanalib.core import SHORT_FORMAT, Dashboard, Graph, Row, Template, single_y_axis
 from grafanalib.influxdb import InfluxDBTarget
 
-from lib.annotations import get_release_annotations
-from lib.templating import get_release_template
 from lib import colors
 from lib.commons import (
     EDITABLE,
@@ -59,21 +48,21 @@ def generate_firehose_graph(influxdb_data_source: str) -> Graph:
     targets = [
         InfluxDBTarget(
             alias=FIREHOSE_INCOMING_RECORDS_ALIAS,
-            query='SELECT sum("incoming_records_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(
+            query='SELECT sum("incoming_records_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(  # noqa: E501
                 RETENTION_POLICY, FIREHOSE_MEASUREMENT
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=FIREHOSE_DELIVERY_TO_S3_SUCCESS_ALIAS,
-            query='SELECT sum("delivery_to_s3._success_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(
+            query='SELECT sum("delivery_to_s3._success_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(  # noqa: E501
                 RETENTION_POLICY, FIREHOSE_MEASUREMENT
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=FIREHOSE_DELIVERY_TO_S3_ALIAS,
-            query='SELECT sum("delivery_to_s3._records_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(
+            query='SELECT sum("delivery_to_s3._records_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(  # noqa: E501
                 RETENTION_POLICY, FIREHOSE_MEASUREMENT
             ),
             rawQuery=RAW_QUERY,
@@ -115,14 +104,6 @@ def generate_firehose_dashboard(
     """Generate Firehose dashboard"""
     tags = ["firehose", environment]
 
-    templating = Templating(
-        [
-            get_firehose_template(data_source=influxdb_data_source),
-            get_release_template(data_source=influxdb_data_source),
-        ]
-    )
-
-    repeat = Repeat(direction="v", variable="$firehose")
     rows = [
         Row(
             panels=[generate_firehose_graph(influxdb_data_source=influxdb_data_source)],
@@ -135,8 +116,6 @@ def generate_firehose_dashboard(
     return Dashboard(
         title="Firehose",
         editable=EDITABLE,
-        annotations=get_release_annotations(data_source=influxdb_data_source),
-        templating=templating,
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,

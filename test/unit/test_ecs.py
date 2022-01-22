@@ -1,5 +1,9 @@
 from os import name
-from grafanalib.core import (
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.core import (  # OP_OR,; RowPanel,; single_y_axis,; Text,
+    OP_AND,
+    RTYPE_MAX,
     Alert,
     AlertCondition,
     Dashboard,
@@ -7,34 +11,26 @@ from grafanalib.core import (
     GreaterThan,
     GridPos,
     Logs,
-    OP_AND,
-    # OP_OR,
-    # RowPanel,
-    RTYPE_MAX,
-    # single_y_axis,
     Stat,
     Target,
-    # Text,
     TimeRange,
     TimeSeries,
 )
-
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.elasticsearch import ElasticsearchTarget
 
 from lib.ecs import (
-    generate_running_count_stats_panel,
-    generate_deployment_graph,
-    generate_running_count_graph,
-    generate_desired_count_graph,
-    generate_pending_count_graph,
     generate_cpu_utilization_graph,
+    generate_deployment_graph,
+    generate_desired_count_graph,
+    generate_ecs_alb_service_dashboard,
+    generate_error_logs_panel,
     generate_mem_utilization_graph,
     generate_mem_utilization_percentage_graph,
+    generate_pending_count_graph,
     generate_req_count_graph,
     generate_res_count_graph,
-    generate_error_logs_panel,
-    generate_ecs_alb_service_dashboard,
+    generate_running_count_graph,
+    generate_running_count_stats_panel,
 )
 
 

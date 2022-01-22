@@ -1,5 +1,6 @@
-from grafanalib.core import Alert, AlertCondition, Graph, Target
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.core import Alert, AlertCondition, Graph, Target
+
 from lib.sns import create_sns_graph
 
 

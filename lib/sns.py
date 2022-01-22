@@ -1,39 +1,22 @@
-from grafanalib.core import (
-    Alert,
-    AlertCondition,
-    Dashboard,
-    Graph,
-    GreaterThan,
-    LowerThan,
-    MILLISECONDS_FORMAT,
-    OP_OR,
-    RTYPE_MAX,
-    single_y_axis,
-    SHORT_FORMAT,
-    TimeRange,
-    Row,
-    Target,
-    YAxes,
-    YAxis,
-)
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
-
-from lib.annotations import get_release_annotations
-from lib.commons import (
-    ALERT_REF_ID,
-    ALERT_THRESHOLD,
-    EDITABLE,
-    RAW_QUERY,
-    RETENTION_POLICY,
-    SHARED_CROSSHAIR,
-    TIMEZONE,
-    TRANSPARENT,
-)
-from lib.templating import get_release_templating
-from lib import colors
+import re
 from typing import List
 
-import re
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.core import (
+    OP_OR,
+    RTYPE_MAX,
+    SHORT_FORMAT,
+    Alert,
+    AlertCondition,
+    Graph,
+    GreaterThan,
+    Target,
+    TimeRange,
+    single_y_axis,
+)
+
+from lib import colors
+from lib.commons import ALERT_REF_ID, ALERT_THRESHOLD, EDITABLE, TRANSPARENT
 
 NAMESPACE = "AWS/SNS"
 PERIOD = "5m"

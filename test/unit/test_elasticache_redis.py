@@ -1,26 +1,25 @@
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
-    Alert,
-    Graph,
-    Template,
-    Templating,
-    LowerThan,
     OP_OR,
     RTYPE_MAX,
+    Alert,
+    Graph,
+    LowerThan,
+    Template,
+    Templating,
 )
-
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.elasticache_redis import (
     generate_elasticache_redis_connections_graph,
-    generate_elasticache_redis_cpu_usage_graph,
     generate_elasticache_redis_cpu_credit_usage_graph,
-    generate_elasticache_redis_latency_graph,
+    generate_elasticache_redis_cpu_usage_graph,
+    generate_elasticache_redis_dashboard,
     generate_elasticache_redis_db_memory_usage_and_evicitons_graph,
-    generate_elasticache_redis_swap_and_memory_usage_graph,
+    generate_elasticache_redis_latency_graph,
     generate_elasticache_redis_network_in_graph,
     generate_elasticache_redis_network_out_graph,
     generate_elasticache_redis_replication_graph,
-    generate_elasticache_redis_dashboard,
+    generate_elasticache_redis_swap_and_memory_usage_graph,
 )
 
 
@@ -268,9 +267,6 @@ class TestElasticCacheRedisDashboard:
         )
 
         generated_dashboard.title.should.equal("ElastiCache Redis: foo")
-        generated_dashboard.templating.should.be.a(Templating)
-        generated_dashboard.templating.list.should.have.length_of(1)
-        generated_dashboard.templating.list[0].should.be.a(Template)
         generated_dashboard.tags.should.have.length_of(3)
         generated_dashboard.rows.should.have.length_of(3)
         generated_dashboard.links.should.have.length_of(1)

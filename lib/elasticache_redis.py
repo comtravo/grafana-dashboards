@@ -3,29 +3,28 @@
 """
 
 from typing import List
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
-    Alert,
-    AlertCondition,
-    Dashboard,
-    LowerThan,
-    Graph,
     MILLISECONDS_FORMAT,
     OP_OR,
     PERCENT_FORMAT,
-    Row,
     RTYPE_MAX,
     SHORT_FORMAT,
+    Alert,
+    AlertCondition,
+    Dashboard,
+    Graph,
+    LowerThan,
+    Row,
     Target,
     TimeRange,
-    single_y_axis,
     YAxes,
     YAxis,
+    single_y_axis,
 )
-from grafanalib.formatunits import MEGA_BYTES, BYTES
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.formatunits import BYTES
 
-from lib.annotations import get_release_annotations
-from lib.templating import get_release_templating
 from lib import colors
 from lib.commons import (
     ALERT_REF_ID,
@@ -42,7 +41,7 @@ NAMESPACE = "AWS/ElastiCache"
 DOCUMENTATION_LINK = {
     "targetBlank": True,
     "title": "Documentation",
-    "url": "https://aws.amazon.com/blogs/database/monitoring-best-practices-with-amazon-elasticache-for-redis-using-amazon-cloudwatch/",
+    "url": "https://aws.amazon.com/blogs/database/monitoring-best-practices-with-amazon-elasticache-for-redis-using-amazon-cloudwatch/",  # noqa: E501
 }
 
 
@@ -553,7 +552,7 @@ def generate_elasticache_redis_dashboard(
     environment: str,
     notifications: List[str],
     *args,
-    **kwargs
+    **kwargs,
 ):
     """Generate ElastiCache Redis dashboard"""
     tags = ["elasticache", "redis", environment]
@@ -616,8 +615,6 @@ def generate_elasticache_redis_dashboard(
     return Dashboard(
         title="ElastiCache Redis: {}".format(name),
         editable=EDITABLE,
-        annotations=get_release_annotations(influxdb_data_source),
-        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,

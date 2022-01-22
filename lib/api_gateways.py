@@ -1,21 +1,23 @@
+from typing import List
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
+    OP_AND,
+    RTYPE_MAX,
+    SHORT_FORMAT,
     Alert,
     AlertCondition,
     Dashboard,
     Graph,
     GreaterThan,
-    OP_AND,
-    RTYPE_MAX,
-    SHORT_FORMAT,
-    TimeRange,
     Row,
     Target,
+    TimeRange,
     YAxes,
     YAxis,
 )
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
-from lib.annotations import get_release_annotations
+from lib import colors
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
@@ -25,20 +27,13 @@ from lib.commons import (
     TIMEZONE,
     TRANSPARENT,
 )
-
-from lib.templating import get_release_templating
 from lib.lambdas import (
-    lambda_generate_invocations_graph,
     lambda_generate_duration_graph,
-    lambda_generate_memory_utilization_percentage_graph,
-    lambda_generate_memory_utilization_graph,
+    lambda_generate_invocations_graph,
     lambda_generate_logs_panel,
+    lambda_generate_memory_utilization_graph,
+    lambda_generate_memory_utilization_percentage_graph,
 )
-from lib import colors
-
-from typing import List
-
-import re
 
 # https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-metrics-and-dimensions.html
 API_GATEWAY_INVOCATION_METRIC_GROUP_BY = "1m"
@@ -145,7 +140,7 @@ def generate_api_gateways_dashboard(
     environment: str,
     lambdas: List[str],
     *args,
-    **kwargs
+    **kwargs,
 ):
     tags = ["api-gateway", environment]
 
@@ -161,9 +156,9 @@ def generate_api_gateways_dashboard(
     ]
 
     if lambdas:
-        for l in lambdas:
+        for lambda_fn in lambdas:
             lambda_metrics_row = Row(
-                title="{} Lambda Metrics".format(l),
+                title="{} Lambda Metrics".format(lambda_fn),
                 showTitle=True,
                 collapse=False,
                 panels=[
@@ -183,7 +178,7 @@ def generate_api_gateways_dashboard(
                 ],
             )
             lambda_logs_row = Row(
-                title="{} Lambda Logs".format(l),
+                title="{} Lambda Logs".format(lambda_fn),
                 showTitle=True,
                 collapse=True,
                 panels=[

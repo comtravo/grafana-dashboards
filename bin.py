@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 
+import argparse
+import base64
+import json
+
 from lib import DashboardEncoder
-from lib.lambdas import dispatcher as lambda_dispatcher
 from lib.api_gateways import generate_api_gateways_dashboard as apig_dispatcher
-from lib.step_functions import generate_sfn_dashboard as sfn_dispatcher
-from lib.firehose import generate_firehose_dashboard as firehose_dispatcher
+from lib.ecs import generate_ecs_alb_service_dashboard as ecs_alb_service_dispatcher
 from lib.elasticache_redis import (
     generate_elasticache_redis_dashboard as elasticache_redis_dispatcher,
 )
 from lib.elasticsearch import (
     generate_elasticsearch_dashboard as elasticsearch_dispatcher,
 )
+from lib.firehose import generate_firehose_dashboard as firehose_dispatcher
+from lib.lambdas import dispatcher as lambda_dispatcher
 from lib.rds import generate_rds_dashboard as rds_dispatcher
-from lib.ecs import generate_ecs_alb_service_dashboard as ecs_alb_service_dispatcher
-
-import argparse
-import base64
-import json
+from lib.step_functions import generate_sfn_dashboard as sfn_dispatcher
 
 
 def parse_options():  # pragma: no cover

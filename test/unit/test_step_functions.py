@@ -1,22 +1,22 @@
+import re
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
+    OP_OR,
     Alert,
     AlertCondition,
+    Annotations,
     Dashboard,
     Graph,
     Target,
-    Annotations,
     Templating,
-    OP_OR,
 )
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
 from lib.step_functions import (
-    generate_sfn_execution_metrics_graph,
-    generate_sfn_execution_duration_graph,
     generate_sfn_dashboard,
+    generate_sfn_execution_duration_graph,
+    generate_sfn_execution_metrics_graph,
 )
-
-import re
 
 
 class TestStepFunctionDashboards:

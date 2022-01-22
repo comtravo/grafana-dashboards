@@ -1,21 +1,24 @@
+from typing import List
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
+    MILLISECONDS_FORMAT,
+    OP_OR,
+    RTYPE_MAX,
+    SHORT_FORMAT,
     Alert,
     AlertCondition,
     Dashboard,
     Graph,
     GreaterThan,
-    MILLISECONDS_FORMAT,
-    OP_OR,
-    RTYPE_MAX,
-    SHORT_FORMAT,
-    TimeRange,
     Row,
     Target,
+    TimeRange,
     YAxes,
     YAxis,
 )
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
+from lib import colors
 from lib.commons import (
     ALERT_THRESHOLD,
     DEFAULT_REFRESH,
@@ -24,18 +27,13 @@ from lib.commons import (
     TIMEZONE,
     TRANSPARENT,
 )
-
-from lib.templating import get_release_templating
 from lib.lambdas import (
-    lambda_generate_invocations_graph,
     lambda_generate_duration_graph,
-    lambda_generate_memory_utilization_percentage_graph,
-    lambda_generate_memory_utilization_graph,
+    lambda_generate_invocations_graph,
     lambda_generate_logs_panel,
+    lambda_generate_memory_utilization_graph,
+    lambda_generate_memory_utilization_percentage_graph,
 )
-from lib import colors
-
-from typing import List
 
 # https://docs.aws.amazon.com/step-functions/latest/dg/procedure-cw-metrics.html
 
@@ -278,7 +276,7 @@ def generate_sfn_dashboard(
     environment: str,
     lambdas: List[str],
     *args,
-    **kwargs
+    **kwargs,
 ):
     """Create a dashboard for the step function"""
 
@@ -311,33 +309,33 @@ def generate_sfn_dashboard(
     if lambdas:
         tags = tags + ["lambda"]
 
-        for l in lambdas:
+        for lambda_fn in lambdas:
             lambda_metrics_row = Row(
-                title="{} Lambda Metrics".format(l),
+                title="{} Lambda Metrics".format(lambda_fn),
                 showTitle=True,
                 collapse=False,
                 panels=[
                     lambda_generate_invocations_graph(
-                        l, cloudwatch_data_source, notifications=[]
+                        lambda_fn, cloudwatch_data_source, notifications=[]
                     ),
-                    lambda_generate_duration_graph(l, cloudwatch_data_source),
+                    lambda_generate_duration_graph(lambda_fn, cloudwatch_data_source),
                     lambda_generate_memory_utilization_percentage_graph(
-                        l,
+                        lambda_fn,
                         cloudwatch_data_source,
                         lambda_insights_namespace,
                         notifications=notifications,
                     ),
                     lambda_generate_memory_utilization_graph(
-                        l, cloudwatch_data_source, lambda_insights_namespace
+                        lambda_fn, cloudwatch_data_source, lambda_insights_namespace
                     ),
                 ],
             )
             lambda_logs_row = Row(
-                title="{} Lambda Logs".format(l),
+                title="{} Lambda Logs".format(lambda_fn),
                 showTitle=True,
                 collapse=True,
                 panels=[
-                    lambda_generate_logs_panel(l, cloudwatch_data_source),
+                    lambda_generate_logs_panel(lambda_fn, cloudwatch_data_source),
                 ],
             )
 

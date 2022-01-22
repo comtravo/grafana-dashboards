@@ -1,10 +1,10 @@
-from lib.firehose import (
-    get_firehose_template,
-    generate_firehose_graph,
-    generate_firehose_dashboard,
-)
-
 from grafanalib.core import Dashboard, Graph, Template
+
+from lib.firehose import (
+    generate_firehose_dashboard,
+    generate_firehose_graph,
+    get_firehose_template,
+)
 
 
 class TestFirehose:

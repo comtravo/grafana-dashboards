@@ -1,20 +1,21 @@
+from grafanalib.cloudwatch import CloudwatchLogsInsightsTarget, CloudwatchMetricsTarget
 from grafanalib.core import Alert, AlertCondition, Dashboard, Graph, Panel, Target
-from grafanalib.cloudwatch import CloudwatchMetricsTarget, CloudwatchLogsInsightsTarget
+
 from lib.lambdas import (
-    dispatcher,
-    lambda_generate_duration_graph,
-    lambda_generate_invocations_graph,
-    lambda_generate_memory_utilization_percentage_graph,
-    lambda_generate_memory_utilization_graph,
-    lambda_generate_logs_panel,
-    lambda_cron_dashboard,
-    lambda_events_dashboard,
-    lambda_cognito_dashboard,
-    lambda_logs_dashboard,
     create_lambda_sqs_dlq_graph,
     create_lambda_sqs_graph,
-    lambda_sqs_dashboard,
+    dispatcher,
+    lambda_cognito_dashboard,
+    lambda_cron_dashboard,
+    lambda_events_dashboard,
+    lambda_generate_duration_graph,
+    lambda_generate_invocations_graph,
+    lambda_generate_logs_panel,
+    lambda_generate_memory_utilization_graph,
+    lambda_generate_memory_utilization_percentage_graph,
+    lambda_logs_dashboard,
     lambda_sns_sqs_dashboard,
+    lambda_sqs_dashboard,
 )
 
 

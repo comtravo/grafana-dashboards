@@ -3,29 +3,28 @@
 """
 
 from typing import List
+
+from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
+    OP_OR,
+    PERCENT_FORMAT,
+    RTYPE_MAX,
+    SHORT_FORMAT,
     Alert,
     AlertCondition,
     Dashboard,
-    LowerThan,
     Graph,
     GreaterThan,
-    OP_OR,
-    PERCENT_FORMAT,
+    LowerThan,
     Row,
-    RTYPE_MAX,
-    SHORT_FORMAT,
     Target,
     TimeRange,
-    single_y_axis,
     YAxes,
     YAxis,
+    single_y_axis,
 )
 from grafanalib.formatunits import MEGA_BYTES
-from grafanalib.cloudwatch import CloudwatchMetricsTarget
 
-from lib.annotations import get_release_annotations
-from lib.templating import get_release_templating
 from lib import colors
 from lib.commons import (
     ALERT_REF_ID,
@@ -42,7 +41,7 @@ NAMESPACE = "AWS/ES"
 DOCUMENTATION_LINK = {
     "targetBlank": True,
     "title": "Documentation",
-    "url": "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains-cloudwatchmetrics.html",
+    "url": "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains-cloudwatchmetrics.html",  # noqa: E501
 }
 
 
@@ -629,7 +628,7 @@ def generate_elasticsearch_dashboard(
     environment: str,
     notifications: List[str],
     *args,
-    **kwargs
+    **kwargs,
 ):
     """Generate Elasticsearch dashboard"""
     tags = ["elasticsearch", environment]
@@ -716,8 +715,6 @@ def generate_elasticsearch_dashboard(
     return Dashboard(
         title="Elasticsearch: {}".format(name),
         editable=EDITABLE,
-        annotations=get_release_annotations(influxdb_data_source),
-        templating=get_release_templating(influxdb_data_source),
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,

@@ -1,26 +1,17 @@
-from grafanalib.core import (
-    Alert,
-    Graph,
-    Template,
-    Templating,
-)
-
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
+from grafanalib.core import Alert, Graph, Template, Templating
 
-from lib.elasticsearch import (
+from lib.elasticsearch import (  # generate_elasticsearch_storage_alert_graph,; generate_elasticsearch_jvm_memory_pressure_alert_graph,; generate_elasticsearch_alerts_dashboard,
+    generate_elasticsearch_automated_snapshot_failure_alert_graph,
     generate_elasticsearch_cpu_graph,
-    generate_elasticsearch_jvm_memory_pressure_graph,
+    generate_elasticsearch_dashboard,
     generate_elasticsearch_documents_graph,
-    generate_elasticsearch_storage_graph,
+    generate_elasticsearch_jvm_memory_pressure_graph,
+    generate_elasticsearch_nodes_alert_graph,
     generate_elasticsearch_requests_graph,
     generate_elasticsearch_status_red_alert_graph,
-    generate_elasticsearch_nodes_alert_graph,
-    # generate_elasticsearch_storage_alert_graph,
+    generate_elasticsearch_storage_graph,
     generate_elasticsearch_writes_blocked_alert_graph,
-    generate_elasticsearch_automated_snapshot_failure_alert_graph,
-    # generate_elasticsearch_jvm_memory_pressure_alert_graph,
-    generate_elasticsearch_dashboard,
-    # generate_elasticsearch_alerts_dashboard,
 )
 
 
@@ -302,9 +293,6 @@ class TestElasticsearchDashboards:
             notifications=notifications,
         )
         generated_dashboard.title.should.equal("Elasticsearch: {}".format(name))
-        generated_dashboard.templating.should.be.a(Templating)
-        generated_dashboard.templating.list.should.have.length_of(1)
-        generated_dashboard.templating.list[0].should.be.a(Template)
         generated_dashboard.tags.should.have.length_of(2)
         generated_dashboard.rows.should.have.length_of(5)
         generated_dashboard.links.should.have.length_of(1)
