@@ -25,6 +25,7 @@ from lib.ecs import (
     generate_ecs_alb_service_dashboard,
     generate_error_logs_panel,
     generate_mem_utilization_graph,
+    generate_mem_utilization_percentage_graph,
     generate_pending_count_graph,
     generate_req_count_graph,
     generate_res_count_graph,
@@ -169,6 +170,25 @@ class TestECSDashboards:
             )
         )
 
+    def test_should_generate_running_count_without_alerts_graph_when_max_is_1(self):
+        name = "service-1"
+        cloudwatch_data_source = "prod"
+        cluster_name = "cluster-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+        max = 1
+        notifications = ["foo", "bar"]
+
+        panel = generate_running_count_graph(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            cluster_name=cluster_name,
+            grid_pos=grid_pos,
+            max=max,
+            notifications=notifications,
+        )
+
+        panel.alert.should.eql(None)
+
     def test_should_generate_desired_count_graph(self):
         name = "service-1"
         cloudwatch_data_source = "prod"
@@ -231,6 +251,25 @@ class TestECSDashboards:
             )
         )
 
+    def test_should_generate_desired_count_without_alerts_graph_when_desired_is_1(self):
+        name = "service-1"
+        cloudwatch_data_source = "prod"
+        cluster_name = "cluster-1"
+        grid_pos = GridPos(1, 2, 3, 4)
+        max = 1
+        notifications = ["foo", "bar"]
+
+        panel = generate_desired_count_graph(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            cluster_name=cluster_name,
+            grid_pos=grid_pos,
+            max=max,
+            notifications=notifications,
+        )
+
+        panel.alert.should.eql(None)
+
     def test_should_generate_pending_count_graph(self):
         name = "service-1"
         cloudwatch_data_source = "prod"
@@ -278,11 +317,12 @@ class TestECSDashboards:
         )
 
         panel.alert.should.be.a(Alert)
+        panel.alert.gracePeriod.should.eql("15m")
         panel.alert.alertConditions.should.have.length_of(1)
         panel.alert.alertConditions[0].should.eql(
             AlertCondition(
                 Target(refId="A"),
-                timeRange=TimeRange("15m", "now"),
+                timeRange=TimeRange("5m", "now"),
                 evaluator=GreaterThan(0),
                 reducerType=RTYPE_MAX,
                 operator=OP_AND,
@@ -336,16 +376,12 @@ class TestECSDashboards:
         cloudwatch_data_source = "prod"
         cluster_name = "cluster-1"
         grid_pos = GridPos(1, 2, 3, 4)
-        memory = 1024
-        notifications = []
 
         panel = generate_mem_utilization_graph(
             name=name,
             cloudwatch_data_source=cloudwatch_data_source,
             cluster_name=cluster_name,
             grid_pos=grid_pos,
-            memory=memory,
-            notifications=notifications,
         )
         panel.should.be.a(Graph)
         panel.title.should.eql("Memory Utilization")
@@ -353,28 +389,46 @@ class TestECSDashboards:
         panel.targets.should.have.length_of(4)
         panel.gridPos.should.eql(grid_pos)
 
-    def test_should_generate_mem_utilization_with_alerts_graph(self):
+    def test_should_generate_mem_utilization_percentage_graph(self):
         name = "service-1"
         cloudwatch_data_source = "prod"
         cluster_name = "cluster-1"
         grid_pos = GridPos(1, 2, 3, 4)
-        memory = 1024
+        notifications = []
+
+        panel = generate_mem_utilization_percentage_graph(
+            name=name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            cluster_name=cluster_name,
+            grid_pos=grid_pos,
+            notifications=notifications,
+        )
+        panel.should.be.a(Graph)
+        panel.title.should.eql("Memory Utilization Percentage")
+        panel.dataSource.should.eql(cloudwatch_data_source)
+        panel.targets.should.have.length_of(3)
+        panel.gridPos.should.eql(grid_pos)
+
+    def test_should_generate_mem_utilization_percentage_with_alerts_graph(self):
+        name = "service-1"
+        cloudwatch_data_source = "prod"
+        cluster_name = "cluster-1"
+        grid_pos = GridPos(1, 2, 3, 4)
         notifications = ["foo", "bar", "baz"]
 
         expected_alert_condition = AlertCondition(
             Target(refId="A"),
             timeRange=TimeRange("15m", "now"),
-            evaluator=GreaterThan(memory),
+            evaluator=GreaterThan(85),
             reducerType=RTYPE_MAX,
             operator=OP_AND,
         )
 
-        panel = generate_mem_utilization_graph(
+        panel = generate_mem_utilization_percentage_graph(
             name=name,
             cloudwatch_data_source=cloudwatch_data_source,
             cluster_name=cluster_name,
             grid_pos=grid_pos,
-            memory=memory,
             notifications=notifications,
         )
 
@@ -502,9 +556,10 @@ class TestECSDashboards:
         name = "service-1"
         grid_pos = GridPos(1, 2, 3, 4)
         elasticsearch_data_source = "es"
+        es_query = 'tag: "booking-api" AND log.level: [50 TO *]'
 
         panel = generate_error_logs_panel(
-            name=name,
+            lucene_query=es_query,
             grid_pos=grid_pos,
             elasticsearch_data_source=elasticsearch_data_source,
         )
@@ -513,18 +568,16 @@ class TestECSDashboards:
         panel.gridPos.should.eql(grid_pos)
         panel.dataSource.should.eql(elasticsearch_data_source)
         panel.targets.should.have.length_of(1)
-        panel.targets[0].query.should.eql(
-            'tag: "{}" AND log.level: [50 TO *] AND NOT log.msg: ""'.format(name)
-        )
+        panel.targets[0].query.should.eql(es_query)
 
     def test_should_generate_ecs_alb_service_dashboard(self):
         name = "service-1"
         cluster_name = "cluster-1"
         cloudwatch_data_source = "cwm"
         elasticsearch_data_source = "es"
+        es_query = 'tag: "booking-api" AND log.level: [50 TO *]'
         notifications = ["foo", "bar", "baz"]
         environment = "prod"
-        memory = 512
         max = 1000
         loadbalancer = "loadbalancer-1"
         target_group = "target-group-1"
@@ -536,13 +589,73 @@ class TestECSDashboards:
             cloudwatch_data_source=cloudwatch_data_source,
             notifications=notifications,
             environment=environment,
-            memory=memory,
             loadbalancer=loadbalancer,
             target_group=target_group,
             kibana_url=kibana_url,
             max=max,
             elasticsearch_data_source=elasticsearch_data_source,
+            lucene_query=es_query,
         )
         dashboard.should.be.a(Dashboard)
         dashboard.title.should.eql("ECS Service: {}".format(name))
-        dashboard.panels.should.have.length_of(16)
+        dashboard.panels.should.have.length_of(17)
+
+    def test_should_generate_ecs_alb_service_dashboard_without_logs_when_es_datasource_is_missing(
+        self,
+    ):
+        name = "service-1"
+        cluster_name = "cluster-1"
+        cloudwatch_data_source = "cwm"
+        notifications = ["foo", "bar", "baz"]
+        environment = "prod"
+        max = 1000
+        loadbalancer = "loadbalancer-1"
+        target_group = "target-group-1"
+        kibana_url = "http://kibana.example.com"
+
+        dashboard = generate_ecs_alb_service_dashboard(
+            name=name,
+            cluster_name=cluster_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
+            environment=environment,
+            loadbalancer=loadbalancer,
+            target_group=target_group,
+            kibana_url=kibana_url,
+            max=max,
+            elasticsearch_data_source=None,
+            lucene_query=None,
+        )
+        dashboard.should.be.a(Dashboard)
+        dashboard.title.should.eql("ECS Service: {}".format(name))
+        dashboard.panels.should.have.length_of(14)
+
+    def test_should_generate_ecs_alb_service_dashboard_without_logs_when_es_query_is_missing(
+        self,
+    ):
+        name = "service-1"
+        cluster_name = "cluster-1"
+        cloudwatch_data_source = "cwm"
+        notifications = ["foo", "bar", "baz"]
+        environment = "prod"
+        max = 1000
+        loadbalancer = "loadbalancer-1"
+        target_group = "target-group-1"
+        kibana_url = "http://kibana.example.com"
+
+        dashboard = generate_ecs_alb_service_dashboard(
+            name=name,
+            cluster_name=cluster_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            notifications=notifications,
+            environment=environment,
+            loadbalancer=loadbalancer,
+            target_group=target_group,
+            kibana_url=kibana_url,
+            max=max,
+            elasticsearch_data_source="foo",
+            lucene_query=None,
+        )
+        dashboard.should.be.a(Dashboard)
+        dashboard.title.should.eql("ECS Service: {}".format(name))
+        dashboard.panels.should.have.length_of(14)

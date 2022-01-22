@@ -10,7 +10,6 @@ from grafanalib.core import (
     RTYPE_MAX,
     Alert,
     AlertCondition,
-    AlertList,
     Dashboard,
     Graph,
     GreaterThan,
@@ -31,6 +30,7 @@ from lib import colors
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
+    DEFAULT_REFRESH,
     EDITABLE,
     SHARED_CROSSHAIR,
     TIMEZONE,
@@ -92,17 +92,6 @@ def generate_running_count_stats_panel(
         thresholds=[{"color": "blue"}],
         gridPos=grid_pos,
     )
-
-
-# def generate_alert_list_panel(name: str, grid_pos: GridPos):
-#     return AlertList(
-#         title="Alerts: {}".format(name),
-#         gridPos=grid_pos,
-#         description="Alerts for service {}".format(name),
-#         transparent=TRANSPARENT,
-#         onlyAlertsOnDashboard=True,
-#         show=True
-#     )
 
 
 def generate_cpu_utilization_graph(
@@ -168,8 +157,6 @@ def generate_mem_utilization_graph(
     name: str,
     cloudwatch_data_source: str,
     cluster_name: str,
-    memory: str,
-    notifications: List[str],
     grid_pos: GridPos,
 ) -> Graph:
     """
@@ -221,6 +208,68 @@ def generate_mem_utilization_graph(
         },
     ]
 
+    return Graph(
+        title="Memory Utilization",
+        dataSource=cloudwatch_data_source,
+        targets=targets,
+        yAxes=y_axes,
+        seriesOverrides=seriesOverrides,
+        transparent=TRANSPARENT,
+        editable=EDITABLE,
+        gridPos=grid_pos,
+        alertThreshold=ALERT_THRESHOLD,
+    ).auto_ref_ids()
+
+
+def generate_mem_utilization_percentage_graph(
+    name: str,
+    cloudwatch_data_source: str,
+    cluster_name: str,
+    notifications: List[str],
+    grid_pos: GridPos,
+) -> Graph:
+    """
+    Generate Mem Percentage graph
+    """
+
+    y_axes = single_y_axis(format=PERCENT_FORMAT)
+
+    targets = [
+        CloudwatchMetricsTarget(
+            alias=MINIMUM_ALIAS,
+            namespace=ECS_NAMESPACE,
+            statistics=["Minimum"],
+            metricName="MemoryUtilization",
+            dimensions={"ServiceName": name, "ClusterName": cluster_name},
+        ),
+        CloudwatchMetricsTarget(
+            alias=AVERAGE_ALIAS,
+            namespace=ECS_NAMESPACE,
+            statistics=["Average"],
+            metricName="MemoryUtilization",
+            dimensions={"ServiceName": name, "ClusterName": cluster_name},
+            refId=ALERT_REF_ID,
+        ),
+        CloudwatchMetricsTarget(
+            alias=MAXIMUM_ALIAS,
+            namespace=ECS_NAMESPACE,
+            statistics=["Maximum"],
+            metricName="MemoryUtilization",
+            dimensions={"ServiceName": name, "ClusterName": cluster_name},
+        ),
+    ]
+
+    seriesOverrides = [
+        {"alias": MINIMUM_ALIAS, "color": colors.GREEN, "lines": False},
+        {"alias": AVERAGE_ALIAS, "color": colors.YELLOW, "fill": 0},
+        {
+            "alias": MAXIMUM_ALIAS,
+            "color": colors.GREEN,
+            "fillBelowTo": MINIMUM_ALIAS,
+            "lines": False,
+        },
+    ]
+
     alert = None
     if notifications:
         alert = Alert(
@@ -231,7 +280,7 @@ def generate_mem_utilization_graph(
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
                     timeRange=TimeRange("15m", "now"),
-                    evaluator=GreaterThan(memory),
+                    evaluator=GreaterThan(85),
                     reducerType=RTYPE_MAX,
                     operator=OP_AND,
                 )
@@ -241,7 +290,7 @@ def generate_mem_utilization_graph(
         )
 
     return Graph(
-        title="Memory Utilization",
+        title="Memory Utilization Percentage",
         dataSource=cloudwatch_data_source,
         targets=targets,
         yAxes=y_axes,
@@ -264,8 +313,8 @@ def generate_req_count_graph(
     Generate req graph
     """
 
-    request_count_alias = "RequestCount"
-    request_count_per_target_alias = "RequestCountPerTarget"
+    request_count_alias = "RequestCount Per Service"
+    request_count_per_target_alias = "RequestCount Per Container"
 
     targets = [
         CloudwatchMetricsTarget(
@@ -419,25 +468,15 @@ def generate_deployment_graph(
     )
 
 
-def get_elasticsearch_query(name: str) -> str:
-    """
-    Get elasticsearch query
-    """
-
-    return 'tag: "{}" AND log.level: [50 TO *] AND NOT log.msg: ""'.format(name)
-
-
-def generate_helpful_resources_panel(name: str, grid_pos: GridPos, kibana_url: str) -> Text:
+def generate_helpful_resources_panel(lucene_query: str, grid_pos: GridPos) -> Text:
 
     content = """
 # Helpful resources
 
 ## Elasticsearch
-
-<a href="{}" target="_blank">Kibana URL</a>\n
 Elasticsearch query to find all error logs: `{}`
     """.format(
-        kibana_url, get_elasticsearch_query(name)
+        lucene_query
     )
     return Text(
         title="Helpful resources",
@@ -448,13 +487,15 @@ Elasticsearch query to find all error logs: `{}`
     )
 
 
-def generate_error_logs_panel(name: str, elasticsearch_data_source: str, grid_pos: GridPos) -> Logs:
+def generate_error_logs_panel(
+    elasticsearch_data_source: str, lucene_query, grid_pos: GridPos
+) -> Logs:
     """
     Generate Logs panel
     """
     targets = [
         ElasticsearchTarget(
-            query=get_elasticsearch_query(name),
+            query=lucene_query,
             metricAggs=[{"id": "1", "settings": {"limit": "10000"}, "type": "logs"}],
         ),
     ]
@@ -492,7 +533,7 @@ def generate_running_count_graph(
     ]
 
     alert = None
-    if notifications:
+    if notifications and max > 1:
         alert = Alert(
             name="{} Running count of containers nearing the max".format(name),
             message="{} is having Running count of containers nearing the max".format(name),
@@ -542,7 +583,7 @@ def generate_desired_count_graph(
     ]
 
     alert = None
-    if notifications:
+    if notifications and max > 1:
         alert = Alert(
             name="{} Desired count of containers nearing the max".format(name),
             message="{} is having Desired count of containers nearing the max".format(name),
@@ -599,13 +640,13 @@ def generate_pending_count_graph(
             alertConditions=[
                 AlertCondition(
                     Target(refId=ALERT_REF_ID),
-                    timeRange=TimeRange("15m", "now"),
+                    timeRange=TimeRange("5m", "now"),
                     evaluator=GreaterThan(0),
                     reducerType=RTYPE_MAX,
                     operator=OP_AND,
                 )
             ],
-            gracePeriod="1m",
+            gracePeriod="15m",
             notifications=notifications,
         )
 
@@ -627,11 +668,10 @@ def generate_ecs_alb_service_dashboard(
     cloudwatch_data_source: str,
     notifications: List[str],
     environment: str,
-    memory: int,
     loadbalancer: str,
     target_group: str,
     elasticsearch_data_source: str,
-    kibana_url: str,
+    lucene_query: str,
     max: int,
     *args,
     **kwargs,
@@ -656,10 +696,6 @@ def generate_ecs_alb_service_dashboard(
             cloudwatch_data_source=cloudwatch_data_source,
             grid_pos=GridPos(8, 12, 12, 1),
         ),
-        # generate_alert_list_panel(
-        #     name=name,
-        #     grid_pos=GridPos(8, 8, 16, 1),
-        # ),
         RowPanel(title="Capacity", gridPos=GridPos(1, 24, 0, 9)),
         generate_running_count_graph(
             name=name,
@@ -689,15 +725,20 @@ def generate_ecs_alb_service_dashboard(
             name=name,
             cluster_name=cluster_name,
             cloudwatch_data_source=cloudwatch_data_source,
-            grid_pos=GridPos(8, 12, 0, 19),
+            grid_pos=GridPos(8, 8, 0, 19),
         ),
         generate_mem_utilization_graph(
             name=name,
             cluster_name=cluster_name,
             cloudwatch_data_source=cloudwatch_data_source,
-            grid_pos=GridPos(8, 12, 12, 19),
+            grid_pos=GridPos(8, 8, 8, 19),
+        ),
+        generate_mem_utilization_percentage_graph(
+            name=name,
+            cluster_name=cluster_name,
+            cloudwatch_data_source=cloudwatch_data_source,
+            grid_pos=GridPos(8, 8, 16, 19),
             notifications=notifications,
-            memory=memory,
         ),
         RowPanel(title="Requests and Responses", gridPos=GridPos(1, 24, 0, 27)),
         generate_req_count_graph(
@@ -714,16 +755,21 @@ def generate_ecs_alb_service_dashboard(
             grid_pos=GridPos(8, 12, 12, 28),
             notifications=notifications,
         ),
-        RowPanel(title="Logs", gridPos=GridPos(1, 24, 0, 36)),
-        generate_helpful_resources_panel(
-            name=name, grid_pos=GridPos(8, 24, 0, 37), kibana_url=kibana_url
-        ),
-        generate_error_logs_panel(
-            name=name,
-            grid_pos=GridPos(24, 24, 0, 45),
-            elasticsearch_data_source=elasticsearch_data_source,
-        ),
     ]
+
+    if elasticsearch_data_source and lucene_query:
+        panels += [
+            RowPanel(title="Logs", gridPos=GridPos(1, 24, 0, 36)),
+            generate_helpful_resources_panel(
+                lucene_query=lucene_query, grid_pos=GridPos(8, 24, 0, 37)
+            ),
+            generate_error_logs_panel(
+                grid_pos=GridPos(24, 24, 0, 45),
+                elasticsearch_data_source=elasticsearch_data_source,
+                lucene_query=lucene_query,
+            ),
+        ]
+
     return Dashboard(
         title="{} {}".format("ECS Service:", name),
         editable=EDITABLE,
@@ -731,4 +777,5 @@ def generate_ecs_alb_service_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         panels=panels,
+        refresh=DEFAULT_REFRESH,
     ).auto_panel_ids()

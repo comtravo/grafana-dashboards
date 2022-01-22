@@ -26,7 +26,14 @@ from grafanalib.core import (
 from grafanalib.formatunits import BYTES
 
 from lib import colors
-from lib.commons import ALERT_REF_ID, EDITABLE, SHARED_CROSSHAIR, TIMEZONE, TRANSPARENT
+from lib.commons import (
+    ALERT_REF_ID,
+    DEFAULT_REFRESH,
+    EDITABLE,
+    SHARED_CROSSHAIR,
+    TIMEZONE,
+    TRANSPARENT,
+)
 
 ELASTICACHE_MEASUREMENT = "cloudwatch_aws_elasticache"
 NAMESPACE = "AWS/ElastiCache"
@@ -613,4 +620,5 @@ def generate_elasticache_redis_dashboard(
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=rows,
         links=[DOCUMENTATION_LINK],
+        refresh=DEFAULT_REFRESH,
     ).auto_panel_ids()

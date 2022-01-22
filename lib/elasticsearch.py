@@ -16,11 +16,8 @@ from grafanalib.core import (
     Graph,
     GreaterThan,
     LowerThan,
-    Repeat,
     Row,
     Target,
-    Template,
-    Templating,
     TimeRange,
     YAxes,
     YAxis,
@@ -29,7 +26,14 @@ from grafanalib.core import (
 from grafanalib.formatunits import MEGA_BYTES
 
 from lib import colors
-from lib.commons import ALERT_REF_ID, EDITABLE, SHARED_CROSSHAIR, TIMEZONE, TRANSPARENT
+from lib.commons import (
+    ALERT_REF_ID,
+    DEFAULT_REFRESH,
+    EDITABLE,
+    SHARED_CROSSHAIR,
+    TIMEZONE,
+    TRANSPARENT,
+)
 
 ES_MEASUREMENT = "cloudwatch_aws_es"
 NAMESPACE = "AWS/ES"
@@ -716,4 +720,5 @@ def generate_elasticsearch_dashboard(
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=rows,
         links=[DOCUMENTATION_LINK],
+        refresh=DEFAULT_REFRESH,
     ).auto_panel_ids()

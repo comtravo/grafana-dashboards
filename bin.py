@@ -38,7 +38,7 @@ def parse_options():  # pragma: no cover
     parser.add_argument(
         "--es", type=str, help="ES datasource name", dest="elasticsearch_data_source"
     )
-    parser.add_argument("--kibana", type=str, help="Kibana URL", dest="kibana_url")
+    parser.add_argument("--lucene-query", type=str, help="ES datasource name", dest="lucene_query")
     parser.add_argument(
         "--lambda_insights_namespace",
         type=str,
@@ -97,9 +97,6 @@ def parse_options():  # pragma: no cover
     )
     ecs_alb_service.add_argument(
         "--max", type=int, help="Maximum number of containers", required=True
-    )
-    ecs_alb_service.add_argument(
-        "--memory", type=int, help="Memory or MemoryReservation in MB", required=True
     )
 
     es = subparsers.add_parser("elasticsearch", help="Create dashboard for AWS ES")

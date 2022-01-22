@@ -22,6 +22,7 @@ from lib import colors
 from lib.commons import (
     ALERT_REF_ID,
     ALERT_THRESHOLD,
+    DEFAULT_REFRESH,
     EDITABLE,
     SHARED_CROSSHAIR,
     TIMEZONE,
@@ -158,7 +159,7 @@ def generate_api_gateways_dashboard(
             lambda_metrics_row = Row(
                 title="{} Lambda Metrics".format(l),
                 showTitle=True,
-                collapse=True,
+                collapse=False,
                 panels=[
                     lambda_generate_invocations_graph(
                         name, cloudwatch_data_source, notifications=[]
@@ -193,5 +194,6 @@ def generate_api_gateways_dashboard(
         tags=tags,
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
+        refresh=DEFAULT_REFRESH,
         rows=rows,
     ).auto_panel_ids()

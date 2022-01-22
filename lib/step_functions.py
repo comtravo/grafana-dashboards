@@ -21,6 +21,7 @@ from grafanalib.core import (
 from lib import colors
 from lib.commons import (
     ALERT_THRESHOLD,
+    DEFAULT_REFRESH,
     EDITABLE,
     SHARED_CROSSHAIR,
     TIMEZONE,
@@ -310,7 +311,7 @@ def generate_sfn_dashboard(
             lambda_metrics_row = Row(
                 title="{} Lambda Metrics".format(l),
                 showTitle=True,
-                collapse=True,
+                collapse=False,
                 panels=[
                     lambda_generate_invocations_graph(l, cloudwatch_data_source, notifications=[]),
                     lambda_generate_duration_graph(l, cloudwatch_data_source),
@@ -344,4 +345,5 @@ def generate_sfn_dashboard(
         timezone=TIMEZONE,
         sharedCrosshair=SHARED_CROSSHAIR,
         rows=rows,
+        refresh=DEFAULT_REFRESH,
     ).auto_panel_ids()
