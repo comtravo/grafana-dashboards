@@ -3,21 +3,15 @@ from typing import List
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
 from grafanalib.core import (
-    MILLISECONDS_FORMAT,
     OP_OR,
     RTYPE_MAX,
     SHORT_FORMAT,
     Alert,
     AlertCondition,
-    Dashboard,
     Graph,
     GreaterThan,
-    LowerThan,
-    Row,
     Target,
     TimeRange,
-    YAxes,
-    YAxis,
     single_y_axis,
 )
 
@@ -86,7 +80,9 @@ def create_sns_graph(name: str, cloudwatch_data_source: str, notifications: List
     if notifications:
         alert = Alert(
             name="{} alerts".format(name),
-            message="{} seems to have no subscriptions or failed deliveries".format(name),
+            message="{} seems to have no subscriptions or failed deliveries".format(
+                name
+            ),
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(

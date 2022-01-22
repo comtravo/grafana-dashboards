@@ -41,7 +41,7 @@ NAMESPACE = "AWS/ES"
 DOCUMENTATION_LINK = {
     "targetBlank": True,
     "title": "Documentation",
-    "url": "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains-cloudwatchmetrics.html",
+    "url": "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains-cloudwatchmetrics.html",  # noqa: E501
 }
 
 

@@ -74,7 +74,7 @@ def lambda_generate_logs_panel(name: str, cloudwatch_data_source: str) -> Logs:
     """
     targets = [
         CloudwatchLogsInsightsTarget(
-            expression="fields @timestamp, @message | filter @message like /^(?!.*(START|END|REPORT|LOGS|EXTENSION)).*$/ | sort @timestamp desc",
+            expression="fields @timestamp, @message | filter @message like /^(?!.*(START|END|REPORT|LOGS|EXTENSION)).*$/ | sort @timestamp desc",  # noqa: E501
             logGroupNames=["/aws/lambda/{}".format(name)],
         ),
     ]
@@ -178,7 +178,11 @@ def lambda_generate_memory_utilization_percentage_graph(
 
 
 def lambda_generate_memory_utilization_graph(
-    name: str, cloudwatch_data_source: str, lambda_insights_namespace: str, *args, **kwargs
+    name: str,
+    cloudwatch_data_source: str,
+    lambda_insights_namespace: str,
+    *args,
+    **kwargs,
 ) -> Graph:
     """
     Generate lambda graph
@@ -629,7 +633,7 @@ def lambda_sns_sqs_dashboard(
     *args,
     **kwargs,
 ):
-    """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""
+    """Create a dashboard with Lambda, the SNS topics it is invoked from and its SQS dead letter queue"""  # noqa: E501
     tags = ["lambda", "sqs", environment, "sns"]
 
     if fifo:

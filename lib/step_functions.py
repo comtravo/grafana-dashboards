@@ -206,7 +206,9 @@ def generate_sfn_execution_metrics_graph(
     ).auto_ref_ids()
 
 
-def generate_sfn_execution_duration_graph(name: str, cloudwatch_data_source: str, *args, **kwargs):
+def generate_sfn_execution_duration_graph(
+    name: str, cloudwatch_data_source: str, *args, **kwargs
+):
     """
     Generate step function graph
     """
@@ -307,31 +309,33 @@ def generate_sfn_dashboard(
     if lambdas:
         tags = tags + ["lambda"]
 
-        for l in lambdas:
+        for lambda_fn in lambdas:
             lambda_metrics_row = Row(
-                title="{} Lambda Metrics".format(l),
+                title="{} Lambda Metrics".format(lambda_fn),
                 showTitle=True,
                 collapse=False,
                 panels=[
-                    lambda_generate_invocations_graph(l, cloudwatch_data_source, notifications=[]),
-                    lambda_generate_duration_graph(l, cloudwatch_data_source),
+                    lambda_generate_invocations_graph(
+                        lambda_fn, cloudwatch_data_source, notifications=[]
+                    ),
+                    lambda_generate_duration_graph(lambda_fn, cloudwatch_data_source),
                     lambda_generate_memory_utilization_percentage_graph(
-                        l,
+                        lambda_fn,
                         cloudwatch_data_source,
                         lambda_insights_namespace,
                         notifications=notifications,
                     ),
                     lambda_generate_memory_utilization_graph(
-                        l, cloudwatch_data_source, lambda_insights_namespace
+                        lambda_fn, cloudwatch_data_source, lambda_insights_namespace
                     ),
                 ],
             )
             lambda_logs_row = Row(
-                title="{} Lambda Logs".format(l),
+                title="{} Lambda Logs".format(lambda_fn),
                 showTitle=True,
                 collapse=True,
                 panels=[
-                    lambda_generate_logs_panel(l, cloudwatch_data_source),
+                    lambda_generate_logs_panel(lambda_fn, cloudwatch_data_source),
                 ],
             )
 

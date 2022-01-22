@@ -257,7 +257,9 @@ class TestElasticsearchDashboards:
             notifications=notifications,
         )
         generated_graph.should.be.a(Graph)
-        generated_graph.title.should.match(r"Elasticsearch automated snapshot failure alerts")
+        generated_graph.title.should.match(
+            r"Elasticsearch automated snapshot failure alerts"
+        )
         generated_graph.dataSource.should.match(cloudwatch_data_source)
         generated_graph.targets.should.have.length_of(1)
         generated_graph.targets[0].should.be.a(CloudwatchMetricsTarget)

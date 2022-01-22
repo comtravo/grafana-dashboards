@@ -38,7 +38,9 @@ from lib.commons import (
 NAMESPACE = "AWS/RDS"
 
 
-def generate_rds_cpu_graph(name: str, cloudwatch_data_source: str, notifications: List[str]):
+def generate_rds_cpu_graph(
+    name: str, cloudwatch_data_source: str, notifications: List[str]
+):
     """
     Generate rds graph
     """

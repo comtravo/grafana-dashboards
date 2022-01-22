@@ -27,18 +27,24 @@ def parse_options():  # pragma: no cover
         description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument("--name", type=str, required=True, help="Name")
-    parser.add_argument("--environment", type=str, required=True, help="Environment name")
+    parser.add_argument(
+        "--environment", type=str, required=True, help="Environment name"
+    )
     parser.add_argument(
         "--cw",
         type=str,
         help="Cloudwatch datasource name",
         dest="cloudwatch_data_source",
     )
-    parser.add_argument("--influxdb_data_source", type=str, help="influxDB datasource name")
+    parser.add_argument(
+        "--influxdb_data_source", type=str, help="influxDB datasource name"
+    )
     parser.add_argument(
         "--es", type=str, help="ES datasource name", dest="elasticsearch_data_source"
     )
-    parser.add_argument("--lucene-query", type=str, help="ES datasource name", dest="lucene_query")
+    parser.add_argument(
+        "--lucene-query", type=str, help="ES datasource name", dest="lucene_query"
+    )
     parser.add_argument(
         "--lambda_insights_namespace",
         type=str,
@@ -50,8 +56,12 @@ def parse_options():  # pragma: no cover
     subparsers = parser.add_subparsers(dest="service")
     subparsers.required = True
 
-    apig = subparsers.add_parser("api-gateway", help="Create dashboard for API gateways")
-    apig.add_argument("--lambdas", nargs="+", help="List of Lambda names or arns", default=[])
+    apig = subparsers.add_parser(
+        "api-gateway", help="Create dashboard for API gateways"
+    )
+    apig.add_argument(
+        "--lambdas", nargs="+", help="List of Lambda names or arns", default=[]
+    )
 
     rds = subparsers.add_parser("rds", help="Create dashboard for RDS")
     rds.add_argument(
@@ -102,14 +112,22 @@ def parse_options():  # pragma: no cover
     es = subparsers.add_parser("elasticsearch", help="Create dashboard for AWS ES")
     es.add_argument("--client_id", type=str, help="Client id", required=True)
 
-    sfn = subparsers.add_parser("step-function", help="Create dashboard for Step function")
-    sfn.add_argument("--lambdas", nargs="+", help="List of Lambda names or arns", default=[])
+    sfn = subparsers.add_parser(
+        "step-function", help="Create dashboard for Step function"
+    )
+    sfn.add_argument(
+        "--lambdas", nargs="+", help="List of Lambda names or arns", default=[]
+    )
 
-    lambda_function = subparsers.add_parser("lambda", help="Create dashboard for lambdas")
+    lambda_function = subparsers.add_parser(
+        "lambda", help="Create dashboard for lambdas"
+    )
     lambda_function_sub_parser = lambda_function.add_subparsers(dest="trigger")
     lambda_function_sub_parser.required = True
 
-    lambda_function_sub_parser.add_parser("cognito-idp", help="Lambda is triggered by Cognito")
+    lambda_function_sub_parser.add_parser(
+        "cognito-idp", help="Lambda is triggered by Cognito"
+    )
     lambda_function_sub_parser.add_parser(
         "cloudwatch-event-schedule", help="Lambda is triggered by Cron"
     )
@@ -119,7 +137,9 @@ def parse_options():  # pragma: no cover
     lambda_function_sub_parser.add_parser(
         "cloudwatch-logs", help="Lambda is triggered by Cloudwatch logs"
     )
-    lambda_function_sub_parser.add_parser("null", help="Lambda is triggered by external forces")
+    lambda_function_sub_parser.add_parser(
+        "null", help="Lambda is triggered by external forces"
+    )
 
     lambda_sns_triggers = lambda_function_sub_parser.add_parser(
         "sns", help="Lambda is triggered by SNS"
@@ -127,8 +147,12 @@ def parse_options():  # pragma: no cover
     lambda_sns_triggers.add_argument(
         "--topics", nargs="+", help="List of SNS topics", required=True
     )
-    lambda_sns_triggers.add_argument("--fifo", action="store_true", help="Are the SQS queues FIFO")
-    sqs = lambda_function_sub_parser.add_parser("sqs", help="Lambda is triggered by SQS")
+    lambda_sns_triggers.add_argument(
+        "--fifo", action="store_true", help="Are the SQS queues FIFO"
+    )
+    sqs = lambda_function_sub_parser.add_parser(
+        "sqs", help="Lambda is triggered by SQS"
+    )
     sqs.add_argument("--fifo", action="store_true", help="Are the SQS queues FIFO")
     return parser.parse_args()
 
@@ -136,7 +160,9 @@ def parse_options():  # pragma: no cover
 def apply_options(args):
     """Apply options"""
     if args.notifications:
-        args.notifications = [{"uid": notification} for notification in args.notifications]
+        args.notifications = [
+            {"uid": notification} for notification in args.notifications
+        ]
 
     return args
 

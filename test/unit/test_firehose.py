@@ -24,7 +24,9 @@ class TestFirehose:
 
     def test_should_generate_firehose_template(self):
         influxdb_data_source = "prod"
-        generated_graph = generate_firehose_graph(influxdb_data_source=influxdb_data_source)
+        generated_graph = generate_firehose_graph(
+            influxdb_data_source=influxdb_data_source
+        )
 
         generated_graph.should.be.a(Graph)
         generated_graph.title.should.match(r"Firehose:")

@@ -48,21 +48,21 @@ def generate_firehose_graph(influxdb_data_source: str) -> Graph:
     targets = [
         InfluxDBTarget(
             alias=FIREHOSE_INCOMING_RECORDS_ALIAS,
-            query='SELECT sum("incoming_records_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(
+            query='SELECT sum("incoming_records_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(  # noqa: E501
                 RETENTION_POLICY, FIREHOSE_MEASUREMENT
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=FIREHOSE_DELIVERY_TO_S3_SUCCESS_ALIAS,
-            query='SELECT sum("delivery_to_s3._success_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(
+            query='SELECT sum("delivery_to_s3._success_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(  # noqa: E501
                 RETENTION_POLICY, FIREHOSE_MEASUREMENT
             ),
             rawQuery=RAW_QUERY,
         ),
         InfluxDBTarget(
             alias=FIREHOSE_DELIVERY_TO_S3_ALIAS,
-            query='SELECT sum("delivery_to_s3._records_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(
+            query='SELECT sum("delivery_to_s3._records_sum") FROM "{}"."{}" WHERE ("delivery_stream_name" =~ /^$firehose$/) AND $timeFilter GROUP BY time(5m), "delivery_stream_name" fill(0)'.format(  # noqa: E501
                 RETENTION_POLICY, FIREHOSE_MEASUREMENT
             ),
             rawQuery=RAW_QUERY,

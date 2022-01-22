@@ -536,7 +536,9 @@ def generate_running_count_graph(
     if notifications and max > 1:
         alert = Alert(
             name="{} Running count of containers nearing the max".format(name),
-            message="{} is having Running count of containers nearing the max".format(name),
+            message="{} is having Running count of containers nearing the max".format(
+                name
+            ),
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(
@@ -586,7 +588,9 @@ def generate_desired_count_graph(
     if notifications and max > 1:
         alert = Alert(
             name="{} Desired count of containers nearing the max".format(name),
-            message="{} is having Desired count of containers nearing the max".format(name),
+            message="{} is having Desired count of containers nearing the max".format(
+                name
+            ),
             executionErrorState="alerting",
             alertConditions=[
                 AlertCondition(

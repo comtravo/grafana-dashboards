@@ -41,7 +41,7 @@ NAMESPACE = "AWS/ElastiCache"
 DOCUMENTATION_LINK = {
     "targetBlank": True,
     "title": "Documentation",
-    "url": "https://aws.amazon.com/blogs/database/monitoring-best-practices-with-amazon-elasticache-for-redis-using-amazon-cloudwatch/",
+    "url": "https://aws.amazon.com/blogs/database/monitoring-best-practices-with-amazon-elasticache-for-redis-using-amazon-cloudwatch/",  # noqa: E501
 }
 
 

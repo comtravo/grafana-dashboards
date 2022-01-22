@@ -1,4 +1,3 @@
-import re
 from typing import List
 
 from grafanalib.cloudwatch import CloudwatchMetricsTarget
@@ -152,12 +151,14 @@ def generate_api_gateways_dashboard(
         name, cloudwatch_data_source, notifications
     )
 
-    rows = [Row(title="API Gateway Metrics", showTitle=True, panels=[api_gateway_graph])]
+    rows = [
+        Row(title="API Gateway Metrics", showTitle=True, panels=[api_gateway_graph])
+    ]
 
     if lambdas:
-        for l in lambdas:
+        for lambda_fn in lambdas:
             lambda_metrics_row = Row(
-                title="{} Lambda Metrics".format(l),
+                title="{} Lambda Metrics".format(lambda_fn),
                 showTitle=True,
                 collapse=False,
                 panels=[
@@ -177,7 +178,7 @@ def generate_api_gateways_dashboard(
                 ],
             )
             lambda_logs_row = Row(
-                title="{} Lambda Logs".format(l),
+                title="{} Lambda Logs".format(lambda_fn),
                 showTitle=True,
                 collapse=True,
                 panels=[
