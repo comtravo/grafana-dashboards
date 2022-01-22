@@ -7,7 +7,13 @@
   - [Requirements](#requirements)
   - [Development](#development)
   - [Examples](#examples)
-  - [TODO](#todo)
+    - [AWS API Gateway](#aws-api-gateway)
+    - [AWS ECS Service](#aws-ecs-service)
+    - [AWS Elasticsearch](#aws-elasticsearch)
+    - [AWS Lambda](#aws-lambda)
+    - [AWS RDS Postgres](#aws-rds-postgres)
+    - [AWS Step function](#aws-step-function)
+    - [Terraform modules](#terraform-modules)
 
 ## What are we trying to solve
 
@@ -41,17 +47,36 @@ Useful make targets:
 - `make build` builds the docker images for local development
 - `make test-docker` runs tests for the previously build docker images
 - `make lint` checks currently the code formatting
-- `make fmt` formats your terraform, go and python code
+- `make fix` formats your terraform, go and python code
 - `make test` runs unit and integration tests
 - `make generate-docs` generates the terraform docs
 
 ## Examples
 
-The [examples](./examples) directory showcases various possibilies on using the terraform modules. They are also used as part of the integration tests in this project.
+### AWS API Gateway
 
-## TODO
+![AWS API Gateway](./img/api_gateway.png)
 
- - [ ] Create snapshots of dashboards in the [examples](./examples) directory
- - [ ] Add ECS Cluster metrics
- - [ ] Add ECS Service metrics
- - [ ] Add MongoDB
+### AWS ECS Service
+
+![AWS ECS Service](./img/ecs_service.png)
+
+### AWS Elasticsearch
+
+![AWS Elasticsearch](./img/elasticsearch.png)
+
+### AWS Lambda
+
+![AWS Lambda](./img/lambda.png)
+
+### AWS RDS Postgres
+
+![AWS Lambda](./img/postgres.png)
+
+### AWS Step function
+
+![AWS Lambda](./img/step_function.png)
+
+### Terraform modules
+
+The [examples](./examples) directory showcases various possibilies on using the terraform modules. They are also used as part of the integration tests in this project. Some example dashboards can be found below.
