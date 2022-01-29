@@ -1,9 +1,7 @@
-FROM golang:1.14-buster
+FROM comtravo/terraform:test-workhorse-0.14.11-1.0.0
 
 WORKDIR /opt/ct
 
-COPY --from=hashicorp/terraform:0.13.7 /bin/terraform /bin/
-COPY --from=cytopia/terraform-docs /usr/local/bin/terraform-docs /bin/
 RUN apt-get update && apt-get -y install python3 python3-pip jq && go version && python3 --version && terraform version && terraform-docs version
 
 COPY ./requirements.txt ./Makefile ./

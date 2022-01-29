@@ -79,4 +79,4 @@ Useful make targets:
 
 ### Terraform modules
 
-The [examples](./examples) directory showcases various possibilies on using the terraform modules. They are also used as part of the integration tests in this project. Some example dashboards can be found below.
+The [examples](./examples) directory showcases various possibilies on using the terraform modules. They are also used as part of the integration tests in this project. Some example dashboards can be found above.
