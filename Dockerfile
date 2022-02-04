@@ -1,4 +1,4 @@
-FROM comtravo/terraform:test-workhorse-0.14.11-1.0.0
+FROM comtravo/terraform:test-workhorse-1.1.5-1.0.0
 
 WORKDIR /opt/ct
 
