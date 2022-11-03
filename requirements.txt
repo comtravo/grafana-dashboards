@@ -1,7 +1,7 @@
 black
 coverage
 flake8
-git+https://github.com/weaveworks/grafanalib
+git+https://github.com/weaveworks/grafanalib@releases/tag/v0.6.3
 isort
 pytest
 sure
